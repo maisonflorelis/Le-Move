@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move par Maison Florélis — Ton premier chez-toi, organisé.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;0,600&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+    --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+    --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--warm-white); font-family: 'DM Sans', sans-serif; color: var(--espresso); overflow-x: hidden; }
+
+  /* ── NAV ─────────────────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(253,250,246,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--linen);
+    padding: 0 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 16px; }
+  .nav-move-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 24px; font-weight: 300; color: var(--espresso); letter-spacing: -0.01em; line-height: 1; }
+  .nav-collab-badge { display: flex; align-items: center; gap: 7px; padding: 5px 11px; border: 1px solid var(--linen); border-radius: 20px; background: var(--cream); }
+  .nav-collab-x { font-size: 9px; font-weight: 200; color: var(--sand); letter-spacing: 0.05em; }
+  .nav-mf-mono { height: 18px; width: 18px; object-fit: contain; opacity: 0.75; filter: invert(0); }
+  .nav-collab-text { font-size: 8.5px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+  .nav-mf-credit { font-size: 8.5px; font-weight: 200; letter-spacing: 0.12em; color: var(--sand); font-style: italic; font-family: 'Cormorant Garamond', serif; }
+  .nav-link { font-size: 11px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); cursor: pointer; transition: color 0.2s; text-decoration: none; }
+  .nav-link:hover { color: var(--espresso); }
+  .nav-cta { padding: 10px 24px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; text-decoration: none; }
+  .nav-cta:hover { opacity: 0.82; }
+
+  /* ── HERO ─────────────────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 68px;
+  }
+  .hero-left {
+    background: var(--espresso);
+    padding: 80px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+    right: -200px; bottom: -200px;
+  }
+  /* Le Move brand in hero */
+  .hero-lemove-brand { margin-bottom: 32px; }
+  .hero-lemove-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 36px; font-weight: 300; color: rgba(247,243,238,0.9); letter-spacing: -0.01em; line-height: 1; }
+  .hero-lemove-sub { font-size: 9px; font-weight: 200; letter-spacing: 0.18em; color: rgba(247,243,238,0.3); font-style: italic; margin-top: 4px; font-family: 'Cormorant Garamond', serif; }
+
+  .hero-eyebrow { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(247,243,238,0.4); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--terracotta); }
+
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: 68px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 0.95; margin-bottom: 32px; letter-spacing: -0.02em; }
+  .hero-title span { color: var(--terracotta); }
+
+  .hero-desc { font-size: 14px; font-weight: 200; color: rgba(247,243,238,0.55); line-height: 1.8; margin-bottom: 48px; max-width: 380px; }
+
+  .hero-price-block { margin-bottom: 36px; }
+  .hero-price-label { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 8px; }
+  .hero-price { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; color: var(--cream); line-height: 1; }
+  .hero-price sub { font-size: 22px; color: var(--text-light); font-family: 'DM Sans', sans-serif; font-weight: 200; }
+  .hero-price-note { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.3); margin-top: 6px; font-style: italic; }
+
+  .hero-actions { display: flex; flex-direction: column; gap: 12px; }
+  .btn-primary-hero {
+    padding: 18px 36px; background: var(--terracotta); color: #fff; border: none;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300;
+    letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+    text-align: center; text-decoration: none; display: block;
+  }
+  .btn-primary-hero:hover { background: #b5613d; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(196,113,74,0.3); }
+  .btn-secondary-hero {
+    padding: 16px 36px; background: transparent; color: rgba(247,243,238,0.5);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+    text-align: center; text-decoration: none; display: block;
+  }
+  .btn-secondary-hero:hover { border-color: rgba(255,255,255,0.25); color: var(--cream); }
+
+  .hero-trust { margin-top: 36px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .trust-item { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.3); }
+  .trust-icon { font-size: 12px; }
+
+  /* HERO RIGHT — COLLAGE */
+  .hero-right {
+    background: var(--cream);
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 3px;
+    overflow: hidden;
+  }
+  .collage-cell { overflow: hidden; position: relative; }
+  .collage-1 { grid-row: span 2; background: linear-gradient(160deg, #D4C4B0 0%, #A89278 100%); }
+  .collage-2 { background: linear-gradient(135deg, #E8DDD0, #C9BAA8); }
+  .collage-3 { background: linear-gradient(135deg, #7A8C7E, #4A6050); }
+  .collage-4 { grid-column: span 2; background: var(--espresso); display: flex; align-items: center; justify-content: center; gap: 40px; padding: 28px 40px; }
+  .collage-preview-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--cream); }
+  .collage-modules { display: flex; gap: 10px; flex-wrap: wrap; }
+  .collage-module-tag { font-size: 9px; font-weight: 300; letter-spacing: 0.1em; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.6); }
+  .collage-1::before { content: ''; position: absolute; left: 50%; top: 20%; transform: translateX(-50%); width: 55%; height: 45%; border: 1px solid rgba(44,31,20,0.15); background: rgba(247,243,238,0.3); }
+  .collage-1::after { content: ''; position: absolute; left: 50%; top: 20%; transform: translateX(-50%); width: 1px; height: 45%; background: rgba(44,31,20,0.12); }
+
+  /* ── BANDEAU AGENCES ─────────────────────────────────────────────── */
+  .agency-banner {
+    background: var(--terracotta);
+    padding: 18px 120px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .agency-banner-text { font-size: 12px; font-weight: 300; color: #fff; flex: 1; letter-spacing: 0.02em; }
+  .agency-banner-text strong { font-weight: 400; }
+  .agency-banner-cta { font-size: 9px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.75); cursor: pointer; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 1px; }
+  .agency-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); flex-shrink: 0; }
+
+  /* ── HOW IT WORKS ────────────────────────────────────────────────── */
+  .how-it-works {
+    padding: 100px 120px;
+    background: var(--warm-white);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hiw-label { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .hiw-label::before { content: ''; width: 24px; height: 1px; background: var(--terracotta); }
+  .hiw-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; margin-bottom: 48px; }
+  .hiw-steps { display: flex; flex-direction: column; gap: 0; }
+  .hiw-step { display: flex; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--linen); }
+  .hiw-step:last-child { border-bottom: none; }
+  .hiw-step-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; color: var(--linen); line-height: 1; min-width: 36px; flex-shrink: 0; }
+  .hiw-step-content {}
+  .hiw-step-title { font-size: 14px; font-weight: 300; color: var(--espresso); margin-bottom: 4px; }
+  .hiw-step-desc { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.7; font-style: italic; }
+  .hiw-right { display: flex; flex-direction: column; gap: 14px; }
+  .hiw-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 16px; padding: 28px 32px; }
+  .hiw-card.dark { background: var(--espresso); border-color: var(--espresso); }
+  .hiw-card-icon { font-size: 24px; margin-bottom: 12px; }
+  .hiw-card-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 6px; }
+  .hiw-card.dark .hiw-card-title { color: var(--cream); }
+  .hiw-card-desc { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.65; }
+  .hiw-card.dark .hiw-card-desc { color: rgba(247,243,238,0.45); }
+
+  /* ── POUR QUI ─────────────────────────────────────────────────────── */
+  .for-who { padding: 100px 120px; background: var(--warm-white); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .fw-label { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .fw-label::before { content: ''; width: 24px; height: 1px; background: var(--terracotta); }
+  .fw-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; margin-bottom: 24px; }
+  .fw-text { font-size: 14px; font-weight: 200; color: var(--text-light); line-height: 1.9; margin-bottom: 36px; }
+  .fw-personas { display: flex; flex-direction: column; gap: 14px; }
+  .persona-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; padding: 22px; display: flex; gap: 16px; align-items: flex-start; }
+  .persona-emoji { font-size: 26px; flex-shrink: 0; }
+  .persona-title { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 3px; }
+  .persona-desc { font-size: 11.5px; font-weight: 200; color: var(--text-light); line-height: 1.6; font-style: italic; }
+  .fw-right { display: flex; flex-direction: column; gap: 0; }
+  .fw-stat-row { padding: 28px 0; border-bottom: 1px solid var(--linen); display: flex; align-items: center; gap: 24px; }
+  .fw-stat-row:first-child { padding-top: 0; }
+  .fw-stat-row:last-child { border-bottom: none; }
+  .fw-stat-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: var(--espresso); line-height: 1; min-width: 80px; }
+  .fw-stat-num span { font-size: 24px; color: var(--terracotta); }
+  .fw-stat-text { font-size: 13px; font-weight: 200; color: var(--text-light); line-height: 1.6; }
+
+  /* ── FEATURES ─────────────────────────────────────────────────────── */
+  .features { background: var(--espresso); padding: 100px 120px; position: relative; overflow: hidden; }
+  .features::before { content: 'Le Move'; position: absolute; right: -40px; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 200px; font-weight: 300; color: rgba(255,255,255,0.03); white-space: nowrap; pointer-events: none; line-height: 1; }
+  .features-header { text-align: center; margin-bottom: 72px; }
+  .features-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-bottom: 20px; }
+  .features-title { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .feature-card { background: rgba(255,255,255,0.04); padding: 36px 32px; transition: background 0.2s; cursor: pointer; border-radius: 2px; }
+  .feature-card:hover { background: rgba(255,255,255,0.07); }
+  .feature-card.featured { background: var(--terracotta); }
+  .feature-card.featured:hover { background: #b5613d; }
+  .feature-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: rgba(255,255,255,0.08); line-height: 1; margin-bottom: 18px; }
+  .feature-card.featured .feature-num { color: rgba(255,255,255,0.25); }
+  .feature-icon { font-size: 26px; margin-bottom: 14px; }
+  .feature-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 9px; }
+  .feature-desc { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.45); line-height: 1.7; }
+  .feature-card.featured .feature-desc { color: rgba(255,255,255,0.72); }
+  .feature-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .ftag { font-size: 7.5px; font-weight: 300; letter-spacing: 0.1em; padding: 3px 9px; border-radius: 10px; background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.5); }
+  .feature-card.featured .ftag { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
+
+  /* ── PREVIEW ──────────────────────────────────────────────────────── */
+  .preview-section { padding: 100px 120px; background: var(--cream); }
+  .preview-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; }
+  .preview-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; }
+  .preview-sub { font-size: 12px; font-weight: 200; color: var(--text-light); max-width: 260px; text-align: right; line-height: 1.7; font-style: italic; }
+  .preview-grid { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: auto auto; gap: 14px; }
+  .preview-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--linen); background: var(--warm-white); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
+  .preview-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(44,31,20,0.1); }
+  .preview-card.tall { grid-row: span 2; }
+  .preview-thumb { height: 200px; position: relative; overflow: hidden; }
+  .preview-thumb.tall-thumb { height: 100%; min-height: 460px; }
+  .mock-dashboard { width: 100%; height: 100%; background: var(--warm-black); padding: 20px; display: flex; gap: 10px; }
+  .mock-sidebar { width: 55px; background: rgba(255,255,255,0.05); border-radius: 6px; }
+  .mock-content { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .mock-header { height: 56px; background: rgba(255,255,255,0.04); border-radius: 6px; }
+  .mock-row { height: 28px; background: rgba(255,255,255,0.04); border-radius: 4px; }
+  .mock-row.short { width: 60%; }
+  .mock-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; flex: 1; }
+  .mock-cell { background: rgba(255,255,255,0.04); border-radius: 6px; }
+  .mock-cell.accent { background: rgba(196,113,74,0.3); }
+  .mock-budget { width: 100%; height: 100%; background: var(--warm-black); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .mock-bar-row { display: flex; align-items: center; gap: 8px; }
+  .mock-bar-label { width: 55px; height: 7px; background: rgba(255,255,255,0.08); border-radius: 4px; flex-shrink: 0; }
+  .mock-bar-track { flex: 1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .mock-bar-fill { height: 100%; border-radius: 4px; }
+  .mock-mood { width: 100%; height: 100%; display: grid; grid-template-columns: 1.5fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 3px; }
+  .mood-m1 { grid-row: span 2; background: linear-gradient(135deg, #D4C4B0, #A89278); }
+  .mood-m2 { background: linear-gradient(135deg, #E8DDD0, #C9BAA8); }
+  .mood-m3 { background: linear-gradient(135deg, #7A8C7E, #4A6050); }
+  .mood-m4 { background: linear-gradient(135deg, #C4714A, #A8522E); }
+  .mood-m5 { background: linear-gradient(135deg, #2C1F14, #4A3728); }
+  .preview-info { padding: 18px 22px; }
+  .preview-page-name { font-size: 8px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 5px; }
+  .preview-page-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-style: italic; font-weight: 300; color: var(--espresso); }
+
+  /* ── TESTIMONIALS ─────────────────────────────────────────────────── */
+  .testimonials { padding: 100px 120px; background: var(--warm-white); }
+  .test-header { text-align: center; margin-bottom: 64px; }
+  .test-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .test-title { font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 300; font-style: italic; color: var(--espresso); }
+  .test-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .test-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s; }
+  .test-card:hover { transform: translateY(-3px); }
+  .test-card.featured { background: var(--espresso); border-color: var(--espresso); }
+  .test-stars { display: flex; gap: 3px; }
+  .star { color: var(--gold); font-size: 13px; }
+  .test-quote { font-size: 13px; font-weight: 200; color: var(--espresso); line-height: 1.8; font-style: italic; flex: 1; }
+  .test-card.featured .test-quote { color: rgba(247,243,238,0.7); }
+  .test-author { display: flex; align-items: center; gap: 12px; }
+  .test-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .test-card.featured .test-avatar { background: rgba(255,255,255,0.1); }
+  .test-name { font-size: 12px; font-weight: 300; color: var(--espresso); }
+  .test-card.featured .test-name { color: var(--cream); }
+  .test-role { font-size: 10px; font-weight: 200; color: var(--text-light); }
+  .test-card.featured .test-role { color: rgba(247,243,238,0.4); }
+
+  /* ── WHAT'S INSIDE ────────────────────────────────────────────────── */
+  .whats-inside { padding: 100px 120px; background: var(--linen); }
+  .wi-header { margin-bottom: 56px; }
+  .wi-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .wi-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); }
+  .wi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+  .wi-item { background: var(--cream); padding: 34px 38px; display: flex; gap: 22px; align-items: flex-start; transition: background 0.2s; cursor: pointer; }
+  .wi-item:hover { background: var(--warm-white); }
+  .wi-number { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--linen); line-height: 1; min-width: 38px; flex-shrink: 0; }
+  .wi-name { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 7px; }
+  .wi-desc { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.7; margin-bottom: 11px; }
+  .wi-features { display: flex; flex-direction: column; gap: 4px; }
+  .wi-feat { font-size: 11px; font-weight: 200; color: var(--text-light); display: flex; gap: 8px; align-items: flex-start; }
+  .wi-feat::before { content: '—'; color: var(--terracotta); flex-shrink: 0; }
+
+  /* ── PRICING ──────────────────────────────────────────────────────── */
+  .pricing { padding: 100px 120px; background: var(--warm-white); }
+  .pricing-header { text-align: center; margin-bottom: 64px; }
+  .pricing-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .pricing-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; }
+  .pricing-sub { font-size: 13px; font-weight: 200; color: var(--text-light); margin-top: 12px; font-style: italic; }
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 18px; align-items: start; max-width: 900px; margin: 0 auto; }
+  .pricing-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 20px; padding: 38px 34px; }
+  .pricing-card.featured { background: var(--espresso); border-color: var(--espresso); position: relative; }
+  .pricing-card.featured::before { content: 'Le plus populaire'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--terracotta); color: #fff; font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; white-space: nowrap; }
+  .pricing-plan { font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .pricing-card.featured .pricing-plan { color: rgba(247,243,238,0.4); }
+  .pricing-price { font-family: 'Cormorant Garamond', serif; font-size: 50px; font-weight: 300; color: var(--espresso); line-height: 1; margin-bottom: 4px; }
+  .pricing-card.featured .pricing-price { color: var(--cream); }
+  .pricing-price sup { font-size: 22px; }
+  .pricing-price-note { font-size: 10px; font-weight: 200; color: var(--text-light); margin-bottom: 26px; font-style: italic; }
+  .pricing-card.featured .pricing-price-note { color: rgba(247,243,238,0.35); }
+  .pricing-divider { height: 1px; background: var(--linen); margin-bottom: 22px; }
+  .pricing-card.featured .pricing-divider { background: rgba(255,255,255,0.1); }
+  .pricing-features-list { display: flex; flex-direction: column; gap: 11px; margin-bottom: 30px; }
+  .pricing-feat { display: flex; gap: 10px; font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .pricing-card.featured .pricing-feat { color: rgba(247,243,238,0.55); }
+  .feat-check { color: var(--sage); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+  .pricing-card.featured .feat-check { color: var(--terracotta); }
+  .feat-x { color: var(--sand); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+  .pricing-btn { width: 100%; padding: 13px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
+  .pricing-btn-outline { background: transparent; border: 1px solid var(--linen); color: var(--text-light); }
+  .pricing-btn-outline:hover { border-color: var(--espresso); color: var(--espresso); }
+  .pricing-btn-filled { background: var(--terracotta); color: #fff; }
+  .pricing-btn-filled:hover { background: #b5613d; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(196,113,74,0.25); }
+  .pricing-btn-dark { background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.6); }
+  .pricing-btn-dark:hover { background: rgba(255,255,255,0.14); color: var(--cream); }
+
+  /* ── FAQ ─────────────────────────────────────────────────────────── */
+  .faq { padding: 100px 120px; background: var(--cream); }
+  .faq-header { margin-bottom: 56px; }
+  .faq-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .faq-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 80px; }
+  .faq-item { padding: 26px 0; border-bottom: 1px solid var(--linen); }
+  .faq-q { font-size: 14px; font-weight: 300; color: var(--espresso); margin-bottom: 9px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .faq-arrow { font-size: 16px; color: var(--terracotta); flex-shrink: 0; }
+  .faq-a { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.8; font-style: italic; }
+
+  /* ── FINAL CTA ───────────────────────────────────────────────────── */
+  .final-cta { padding: 100px 120px; background: var(--espresso); text-align: center; position: relative; overflow: hidden; }
+  .final-cta::before { content: ''; position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); left: -200px; top: -200px; }
+  .final-cta::after { content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); right: -100px; bottom: -100px; }
+  .final-cta-inner { position: relative; z-index: 1; }
+  /* Logo MF dans le footer CTA */
+  .cta-mf-logo { width: 120px; height: auto; opacity: 0.2; margin: 0 auto 36px; display: block; }
+  .cta-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-bottom: 24px; }
+  .cta-title { font-family: 'Cormorant Garamond', serif; font-size: 60px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 20px; }
+  .cta-sub { font-size: 14px; font-weight: 200; color: rgba(247,243,238,0.45); margin-bottom: 48px; font-style: italic; }
+  .cta-actions { display: flex; gap: 16px; justify-content: center; }
+  .cta-btn-main { padding: 18px 48px; background: var(--terracotta); color: #fff; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .cta-btn-main:hover { background: #b5613d; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(196,113,74,0.3); }
+  .cta-btn-ghost { padding: 18px 34px; background: transparent; color: rgba(247,243,238,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .cta-btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--cream); }
+  .cta-note { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.22); margin-top: 20px; font-style: italic; }
+
+  /* ── FOOTER ──────────────────────────────────────────────────────── */
+  .footer-move-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; font-weight: 300; color: rgba(247,243,238,0.7); }
+  .footer-collab-badge { display: flex; align-items: center; gap: 7px; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; }
+  .footer-collab-x { font-size: 9px; color: rgba(247,243,238,0.25); }
+  .footer-mf-mono { height: 16px; width: 16px; object-fit: contain; opacity: 0.35; filter: invert(1); }
+  .footer-collab-text { font-size: 8px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247,243,238,0.3); }
+  footer { background: var(--warm-black); padding: 36px 120px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .footer-brand { display: flex; align-items: center; gap: 14px; }
+  .footer-copy { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.2); letter-spacing: 0.05em; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-link { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.3); letter-spacing: 0.08em; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .footer-link:hover { color: var(--cream); }
+
+  /* ── ANIMATIONS ──────────────────────────────────────────────────── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-left > * { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+  .hero-lemove-brand { animation-delay: 0s; }
+  .hero-eyebrow { animation-delay: 0.1s; }
+  .hero-title { animation-delay: 0.2s; }
+  .hero-desc { animation-delay: 0.3s; }
+  .hero-price-block { animation-delay: 0.4s; }
+  .hero-actions { animation-delay: 0.5s; }
+  .hero-trust { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-move-title">Le Move</div>
+    <div class="nav-mf-credit">par Maison Florélis</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="#features">Fonctionnalités</a>
+    <a class="nav-link" href="#preview">Aperçu</a>
+    <a class="nav-link" href="#pricing">Tarifs</a>
+    <a class="nav-link" href="#faq">FAQ</a>
+  </div>
+  <a class="nav-cta" href="#pricing">Créer mon espace →</a>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-left">
+    <!-- Le Move title in hero -->
+    <div class="hero-lemove-brand">
+      <div class="hero-lemove-title">Le Move</div>
+      <div class="hero-lemove-sub">par Maison Florélis</div>
+    </div>
+    <div class="hero-eyebrow">Application web · Accès personnel sécurisé</div>
+    <div class="hero-title">Ton premier<br>chez-<span>toi</span>,<br>organisé.</div>
+    <div class="hero-desc">Le Move par Maison Florélis — l'espace digital qui pense à tout. Budget, déménagement, moodboard, livraisons. Pour vivre ce moment avec sérénité plutôt qu'avec stress.</div>
+    <div class="hero-price-block">
+      <div class="hero-price-label">Accès à vie · Paiement unique</div>
+      <div class="hero-price"><sub>€</sub>39</div>
+      <div class="hero-price-note">Accès instantané. Compte personnel sécurisé. Aucun abonnement.</div>
+    </div>
+    <div class="hero-actions">
+      <a class="btn-primary-hero" href="#pricing">Créer mon espace Le Move</a>
+      <a class="btn-secondary-hero" href="#preview">Voir l'aperçu complet</a>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-item"><span class="trust-icon">🔐</span> Compte personnel sécurisé</div>
+      <div class="trust-item"><span class="trust-icon">📱</span> Web & mobile</div>
+      <div class="trust-item"><span class="trust-icon">🔄</span> Mises à jour incluses</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="collage-cell collage-1"></div>
+    <div class="collage-cell collage-2"></div>
+    <div class="collage-cell collage-3"></div>
+    <div class="collage-cell collage-4">
+      <div class="collage-preview-text">6 modules intégrés</div>
+      <div class="collage-modules">
+        <div class="collage-module-tag">Dashboard</div>
+        <div class="collage-module-tag">Budget</div>
+        <div class="collage-module-tag">Moodboard</div>
+        <div class="collage-module-tag">Livraisons</div>
+        <div class="collage-module-tag">Avancement</div>
+        <div class="collage-module-tag">Déménagement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BANDEAU AGENCES ──────────────────────────────────────────────── -->
+<div class="agency-banner">
+  <div class="agency-dot"></div>
+  <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos nouveaux locataires comme cadeau de bienvenue. Tarifs partenaires disponibles à partir de 50 licences.</div>
+  <div class="agency-banner-cta">Nous contacter →</div>
+</div>
+
+<!-- ── COMMENT ÇA MARCHE ────────────────────────────────────────────── -->
+<section class="how-it-works">
+  <div>
+    <div class="hiw-label">Simple comme bonjour</div>
+    <div class="hiw-title">Ton espace prêt<br>en 3 minutes.</div>
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-step-num">1</div>
+        <div class="hiw-step-content">
+          <div class="hiw-step-title">Tu choisis ton accès</div>
+          <div class="hiw-step-desc">Paiement sécurisé en ligne. Une seule fois, c'est tout.</div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step-num">2</div>
+        <div class="hiw-step-content">
+          <div class="hiw-step-title">Ton compte est créé instantanément</div>
+          <div class="hiw-step-desc">Tu reçois un email avec tes identifiants. Tu te connectes, et c'est déjà là.</div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step-num">3</div>
+        <div class="hiw-step-content">
+          <div class="hiw-step-title">Tu personnalises, tu vis</div>
+          <div class="hiw-step-desc">Ton prénom, ta date de déménagement, ton budget. Le Move s'adapte à toi en quelques secondes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hiw-right">
+    <div class="hiw-card">
+      <div class="hiw-card-icon">💻</div>
+      <div class="hiw-card-title">Accessible partout</div>
+      <div class="hiw-card-desc">Sur ton ordinateur, ton téléphone, ta tablette. Ton espace Le Move t'accompagne partout, sans rien à installer.</div>
+    </div>
+    <div class="hiw-card dark">
+      <div class="hiw-card-icon">🔐</div>
+      <div class="hiw-card-title">Ton espace, rien qu'à toi</div>
+      <div class="hiw-card-desc">Connexion sécurisée. Tes données sont privées, sauvegardées, et ne sont jamais partagées.</div>
+    </div>
+    <div class="hiw-card">
+      <div class="hiw-card-icon">✨</div>
+      <div class="hiw-card-title">Toujours à jour</div>
+      <div class="hiw-card-desc">Chaque nouvelle fonctionnalité est disponible automatiquement dans ton espace. Sans rien faire.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── POUR QUI ────────────────────────────────────────────────────── -->
+<section class="for-who">
+  <div>
+    <div class="fw-label">Pour qui ?</div>
+    <div class="fw-title">Fait pour toi, si tu t'installes pour la première fois.</div>
+    <div class="fw-text">Que tu signes ton bail dans deux semaines ou que tu sois en plein milieu du chaos, Le Move est conçu pour transformer l'un des moments les plus stressants de ta vie en quelque chose d'organisé, de beau — et même d'excitant.</div>
+    <div class="fw-personas">
+      <div class="persona-card">
+        <div class="persona-emoji">🎓</div>
+        <div>
+          <div class="persona-title">L'étudiante qui prend son premier appart</div>
+          <div class="persona-desc">"J'avais 3 500 € de budget, zéro idée par où commencer et une mère qui m'envoyait des liens IKEA toutes les heures."</div>
+        </div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-emoji">💼</div>
+        <div>
+          <div class="persona-title">Le jeune actif qui s'installe enfin seul</div>
+          <div class="persona-desc">"J'ai un CDI, j'ai trouvé l'appart. Il me fallait juste un système pour ne rien oublier sans y passer mes soirées."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fw-right">
+    <div class="fw-stat-row">
+      <div class="fw-stat-num">6<span>+</span></div>
+      <div class="fw-stat-text">modules pensés ensemble pour couvrir chaque aspect de ton emménagement — du premier carton à la première soirée.</div>
+    </div>
+    <div class="fw-stat-row">
+      <div class="fw-stat-num">40<span>+</span></div>
+      <div class="fw-stat-text">conseils pratiques intégrés directement dans l'app — juridiques, budgétaires, logistiques.</div>
+    </div>
+    <div class="fw-stat-row">
+      <div class="fw-stat-num">0</div>
+      <div class="fw-stat-text">installation requise. Tu crées ton compte, tu te connectes, tu organises. C'est tout.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ────────────────────────────────────────────────────── -->
+<section class="features" id="features">
+  <div class="features-header">
+    <div class="features-label">Ce que tu obtiens</div>
+    <div class="features-title">Tout ce dont tu as besoin,<br>au même endroit.</div>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">🏠</div>
+      <div class="feature-title">Dashboard central</div>
+      <div class="feature-desc">Vue d'ensemble de ton projet en un coup d'œil. Progression globale, livraisons du jour, tâches urgentes, compte à rebours.</div>
+      <div class="feature-tags"><span class="ftag">Vue globale</span><span class="ftag">Temps réel</span></div>
+    </div>
+    <div class="feature-card featured">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">💰</div>
+      <div class="feature-title">Budget mobilier & déco</div>
+      <div class="feature-desc">Catégories pré-remplies, jauges visuelles, alertes de dépassement. Ton budget au centime près, sans effort.</div>
+      <div class="feature-tags"><span class="ftag">6 catégories</span><span class="ftag">Alertes</span><span class="ftag">Par pièce</span></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">🎨</div>
+      <div class="feature-title">Moodboard & inspirations</div>
+      <div class="feature-desc">Galerie par pièce, palette de couleurs, notes de style, inspirations sauvegardées. Ton intérieur commence ici.</div>
+      <div class="feature-tags"><span class="ftag">Par pièce</span><span class="ftag">Palette</span><span class="ftag">Notes</span></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">04</div>
+      <div class="feature-icon">📦</div>
+      <div class="feature-title">Suivi achats & livraisons</div>
+      <div class="feature-desc">Timeline de livraisons, alertes du jour, suivi par boutique, mini-tracker de statut pour chaque colis.</div>
+      <div class="feature-tags"><span class="ftag">Tracking</span><span class="ftag">Par boutique</span><span class="ftag">Alertes</span></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">05</div>
+      <div class="feature-icon">🚚</div>
+      <div class="feature-title">Organisation déménagement</div>
+      <div class="feature-desc">Checklist chronologique J-30 à J+7, contacts utiles, compte à rebours jusqu'au Jour J, journal du projet.</div>
+      <div class="feature-tags"><span class="ftag">5 phases</span><span class="ftag">Contacts</span><span class="ftag">Journal</span></div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">06</div>
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Avancement global</div>
+      <div class="feature-desc">Kanban visuel, score de progression, avancement par module, milestones et journal personnel du projet.</div>
+      <div class="feature-tags"><span class="ftag">Kanban</span><span class="ftag">Score</span><span class="ftag">Milestones</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PREVIEW ─────────────────────────────────────────────────────── -->
+<section class="preview-section" id="preview">
+  <div class="preview-header">
+    <div class="preview-title">Beau par design.<br>Puissant par nature.</div>
+    <div class="preview-sub">"Une app dans laquelle on a envie de s'installer avant même d'avoir signé son bail."</div>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-card tall">
+      <div class="preview-thumb tall-thumb">
+        <div class="mock-dashboard">
+          <div class="mock-sidebar"></div>
+          <div class="mock-content">
+            <div class="mock-header"></div>
+            <div class="mock-row"></div>
+            <div class="mock-row short"></div>
+            <div class="mock-grid">
+              <div class="mock-cell accent"></div>
+              <div class="mock-cell"></div>
+              <div class="mock-cell"></div>
+              <div class="mock-cell"></div>
+              <div class="mock-cell"></div>
+              <div class="mock-cell"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-info">
+        <div class="preview-page-name">Page 01</div>
+        <div class="preview-page-title">Dashboard — Vue d'ensemble</div>
+      </div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-thumb">
+        <div class="mock-budget">
+          <div class="mock-row" style="width:40%;height:14px;background:rgba(255,255,255,0.06)"></div>
+          <div style="height:14px"></div>
+          <div class="mock-bar-row"><div class="mock-bar-label"></div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:80%;background:rgba(247,243,238,0.3)"></div></div></div>
+          <div class="mock-bar-row"><div class="mock-bar-label"></div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:100%;background:#C4714A"></div></div></div>
+          <div class="mock-bar-row"><div class="mock-bar-label"></div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:56%;background:#7A8C7E"></div></div></div>
+          <div class="mock-bar-row"><div class="mock-bar-label"></div><div class="mock-bar-track"><div class="mock-bar-fill" style="width:95%;background:#B89A6A"></div></div></div>
+        </div>
+      </div>
+      <div class="preview-info">
+        <div class="preview-page-name">Page 02</div>
+        <div class="preview-page-title">Mon Budget</div>
+      </div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-thumb">
+        <div class="mock-mood">
+          <div class="mood-m1"></div>
+          <div class="mood-m2"></div>
+          <div class="mood-m3"></div>
+          <div class="mood-m4"></div>
+          <div class="mood-m5"></div>
+        </div>
+      </div>
+      <div class="preview-info">
+        <div class="preview-page-name">Page 03</div>
+        <div class="preview-page-title">Mon Moodboard</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ────────────────────────────────────────────────── -->
+<section class="testimonials">
+  <div class="test-header">
+    <div class="test-label">Ce qu'elles en disent</div>
+    <div class="test-title">Des emménagements<br>qui ont changé.</div>
+  </div>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"J'avais peur de me perdre dans tous les détails du déménagement. Le Move m'a donné une clarté que je n'avais jamais eue. Le dashboard m'a sauvée au moins 10 fois."</div>
+      <div class="test-author"><div class="test-avatar">👩</div><div><div class="test-name">Camille R.</div><div class="test-role">Étudiante en master, Paris 11e</div></div></div>
+    </div>
+    <div class="test-card featured">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"La section budget avec les alertes de dépassement m'a sauvé 400€. J'allais commander une cuisine qui ne rentrait pas dans mon enveloppe. Le Move me l'a signalé avant que je valide."</div>
+      <div class="test-author"><div class="test-avatar">👩‍💼</div><div><div class="test-name">Léa M.</div><div class="test-role">Chargée de projet, Lyon</div></div></div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-quote">"Le journal du projet m'a fait pleurer. Cette petite entrée 'Première nuit dans l'appartement' que tu remplis toi-même... ça rend le moment vraiment spécial. Je le relirai dans 10 ans."</div>
+      <div class="test-author"><div class="test-avatar">🧑</div><div><div class="test-name">Thomas B.</div><div class="test-role">Développeur freelance, Bordeaux</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT'S INSIDE ───────────────────────────────────────────────── -->
+<section class="whats-inside" id="inside">
+  <div class="wi-header">
+    <div class="wi-label">Le contenu complet</div>
+    <div class="wi-title">6 modules.<br>1 système.</div>
+  </div>
+  <div class="wi-grid">
+    <div class="wi-item"><div class="wi-number">01</div><div class="wi-content"><div class="wi-name">Dashboard Central</div><div class="wi-desc">Le point de départ. Tout ce dont tu as besoin au quotidien, en un coup d'œil.</div><div class="wi-features"><div class="wi-feat">Progression globale en pourcentage</div><div class="wi-feat">Livraisons du jour avec alerte visuelle</div><div class="wi-feat">Accès rapide aux modules prioritaires</div><div class="wi-feat">Compte à rebours jusqu'au Jour J</div></div></div></div>
+    <div class="wi-item"><div class="wi-number">02</div><div class="wi-content"><div class="wi-name">Mon Budget</div><div class="wi-desc">Ton budget déco et mobilier organisé par catégorie avec alertes automatiques.</div><div class="wi-features"><div class="wi-feat">6 catégories pré-remplies</div><div class="wi-feat">Jauges visuelles par catégorie</div><div class="wi-feat">Tableau détail des achats</div><div class="wi-feat">Conseils budget intégrés</div></div></div></div>
+    <div class="wi-item"><div class="wi-number">03</div><div class="wi-content"><div class="wi-name">Mon Moodboard</div><div class="wi-desc">Construis l'univers visuel de ton appartement pièce par pièce.</div><div class="wi-features"><div class="wi-feat">Galerie organisée par pièce</div><div class="wi-feat">Palette de couleurs avec codes hex</div><div class="wi-feat">Inspirations sauvegardées</div><div class="wi-feat">Notes "Ce que j'aime / j'évite"</div></div></div></div>
+    <div class="wi-item"><div class="wi-number">04</div><div class="wi-content"><div class="wi-name">Mes Achats & Livraisons</div><div class="wi-desc">Ne rate plus aucune livraison. Suis chaque colis de la commande à la réception.</div><div class="wi-features"><div class="wi-feat">Alerte pour les livraisons du jour</div><div class="wi-feat">Mini-tracker de statut par article</div><div class="wi-feat">Vue synthétique par boutique</div><div class="wi-feat">Conseils livraison et astuces économies</div></div></div></div>
+    <div class="wi-item"><div class="wi-number">05</div><div class="wi-content"><div class="wi-name">Mon Déménagement</div><div class="wi-desc">De la signature du bail à la première soirée. Chaque étape anticipée.</div><div class="wi-features"><div class="wi-feat">Compte à rebours jusqu'au Jour J</div><div class="wi-feat">5 phases avec checklists J-30 à J+7</div><div class="wi-feat">Contacts utiles centralisés</div><div class="wi-feat">Journal personnel du projet</div></div></div></div>
+    <div class="wi-item"><div class="wi-number">06</div><div class="wi-content"><div class="wi-name">Mon Avancement</div><div class="wi-desc">La page qui rend addictif de cocher des cases. Ton projet visualisé.</div><div class="wi-features"><div class="wi-feat">Score global avec cercle de progression</div><div class="wi-feat">Kanban À faire / En cours / Terminé</div><div class="wi-feat">Avancement par module</div><div class="wi-feat">Milestones et journal du projet</div></div></div></div>
+  </div>
+</section>
+
+<!-- ── PRICING ─────────────────────────────────────────────────────── -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header">
+    <div class="pricing-label">Tarifs</div>
+    <div class="pricing-title">Simple.<br>Une fois. Pour toujours.</div>
+    <div class="pricing-sub">Pas d'abonnement. Pas de surprises. Accès à vie avec toutes les mises à jour futures.</div>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-plan">Essentiel</div>
+      <div class="pricing-price"><sup>€</sup>22</div>
+      <div class="pricing-price-note">Accès à vie</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-features-list">
+        <div class="pricing-feat"><span class="feat-check">✓</span>Dashboard central</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mon Budget</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mon Déménagement</div>
+        <div class="pricing-feat"><span class="feat-x">✕</span>Moodboard & Inspirations</div>
+        <div class="pricing-feat"><span class="feat-x">✕</span>Suivi achats & livraisons</div>
+        <div class="pricing-feat"><span class="feat-x">✕</span>Avancement Kanban</div>
+      </div>
+      <button class="pricing-btn pricing-btn-outline">Choisir Essentiel</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-plan">Complet</div>
+      <div class="pricing-price"><sup>€</sup>39</div>
+      <div class="pricing-price-note">Accès à vie · Recommandé</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-features-list">
+        <div class="pricing-feat"><span class="feat-check">✓</span>Les 6 modules complets</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Moodboard & Inspirations</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Suivi achats & livraisons</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>40+ conseils intégrés</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Compte personnel sécurisé</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
+      </div>
+      <button class="pricing-btn pricing-btn-dark">Créer mon espace — 39€</button>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-plan">Agences Immobilières</div>
+      <div class="pricing-price"><sup>€</sup>56</div>
+      <div class="pricing-price-note">Accès à vie · Premium</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-features-list">
+        <div class="pricing-feat"><span class="feat-check">✓</span>Les 6 modules + Moodboard avancé</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Branding personnalisable</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Tableau de bord agence</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Facturation centralisée</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Support dédié</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Volume sur devis</div>
+      </div>
+      <button class="pricing-btn pricing-btn-outline">Demander un devis</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ────────────────────────────────────────────────────────── -->
+<section class="faq" id="faq">
+  <div class="faq-header">
+    <div class="faq-label">Questions fréquentes</div>
+    <div class="faq-title">Tout ce que<br>tu te demandes.</div>
+  </div>
+  <div class="faq-grid">
+    <div class="faq-item">
+      <div class="faq-q">Il faut installer quelque chose ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Non. Le Move est une application web — tu y accèdes directement depuis ton navigateur, sur ordinateur ou mobile. Rien à installer.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Comment je reçois mon accès ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Immédiatement après le paiement, tu reçois un email avec tes identifiants. Tu te connectes et ton espace est déjà prêt.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Mes données sont-elles sauvegardées ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Oui. Toutes tes données sont sauvegardées automatiquement et accessibles depuis n'importe quel appareil dès que tu te connectes.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Et si j'ai des questions après l'achat ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Tu peux nous contacter par email. Nous répondons sous 24h. Les agences partenaires bénéficient d'un support prioritaire.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">C'est quoi le partenariat agences immobilières ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Les agences peuvent offrir Le Move comme cadeau de bienvenue à leurs nouveaux locataires. Tarifs dégressifs à partir de 50 licences, avec possibilité de personnalisation aux couleurs de l'agence.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Est-ce qu'il y a une politique de remboursement ? <span class="faq-arrow">→</span></div>
+      <div class="faq-a">Oui — si Le Move ne correspond pas à tes attentes dans les 7 jours suivant l'achat, nous te remboursons intégralement. Sans question.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ───────────────────────────────────────────────────── -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <!-- Logo MF blanc centré -->
+    <svg class="cta-mf-logo" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#FFFFFF" d="M715.2,210.8l-59.6,210.7c-27.1,112-103,103-103,103s-59.4,1.1-72.3-75.2C464.7,356.6,608.8,247,608.8,247l27.3-28.5l-4.9,16.6l-32.5,115.9l-22.9,78c-3.3,20.5-20.8,23.5-20.8,23.5l-6.3,0.6l0.3,3.6h66.8l0.6-3.3l-4.2-0.6c-7.8-0.6-10.5-7.5-10.5-7.5c-1.2-6.6,1.5-17.8,1.5-17.8l4.8-17.8l27.7-100l27.1-97.5c3.9-17.8,10.5-32.5,10.5-32.5c6.3-15.7,19-15.7,19-15.7l4.8,0.3v-5.1l-67.4,0.9l0.3,3.3l3,0.3c13.2,0,10.5,7.8,10.5,7.8v7.2c-0.4,3.1-1.1,6.1-2,8.9c-7.9,20.1-37.8,47.6-37.8,47.6c-31.4,22.4-55.9,44.2-75.2,64.9l-51.8-124.5c6.7-11.6,17-11.6,17-11.6l4.8,0.3v-5.1l-46.9,0.6h-7.2v0.1l-13.4,0.2l0.3,3.3l3,0.3c13.2,0,10.5,7.8,10.5,7.8v7.2c0,12.2-4.5,29.5-4.5,29.5l-7.8,26.8l-32.5,115.9l-22.9,78c-3.3,20.5-20.8,23.5-20.8,23.5l-6.3,0.6l0.3,3.6h66.8l0.6-3.3l-4.2-0.6c-7.8-0.6-10.5-7.5-10.5-7.5c-1.2-6.6,1.5-17.8,1.5-17.8l4.8-17.8l27.7-100l27.1-97.5c1.4-6.4,3.1-12.3,4.8-17.4l18.9,46.9l29.7,70.6c-67.7,79.6-57.1,139.3-57.1,139.3c8,87.5,89.9,91.1,89.9,91.1c108.4,1.2,133.7-125.8,133.7-125.8l31.6-120.4l2.1-8l55-0.4c0,0,7.5,1.5,7.5-3.7s-4.8-5-4.8-5h-54.6l24.1-74.7c26.5-72.3,74.6-62.6,74.6-62.6v-10.9C736.9,129.5,715.2,210.8,715.2,210.8z"/>
+      <g fill="#FFFFFF"><path d="M339.9,617.5l22.7-29.3v63.3h-8.7v-37.7l-14,18l-14-18v37.7h-8.7v-63.3L339.9,617.5z"/><path d="M554,589.1h8.7v62.3H554v-26.1l-11.4-13.5v39.6h-8.7v-63.4l20.1,23.8V589.1z"/><path d="M600.1,609.5h10.6v7.5h-10.6v34.5h-8.7v-62.3h23.7v8.7h-15V609.5z"/><path d="M631.3,642.7H644v8.7h-21.5v-62.3h8.7V642.7z"/><path d="M749.6,589.1h23.6v8.7h-14.9v11.7h10.5v7.5h-10.5v25.7h14.9v8.7h-23.6V589.1z"/><path d="M789.5,642.7h12.8v8.7h-21.5v-62.3h8.7V642.7z"/><path d="M809.7,589.1h8.7v62.3h-8.7V589.1z"/></g>
+    </svg>
+    <div class="cta-label">par Maison Florélis · Prête à commencer ?</div>
+    <div class="cta-title">Ton premier chez-toi<br>mérite d'être bien organisé.</div>
+    <div class="cta-sub">Le Move est prêt. Il n'attend que toi.</div>
+    <div class="cta-actions">
+      <button class="cta-btn-main">Créer mon espace — 39€</button>
+      <button class="cta-btn-ghost">Voir l'aperçu complet</button>
+    </div>
+    <div class="cta-note">Accès à vie · Compte personnel sécurisé · Mises à jour incluses · Remboursement 7 jours</div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">
+    <div class="footer-move-title">Le Move</div>
+    <div class="footer-collab-badge">
+      <span class="footer-collab-x">×</span>
+      <img class="footer-mf-mono" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAGQAZADASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAQFBgMBAgj/xAA7EAACAgEBBQQGCAYDAQEAAAAAAQIDBBEFEhMhMSJBcYEGMlFSYcEUFUKRkqHh8CNUYrHR8TNTcjVj/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/APxkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADrTRdc9KqpT+KXImV7Iypc5OuHi9X+QFcC3jsSX2shLwhr8yBtDG+iXqrf3+zrrpoBHAAAAAAAAAAAAAAAAAAAAAAAAAO+Li3ZLkqYp7vXV6AcAT/qnM9yP4kPqnM92H4gIALD6oy/ZX+IfVGX7a/wAQFeCZlbPvxqeLY4buunJkMAAAAAAAAAAAAOlFU7rVVWk5S6avQlfVWb7kfxICCCf9U5nuw/Ee/VGZ7IfiArwWH1Rl/wD5/iE9k5UISk3XpFavtfoBXgAAAS9nYU8uz3a160vkgOONj25Nm5VHV977kXeHsqipKVv8Wfx6LyJlFNdFarqioxX5nPOy68Srenzk/Vj3sDrOVdNe9JxhBeSK7I2zVFtU1uz4vkipy8m3Js37ZeEV0RxAsZbYy2+Srj4RImVkWZNvEt03tNOSOIAAAAAAAAAAAAAAAAAAAAAAAAAAAC49HrbJTsrlNuKSaTfQuCl9HF/EufsSRdACi2ntKydkqseThBcnJdZF6ZzbFHAzZaLsz7S+YERyk+sm/FnyAAAAAAAAAAAAAm7HtsjnVwjNqMno1ryZCJ2xK3PaEH3QTkwNEAfF1kaqZ2S6RTYFftfaEqHwKGuJp2pe6Us7bJycp2Tk33tnls5WWSsk9ZSerPkAAAO+FjTyr1VHkusn7EaaiqFNUa61pGJH2VirGxlvL+JPnL/BLA55N0KKZWzfKK+8zGVfPJulbY+b6L2L2E3buVxb+BF9ivr8WVoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF76Ow0xrLPelp93+yzI2zKuFg1QfXTV+fMkgcYZEJZdmOvWhFP9/kRdu0cXD4iXarevl3lXXl7u1Hk69lzev/AJ/0aNpSi09HFrn8QMgDrl0ujJnU/svl8V3HIAAAAAAAAAAABotjYv0fH3prSyzm/gu5EHYuDxJrItXYi+yn3svABW+kF25ixqT52S5+C/aLIz+3rN/N3E+UIpefUCvAAAnbFx+PmKUl2K+0/HuIJoNhVcPC32udj18uiAsDjnXLHxZ296XLx7jsU/pFd/x0J/1P+y+YFQ22229W+p4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADrh1cbKrq7pSWvh3nIs/R6reyZ2tcoR5eL/bAvSPtK3g4Vs9ee7ovF8iQVXpFbpVXSn6z3n5AUhpNjX8bCim+1Dsv5GbLDYV/Cy+G32bFp59wEj0ho9TIiv6ZfIpzV5VKvx51P7S5ePcZWUXGTjJaNPRoDwAAAAAAAAn7KwJZM+JYmqU+f9XwPrZ2zJ3tWXJwq9nfIuMm6nCx9WkopaRiu/wCAHmXkVYePvNLppCK7ztTvuqLs9drV+JnqZ2Z+063Zz1lrp3JLnoaMA2km3ySMnkWO2+y1/ak2aLatvCwLXrza3V5mZAAAD2KcpKKWrb0RrKYKqmFa6RikZ7Y9XFz6/ZDtPy/XQ0gAzG0ruNm2TT5a6LwRoM+3gYdlmvNR0Xi+hlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABodhVbmCptc7JN+XQz8U5SUUtW3ojWUVqqmFa6RikB9mc21bxM+aT5QSijQ2SUK5Tl0im2ZOyTnZKcusm2wPk9jJxkpRejT1TPABq8S5X48LV9pc/g+8pNu0cLL4iXZsWvn3kj0ev9fHk/wCqPzJm16OPhS0Xah2kBmwAAAOuNRZkWquqOr/JAfEIynJRhFyk+iRd7O2XGrS3ISlPuj3L/JJ2fg1YkNV2rH1k/kfG0s+GLHcjpK19F7PEDrm5dWLXvWPWT9WK6szuZk2ZVzssfgu5I+LrZ3WOyyTlJ9Wz4AtfR2rW6y5r1VurzLshbEq4eBFtc5tyZNAqPSO3lVSvjJ/2XzKYl7Xt4ufY9eUeyvL9dSIAAAF16O1aQtua6vdXz+RbEbZlXBwao6c2t5+fMkgVPpFdpCuhPq95/IpSVtW7jZ1kk+UXuryIoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEzY9XFz6/ZHtPy/XQ0hUejlXZtua6vdX938i3Ahbbt4eBJJ85tRRnC19Irdbq6U/VW8/MqgAAA64lzoyIWr7L5/Fd5qotSipJ6prVGQNBsK/i4nCb7Vb08u4Cn2jR9Hy51pdnXWPgyOXnpBRvURviucHo/B/v8AMrMDEsy7d2PKK9aXsA+cLFsyrdyC0S9aT6I0eJjVY1W5WvFvqz6x6a8epV1R0ivzIO1toqlOmh62d7939QPdqbRWOnVS07e990f1KGUpSk5SbbfNthtt6t6tngA+q4udkYR6yaSPknbEq4mfFtcoJyYGgrioVxhHpFJI8vsVVM7H0jFs+yBt23cwXBPnOSXl1Az8m5Scm9W3qzwAAdcSrjZNdXvSSfh3nIsvR+rey5WPpCP5v9sC+OeTKUMecoRcpKL3Ulq2zoRM/OrxJQjKEpOSb5dwFD9Eyv5e78DH0TK/lrvwMtPrqr/pn96H11V/0T+9AVf0TK/lrvwMfRMr+Wu/Ay0+uq/+if3j66r/AOiX4gKWUZRk4yi4tdU1zPDvn5H0rJlbubqaS0OAAAAAAAAAAAAAAAAAAAAAAAAAAA6Y1fGyK6vekkBo9l1cLAqjpza3n5kkJaLRHLMt4OLZZ3xi9PHuAzm0beNm2z15b2i8FyI4AAAACZsi/gZsW32Z9mXmQzpj0zvujVWtZP8AIDVXVxtqlXL1ZLRnzjU149SrrWiX5/E+6041xjKW80km/aQ9q5qxa92DTtkuS9nxA57Xz+BF00v+K+r939ShbbererYk3KTlJttvVtngAAAC79HatKbLn9p7q8v9lIanZ9XBwqoac93V+L5gdyi9Ibd7JhUnyhHV+L/aL0yubbxsu2zucuXh3AcQAANBsGrcwt99bJN+XQoEm2kubfJGsorVVEK19mKQH2ZzbdnEz5rXlBKKNFOShByl0S1ZkrZuyyU31k22B8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFjsCrfzHY1yrj+b5f5K4v9gVbmG7GudkvyXL/IFiVnpDbu4sKk+c5fkv2izM/t63fzdxPlXFLz6gV4AAAAD1JtpJatmi2VhrFp3pL+LP1n7PgQthYe9L6VYuS9RfH2lxZONcJTm9IxWrYHLOyYYtDslzfSMfazM3WTutlZY9ZSerZ12hlSyshzfKK5RXsRHAAAAAAO2FVxsuqvTk5c/DvNUUfo9VvZM7X0hHReLLwDhtC3g4VtmvPd0Xi+Rli79IrdKa6k/Wlq/Bf7KQAAAJeyKuLn1rTlF7z8jSlR6OVcrbmv6V/d/ItwIe2LOHs+znzl2V5/pqZsuPSOznVSn7ZP+y+ZTgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAepNvRdWavGrVOPXUvsxSM9smri59aa5Re8/I0oBtJNvklzZkr7HbfOx/ak2aLa1vCwLHrzkt1eZmgAAAHfCx5ZOTGpdHzk/YjgaDYeNwcbiyXbs5+C7gJ9cI1wjCC0jFaJFNt3L3p/Ra32Y85/F+wsto5KxcWVn2nyiviZhtttt6t82wPAAAAAAA9hFznGEesnogNBsKrh4Kk1zsbl5dCefNUFXVGuPSKSR7OShCU5dIrVgZ7bdvEz5JPlBKJBPq2bsslZLrJts+QAB0xq+NkV1e9JIDRbKq4WBVHTm1vPzJQSSWi6HzdNV1TsfSMWwM5tezi7QsevKL3V5EQ9k3KTk+bb1Z4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABc+jlXK25/wDlf3fyLcjbLq4ODVHTm1vPzJIFP6R2/wDFSn7ZP+y+ZTkva1vFz7GukXuryIgAAAd8Cj6RlQq7m9ZeBqUklolokVPo7TpCy9rm3urw7ywzrvo+JZb3pcvHuApNt5HGy3CL7FfJePeQA+b1YAAAAAABN2LVxc+Da5QW8/kQi79HatKbLmucnovBAWpD21bw8Cftn2V+/AmFL6RW62VUp9FvMCpAAAsdgVb+Y7H0rj+b5f5K4v8AYFW5huxrnZL8ly/yBYkHblnDwJRT5zaj8ycUnpFZrdXUn6sd5+f+gKoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA64lXGya6vekk/DvORZ+j1W9lTta5Qjy8X+2BenxfYqqJ2P7MWz7K/b1u5g7i6zkl5dQKBtttvm3zZ4AAAOuLDiZNdfvSSf3gaTAq4OHVXpo1HV+L6kD0it0hVSn1e8/kWxntuz3toSj7kUvn8wIAAAAAAAABqsCrg4dVfeo8/HvM7s+rjZlVemq3tX4LmagAZjadvFzrZa8lLReXI0eVZwcay33YtrxMmAAAHqTb0XVmrxq1Tj11L7MUjO7Kq4ufVF9E95+RpgBmNpWcXOtn3b2i8FyNHk2cLHss92LZkwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABodhVcPB32uc5N+XQqtnYNmVNNpxqXWXt8DRwjGEFGK0ilokB6UnpFPXIqr7ox1+9/oXZR+kNU1kxt0e446a/ECrAAAmbHjvbRq+Gr/ACZDJuxP/o1+D/sBozM7Veu0Lv8A0aYzW2I7u0bfi0/yAiAAAAAAB1xse3IsUKot+19y8QLD0dq1usua5RW6vMuzjhY8MbHjVHnpzb9rOwFft+e7g7q+3NL5/Iz5f7fqnZiRlBN7ktXp7CgAAAC39HKu1bc1/Sv7v5FyRtl08DCri12mt6XiySBXbft3MNVrrZL8l+0UBO23dxc1xT7Na3V495BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABLxcummtRliV2yT9aREAFsttSS0WNHT/wBfoe/Xcv5dfi/QqABb/Xcv5dfi/Q8ltlyi4yxYyT6py1+RUgDvl3V3Si68eFOnVRfU4AACTsuW5tCl/wBWn38iMfUJOE4zXWL1QGuKP0ir3cmuzulHTzX+y7hJThGceklqiFtyni4Tklzre95d4GdAAAAAd8S6umUnZjwu16b3cTobY3I7sMWEV7FLT5FUALf67l/Lr8X6D67l/Lr8X6FQALf67l/Lr8X6EPLy6r4NRxK65N+tFkQACVszH+kZkINaxXal4Iimh2Li8DG35rSdnN/BdyAnnHOvWPiztfVLs/F9x2KHbuTxb1RF9mvr8WBXNtttvVvqeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABodh38XCUG+1W93y7idJKUXFrVNaNGb2Xk/RspSb7EuUvD2mlTTWq5oDLZ2O8bJnU+i5xftRwNJtXDWVTrH/lh6vx+BnJJxk4yTTXJpgeAAAAAAAAAErZ+HZl2aLWNa9aX77wO2x8P6RdxZr+FB/e/YaA+aa4VVxrrjuxitEj5yLoUVStsekV+YHDamWsXHbT/iS5RXzM2229W9WzrmZE8m92z8EvYjiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC42LnrRY10tO6En/YpwBsCBtLZ0MnWyvSFvt7peJF2btXdSqym2uin7PEuIyjKKlFqSfRoDKX02U2OFsHGXxOZrbqq7oblsIzXxRXX7Gpk9abJV/B80BRgspbGyU+zOprxa+R5HY+U3zlUvN/4Arj1Jt6Lmy4p2Ktdbb2/hFfMsMbDx8fnVWlL3nzYFTgbKstanka1w93vf8Agu6q4VQUK4qMV0SPoiZufRippvfs7oL5+wCRfbXRW7LJKMUZzaGZPLt1esa16sT4zMq3Ks3rJcl0iuiOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADvi5d+M9aptLvi+aZwAF5j7Zqlor4OD9seaJ1OVj2/8AHdCXw15/cZUAbAGSjZZFaRskl8GeSssl605PxYGqsupr/wCS2EfGSREv2ti18oOVj/pXL8zPACflbUybtYwaqj/T1+8gPm9WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//2Q==" alt="MF" />
+      <span class="footer-collab-text">Maison Florélis</span>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 Maison Florélis. Tous droits réservés.</div>
+  <div class="footer-links">
+    <a class="footer-link">Mentions légales</a>
+    <a class="footer-link">Politique de confidentialité</a>
+    <a class="footer-link">Contact</a>
+    <a class="footer-link">Partenaires agences →</a>
+  </div>
+</footer>
+
+<script>
+  // Navigation active state
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(l => {
+      l.style.color = l.getAttribute('href') === '#' + current ? 'var(--espresso)' : '';
+    });
+  });
+</script>
+
+</body>
+</html>
