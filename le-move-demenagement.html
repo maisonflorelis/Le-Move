@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mon Déménagement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDFAF6;
+    --linen: #E8E0D5;
+    --sand: #C9BAA8;
+    --espresso: #2C1F14;
+    --warm-black: #1A1410;
+    --sage: #7A8C7E;
+    --terracotta: #C4714A;
+    --gold: #B89A6A;
+    --text-light: #8A7968;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--espresso);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--warm-black);
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .sidebar-logo span {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sand);
+    font-style: normal;
+    margin-top: 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--sand);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--terracotta); }
+  .nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+  .sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+  .progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill-mini { height: 100%; width: 67%; background: var(--terracotta); border-radius: 2px; }
+
+  .main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--espresso);
+    padding: 52px 52px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '02';
+    position: absolute;
+    right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 180px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+  .breadcrumb span { color: rgba(247,243,238,0.6); }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+  .page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+  .page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); letter-spacing: 0.02em; }
+
+  /* COUNTDOWN */
+  .countdown-bar {
+    background: var(--terracotta);
+    padding: 20px 52px;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+  .countdown-label { font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+  .countdown-blocks { display: flex; gap: 24px; }
+  .countdown-block { text-align: center; }
+  .countdown-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; color: #fff; line-height: 1; }
+  .countdown-unit { font-size: 8px; font-weight: 200; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-top: 2px; }
+  .countdown-sep { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: rgba(255,255,255,0.3); line-height: 1; padding-top: 4px; }
+  .date-info { margin-left: auto; text-align: right; }
+  .date-info-label { font-size: 9px; font-weight: 200; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .date-info-value { font-size: 14px; font-weight: 300; color: #fff; margin-top: 2px; letter-spacing: 0.05em; }
+
+  /* CONTENT */
+  .content { padding: 44px 52px; }
+
+  .section-eyebrow {
+    font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px;
+  }
+  .section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+  /* TIMELINE */
+  .timeline { margin-bottom: 48px; position: relative; }
+
+  .timeline-track {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    position: relative;
+    margin-bottom: 0;
+  }
+
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: var(--linen);
+    z-index: 0;
+  }
+
+  .timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 300;
+    margin-bottom: 12px;
+    border: 2px solid var(--linen);
+    background: var(--warm-white);
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .step-dot.done { background: var(--espresso); border-color: var(--espresso); color: var(--cream); }
+  .step-dot.current { background: var(--terracotta); border-color: var(--terracotta); color: #fff; box-shadow: 0 0 0 5px rgba(196,113,74,0.15); }
+  .step-dot.upcoming { color: var(--text-light); }
+
+  .step-label {
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    text-align: center;
+    line-height: 1.4;
+  }
+  .step-label.done-label { color: var(--espresso); font-weight: 400; }
+  .step-label.current-label { color: var(--terracotta); font-weight: 400; }
+
+  .step-date {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* PHASES */
+  .phases { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+
+  .phase-block {
+    background: var(--cream);
+    border-radius: 14px;
+    border: 1px solid var(--linen);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .phase-block:hover { box-shadow: 0 8px 24px rgba(44,31,20,0.06); }
+  .phase-block.current-phase { border-color: rgba(196,113,74,0.3); }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 28px;
+    gap: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--linen);
+  }
+
+  .phase-block.current-phase .phase-header { border-bottom-color: rgba(196,113,74,0.2); }
+
+  .phase-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--linen);
+    line-height: 1;
+    min-width: 40px;
+  }
+  .phase-block.current-phase .phase-number { color: rgba(196,113,74,0.25); }
+
+  .phase-info { flex: 1; }
+
+  .phase-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--espresso);
+    margin-bottom: 2px;
+  }
+
+  .phase-period {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+  }
+
+  .phase-progress-wrap { width: 120px; }
+  .phase-progress-label { display: flex; justify-content: space-between; font-size: 9px; font-weight: 300; color: var(--text-light); margin-bottom: 6px; }
+  .phase-bar { height: 2px; background: var(--linen); border-radius: 2px; overflow: hidden; }
+  .phase-fill { height: 100%; border-radius: 2px; }
+
+  .phase-badge {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 300;
+    white-space: nowrap;
+  }
+  .badge-done { background: rgba(122,140,126,0.12); color: var(--sage); }
+  .badge-current { background: rgba(196,113,74,0.12); color: var(--terracotta); }
+  .badge-upcoming { background: rgba(201,186,168,0.2); color: var(--text-light); }
+
+  .phase-tasks { padding: 16px 28px 20px; }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(232,224,213,0.6);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row:hover { opacity: 0.75; }
+
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--sand);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .check-box.done { background: var(--espresso); border-color: var(--espresso); }
+  .check-box.done::after { content: ''; width: 6px; height: 3px; border-left: 1.5px solid var(--cream); border-bottom: 1.5px solid var(--cream); transform: rotate(-45deg) translateY(-1px); display: block; }
+
+  .task-text { font-size: 12px; font-weight: 300; color: var(--espresso); flex: 1; line-height: 1.4; }
+  .task-text.done-text { text-decoration: line-through; color: var(--text-light); }
+
+  .task-tag {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 300;
+    white-space: nowrap;
+  }
+  .tag-urgent { background: rgba(196,113,74,0.1); color: var(--terracotta); }
+  .tag-ok { background: rgba(122,140,126,0.1); color: var(--sage); }
+  .tag-soon { background: rgba(184,154,106,0.1); color: var(--gold); }
+
+  .task-note {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  /* CONTACTS */
+  .contacts-section { margin-bottom: 40px; }
+  .contacts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+  .contact-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s;
+  }
+  .contact-card:hover { transform: translateY(-2px); }
+
+  .contact-role { font-size: 8px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+  .contact-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic; color: var(--espresso); margin-bottom: 4px; }
+  .contact-detail { font-size: 10px; font-weight: 200; color: var(--text-light); line-height: 1.6; }
+
+  /* NOTES */
+  .notes-section {
+    background: var(--espresso);
+    border-radius: 14px;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .notes-section::before {
+    content: '"';
+    position: absolute;
+    right: 32px; top: -20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 160px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+  }
+  .notes-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 16px; }
+  .notes-text { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.5); font-style: italic; line-height: 1.8; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: fadeUp 0.4s ease forwards; }
+  .countdown-bar { animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; }
+  .content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .timeline { animation-delay: 0.15s; }
+  .phases { animation-delay: 0.25s; }
+  .contacts-section { animation-delay: 0.35s; }
+  .notes-section { animation-delay: 0.45s; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-section">Projet</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Tâches</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini"></div></div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mon Déménagement</span></div>
+    <div class="page-title">Mon Déménagement</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Ce n'est pas un déménagement. C'est un commencement."</div>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="countdown-bar">
+    <div>
+      <div class="countdown-label">Jour J dans</div>
+    </div>
+    <div class="countdown-blocks">
+      <div class="countdown-block">
+        <div class="countdown-num">18</div>
+        <div class="countdown-unit">Jours</div>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-block">
+        <div class="countdown-num">06</div>
+        <div class="countdown-unit">Heures</div>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-block">
+        <div class="countdown-num">42</div>
+        <div class="countdown-unit">Minutes</div>
+      </div>
+    </div>
+    <div class="date-info">
+      <div class="date-info-label">Date du déménagement</div>
+      <div class="date-info-value">Samedi 19 mars 2026</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- TIMELINE -->
+    <div class="timeline">
+      <div class="section-eyebrow">Étapes clés</div>
+      <div class="timeline-track">
+        <div class="timeline-step">
+          <div class="step-dot done">✓</div>
+          <div class="step-label done-label">Signature<br>du bail</div>
+          <div class="step-date">15 jan.</div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-dot done">✓</div>
+          <div class="step-label done-label">Préparation<br>J-30</div>
+          <div class="step-date">17 fév.</div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-dot current">●</div>
+          <div class="step-label current-label">Démarches<br>admin J-15</div>
+          <div class="step-date">En cours</div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-dot upcoming">○</div>
+          <div class="step-label">Jour J</div>
+          <div class="step-date">19 mars</div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-dot upcoming">○</div>
+          <div class="step-label">Installation<br>J+7</div>
+          <div class="step-date">26 mars</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASES -->
+    <div class="section-eyebrow">Checklist par phase</div>
+    <div class="phases">
+
+      <!-- Phase 1 — Done -->
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">1</div>
+          <div class="phase-info">
+            <div class="phase-name">Signature & premières démarches</div>
+            <div class="phase-period">Janvier — 1er février</div>
+          </div>
+          <div class="phase-progress-wrap">
+            <div class="phase-progress-label"><span>Complété</span><span>100%</span></div>
+            <div class="phase-bar"><div class="phase-fill" style="width:100%;background:var(--sage)"></div></div>
+          </div>
+          <div class="phase-badge badge-done">Terminé</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Signer le bail et récupérer les clés</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Souscrire une assurance habitation</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Ouvrir un compteur EDF / Engie</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Visiter l'appartement et prendre les mesures</div><span class="task-tag tag-ok">Fait</span></div>
+        </div>
+      </div>
+
+      <!-- Phase 2 — Done -->
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">2</div>
+          <div class="phase-info">
+            <div class="phase-name">Préparation J-30</div>
+            <div class="phase-period">1er — 17 février</div>
+          </div>
+          <div class="phase-progress-wrap">
+            <div class="phase-progress-label"><span>Complété</span><span>100%</span></div>
+            <div class="phase-bar"><div class="phase-fill" style="width:100%;background:var(--sage)"></div></div>
+          </div>
+          <div class="phase-badge badge-done">Terminé</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Commander les cartons de déménagement</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Réserver le camion ou les déménageurs</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Trier et donner les affaires inutiles</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Commencer à emballer les objets non essentiels</div><span class="task-tag tag-ok">Fait</span></div>
+        </div>
+      </div>
+
+      <!-- Phase 3 — Current -->
+      <div class="phase-block current-phase">
+        <div class="phase-header">
+          <div class="phase-number">3</div>
+          <div class="phase-info">
+            <div class="phase-name">Démarches administratives J-15</div>
+            <div class="phase-period">17 fév. — 5 mars · En cours</div>
+          </div>
+          <div class="phase-progress-wrap">
+            <div class="phase-progress-label"><span>En cours</span><span>60%</span></div>
+            <div class="phase-bar"><div class="phase-fill" style="width:60%;background:var(--terracotta)"></div></div>
+          </div>
+          <div class="phase-badge badge-current">En cours</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Résilier le bail de l'ancien logement</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Changer d'adresse à la banque</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box done"></div><div class="task-text done-text">Faire suivre le courrier (La Poste)</div><span class="task-tag tag-ok">Fait</span></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Souscrire un abonnement internet</div><span class="task-tag tag-urgent">J-3</span></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Prévenir CAF, impôts, sécu du changement d'adresse</div><span class="task-tag tag-soon">Cette semaine</span></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Informer employeur et mutuelles</div><span class="task-tag tag-soon">Cette semaine</span></div>
+        </div>
+      </div>
+
+      <!-- Phase 4 — Upcoming -->
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">4</div>
+          <div class="phase-info">
+            <div class="phase-name">Jour J — Le grand départ</div>
+            <div class="phase-period">Samedi 19 mars 2026</div>
+          </div>
+          <div class="phase-progress-wrap">
+            <div class="phase-progress-label"><span>À venir</span><span>0%</span></div>
+            <div class="phase-bar"><div class="phase-fill" style="width:0%;background:var(--espresso)"></div></div>
+          </div>
+          <div class="phase-badge badge-upcoming">À venir</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task-row"><div class="check-box"></div><div class="task-text">État des lieux sortant de l'ancien logement</div><div class="task-note">Prendre des photos de chaque pièce</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Charger le camion — cartons étiquetés par pièce</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">État des lieux entrant du nouvel appartement</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Vérifier les compteurs eau, gaz, électricité</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Déposer les cartons dans les bonnes pièces</div></div>
+        </div>
+      </div>
+
+      <!-- Phase 5 — Upcoming -->
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">5</div>
+          <div class="phase-info">
+            <div class="phase-name">Installation J+7</div>
+            <div class="phase-period">19 — 26 mars 2026</div>
+          </div>
+          <div class="phase-progress-wrap">
+            <div class="phase-progress-label"><span>À venir</span><span>0%</span></div>
+            <div class="phase-bar"><div class="phase-fill" style="width:0%;background:var(--espresso)"></div></div>
+          </div>
+          <div class="phase-badge badge-upcoming">À venir</div>
+        </div>
+        <div class="phase-tasks">
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Monter les meubles — commencer par la chambre</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Installer la cuisine et l'électroménager</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Déballer et ranger les cartons pièce par pièce</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Accrocher les tableaux et luminaires</div></div>
+          <div class="task-row"><div class="check-box"></div><div class="task-text">Première vraie soirée chez soi 🥂</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CONTACTS UTILES -->
+    <div class="contacts-section">
+      <div class="section-eyebrow">Contacts utiles</div>
+      <div class="contacts-grid">
+        <div class="contact-card">
+          <div class="contact-role">Propriétaire</div>
+          <div class="contact-name">M. Lefebvre</div>
+          <div class="contact-detail">06 12 34 56 78<br>lefebvre.immo@gmail.com</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-role">Agence immobilière</div>
+          <div class="contact-name">Foncia Paris 11e</div>
+          <div class="contact-detail">01 43 55 XX XX<br>Réf. dossier : F2024-1182</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-role">Location camion</div>
+          <div class="contact-name">Kiloutou Nation</div>
+          <div class="contact-detail">Réservé le 19 mars — 8h<br>Véhicule 12m³ · Réf. K8821</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-role">Fournisseur énergie</div>
+          <div class="contact-name">EDF — Compte ouvert</div>
+          <div class="contact-detail">N° client : 558 291 4<br>PDL : 14 123 456 789 01</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-role">Internet</div>
+          <div class="contact-name">Free — À souscrire</div>
+          <div class="contact-detail">Délai installation : 10-14j<br>⚠️ À faire avant le 5 mars</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-role">Assurance habitation</div>
+          <div class="contact-name">Luko — Actif</div>
+          <div class="contact-detail">Contrat : LK-2026-00432<br>Attestation téléchargée ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE PERSO -->
+    <div class="notes-section">
+      <div class="notes-title">Ma note personnelle</div>
+      <div class="notes-text">
+        "Ce déménagement, c'est plus qu'un changement d'adresse. C'est la première fois que je construis quelque chose qui est vraiment à moi. Prendre le temps de bien s'organiser, c'est se respecter soi-même. Et quand tout sera en place, cette première soirée va valoir tous les cartons du monde."
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

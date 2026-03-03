@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mon Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDFAF6;
+    --linen: #E8E0D5;
+    --sand: #C9BAA8;
+    --espresso: #2C1F14;
+    --warm-black: #1A1410;
+    --sage: #7A8C7E;
+    --terracotta: #C4714A;
+    --gold: #B89A6A;
+    --text-light: #8A7968;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--espresso);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--warm-black);
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .sidebar-logo span {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sand);
+    font-style: normal;
+    margin-top: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--sand);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+
+  .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--sand);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-dot { background: var(--terracotta); }
+
+  .nav-section {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(201,186,168,0.4);
+    padding: 16px 12px 6px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+  .progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill-mini { height: 100%; width: 67%; background: var(--terracotta); border-radius: 2px; }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    min-height: 100vh;
+    background: var(--warm-white);
+    flex: 1;
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--espresso);
+    padding: 52px 52px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '01';
+    position: absolute;
+    right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 180px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .breadcrumb {
+    font-size: 9px;
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(247,243,238,0.35);
+    margin-bottom: 16px;
+  }
+
+  .breadcrumb span { color: rgba(247,243,238,0.6); }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .page-quote {
+    font-size: 12px;
+    font-weight: 200;
+    font-style: italic;
+    color: rgba(247,243,238,0.45);
+    letter-spacing: 0.02em;
+  }
+
+  .page-line {
+    width: 40px; height: 1px;
+    background: var(--terracotta);
+    margin: 14px 0;
+  }
+
+  /* BUDGET SUMMARY BAR */
+  .summary-bar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--linen);
+    padding: 24px 52px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .summary-stat {
+    flex: 1;
+    padding: 0 28px;
+    border-right: 1px solid var(--linen);
+  }
+
+  .summary-stat:first-child { padding-left: 0; }
+  .summary-stat:last-child { border-right: none; }
+
+  .summary-label {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .summary-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 300;
+    color: var(--espresso);
+    line-height: 1;
+  }
+
+  .summary-value.alert { color: var(--terracotta); }
+  .summary-value.ok { color: var(--sage); }
+
+  .summary-sub {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    margin-top: 3px;
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 44px 52px;
+  }
+
+  /* GLOBAL PROGRESS */
+  .global-progress {
+    margin-bottom: 40px;
+  }
+
+  .section-eyebrow {
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--linen);
+  }
+
+  .global-bar-wrap {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 28px 32px;
+    border: 1px solid var(--linen);
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .global-bar-main { flex: 1; }
+
+  .global-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .gbl-label {
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+  }
+
+  .gbl-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--espresso);
+  }
+
+  .global-bar {
+    height: 6px;
+    background: var(--linen);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .global-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--espresso) 0%, var(--gold) 100%);
+    width: 73%;
+  }
+
+  .global-note {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  .global-total {
+    text-align: right;
+    border-left: 1px solid var(--linen);
+    padding-left: 40px;
+  }
+
+  .global-total-label {
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .global-total-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--espresso);
+    line-height: 1;
+  }
+
+  .global-total-sub {
+    font-size: 11px;
+    font-weight: 200;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  /* CATEGORIES */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .category-card {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 28px;
+    border: 1px solid var(--linen);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(44,31,20,0.07);
+  }
+
+  .category-card.alert-card {
+    border-color: rgba(196,113,74,0.25);
+    background: rgba(196,113,74,0.04);
+  }
+
+  .category-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .category-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: var(--linen);
+  }
+
+  .category-status {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 300;
+  }
+
+  .status-ok { background: rgba(122,140,126,0.12); color: var(--sage); }
+  .status-warn { background: rgba(184,154,106,0.15); color: var(--gold); }
+  .status-over { background: rgba(196,113,74,0.12); color: var(--terracotta); }
+
+  .category-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--espresso);
+    margin-bottom: 4px;
+  }
+
+  .category-desc {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+    margin-bottom: 20px;
+  }
+
+  .cat-bar {
+    height: 3px;
+    background: var(--linen);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .cat-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .fill-espresso { background: var(--espresso); }
+  .fill-sage { background: var(--sage); }
+  .fill-terracotta { background: var(--terracotta); }
+  .fill-gold { background: var(--gold); }
+
+  .cat-amounts {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .cat-spent {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--espresso);
+  }
+
+  .cat-budget {
+    font-size: 10px;
+    font-weight: 200;
+    color: var(--text-light);
+  }
+
+  /* ITEMS TABLE */
+  .table-section { margin-bottom: 40px; }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .table-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--espresso);
+  }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--espresso);
+    color: var(--cream);
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .add-btn:hover { opacity: 0.85; }
+
+  .table-wrap {
+    background: var(--cream);
+    border-radius: 14px;
+    border: 1px solid var(--linen);
+    overflow: hidden;
+  }
+
+  .table-head {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    padding: 14px 24px;
+    background: var(--linen);
+    border-bottom: 1px solid var(--sand);
+  }
+
+  .th {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--linen);
+    align-items: center;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .table-row:last-child { border-bottom: none; }
+  .table-row:hover { background: rgba(232,224,213,0.4); }
+
+  .td {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--espresso);
+  }
+
+  .td-name { font-weight: 400; }
+
+  .td-sub {
+    font-size: 9px;
+    font-weight: 200;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  .td-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 300;
+  }
+
+  .td-tag {
+    display: inline-block;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 300;
+  }
+
+  /* TIPS */
+  .tips-section {
+    background: var(--espresso);
+    border-radius: 14px;
+    padding: 32px 36px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tips-section::before {
+    content: '💡';
+    position: absolute;
+    right: 32px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    opacity: 0.06;
+  }
+
+  .tips-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream);
+    margin-bottom: 12px;
+    white-space: nowrap;
+  }
+
+  .tip-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 200;
+    color: rgba(247,243,238,0.55);
+    line-height: 1.5;
+  }
+
+  .tip-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-header { animation: fadeUp 0.4s ease forwards; }
+  .summary-bar { animation: fadeUp 0.4s 0.1s ease forwards; opacity: 0; }
+  .content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .global-progress { animation-delay: 0.2s; }
+  .categories-grid { animation-delay: 0.3s; }
+  .table-section { animation-delay: 0.4s; }
+  .tips-section { animation-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    Le Move
+    <span>Ton premier chez-toi</span>
+  </div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-section">Projet</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Tâches</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini"></div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mon Budget</span></div>
+    <div class="page-title">Mon Budget</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Un bon budget, c'est pas se priver. C'est choisir."</div>
+  </div>
+
+  <!-- SUMMARY BAR -->
+  <div class="summary-bar">
+    <div class="summary-stat">
+      <div class="summary-label">Budget total</div>
+      <div class="summary-value">3 500 €</div>
+      <div class="summary-sub">Enveloppe globale</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-label">Dépensé</div>
+      <div class="summary-value">2 560 €</div>
+      <div class="summary-sub">73% du budget</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-label">Restant</div>
+      <div class="summary-value ok">940 €</div>
+      <div class="summary-sub">Disponible</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-label">Dépassements</div>
+      <div class="summary-value alert">+ 220 €</div>
+      <div class="summary-sub">Cuisine over budget</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-label">Économies</div>
+      <div class="summary-value">— 110 €</div>
+      <div class="summary-sub">Vs estimation initiale</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GLOBAL PROGRESS -->
+    <div class="global-progress">
+      <div class="section-eyebrow">Vue globale</div>
+      <div class="global-bar-wrap">
+        <div class="global-bar-main">
+          <div class="global-bar-labels">
+            <div>
+              <div class="gbl-label">Budget consommé</div>
+              <div class="gbl-value">2 560 € / 3 500 €</div>
+            </div>
+            <div style="text-align:right">
+              <div class="gbl-label">Reste à dépenser</div>
+              <div class="gbl-value" style="color:var(--sage)">940 €</div>
+            </div>
+          </div>
+          <div class="global-bar"><div class="global-fill"></div></div>
+          <div class="global-note">La cuisine a dépassé son enveloppe de 220 €. Pensez à rééquilibrer sur la déco.</div>
+        </div>
+        <div class="global-total">
+          <div class="global-total-label">Progression</div>
+          <div class="global-total-value">73<span style="font-size:20px;color:var(--text-light)">%</span></div>
+          <div class="global-total-sub">du budget utilisé</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="section-eyebrow">Par catégorie</div>
+    <div class="categories-grid">
+
+      <div class="category-card">
+        <div class="category-header">
+          <div class="category-icon">🛋</div>
+          <div class="category-status status-warn">73% utilisé</div>
+        </div>
+        <div class="category-name">Mobilier</div>
+        <div class="category-desc">Salon, chambre, bureau</div>
+        <div class="cat-bar"><div class="cat-fill fill-espresso" style="width:73%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent">1 095 €</div>
+          <div class="cat-budget">sur 1 500 €</div>
+        </div>
+      </div>
+
+      <div class="category-card alert-card">
+        <div class="category-header">
+          <div class="category-icon">🍳</div>
+          <div class="category-status status-over">Dépassé</div>
+        </div>
+        <div class="category-name">Cuisine</div>
+        <div class="category-desc">Électroménager, rangement</div>
+        <div class="cat-bar"><div class="cat-fill fill-terracotta" style="width:100%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent" style="color:var(--terracotta)">520 €</div>
+          <div class="cat-budget">sur 300 € <span style="color:var(--terracotta)">+220 €</span></div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <div class="category-header">
+          <div class="category-icon">🌿</div>
+          <div class="category-status status-warn">95% utilisé</div>
+        </div>
+        <div class="category-name">Déco & Textiles</div>
+        <div class="category-desc">Coussins, plantes, cadres</div>
+        <div class="cat-bar"><div class="cat-fill fill-gold" style="width:95%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent">380 €</div>
+          <div class="cat-budget">sur 400 €</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <div class="category-header">
+          <div class="category-icon">🚿</div>
+          <div class="category-status status-ok">56% utilisé</div>
+        </div>
+        <div class="category-name">Salle de bain</div>
+        <div class="category-desc">Accessoires, rangement</div>
+        <div class="cat-bar"><div class="cat-fill fill-sage" style="width:56%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent">140 €</div>
+          <div class="cat-budget">sur 250 €</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <div class="category-header">
+          <div class="category-icon">💡</div>
+          <div class="category-status status-ok">40% utilisé</div>
+        </div>
+        <div class="category-name">Luminaires</div>
+        <div class="category-desc">Suspensions, lampes</div>
+        <div class="cat-bar"><div class="cat-fill fill-espresso" style="width:40%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent">100 €</div>
+          <div class="cat-budget">sur 250 €</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <div class="category-header">
+          <div class="category-icon">📦</div>
+          <div class="category-status status-ok">75% utilisé</div>
+        </div>
+        <div class="category-name">Déménagement</div>
+        <div class="category-desc">Location camion, cartons</div>
+        <div class="cat-bar"><div class="cat-fill fill-sage" style="width:75%"></div></div>
+        <div class="cat-amounts">
+          <div class="cat-spent">225 €</div>
+          <div class="cat-budget">sur 300 €</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-title">Détail des achats</div>
+        <button class="add-btn">+ Ajouter un achat</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <div class="th">Article</div>
+          <div class="th">Catégorie</div>
+          <div class="th">Boutique</div>
+          <div class="th">Prix</div>
+          <div class="th">Statut</div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Canapé Linen 3 places
+            <div class="td-sub">Coloris beige naturel</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(44,31,20,0.08);color:var(--espresso)">Mobilier</span></div>
+          <div class="td">Maison du Monde</div>
+          <div class="td td-price">699 €</div>
+          <div class="td"><span class="td-tag status-warn">En livraison</span></div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Table basse marbre travertin
+            <div class="td-sub">Ø 80cm</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(44,31,20,0.08);color:var(--espresso)">Mobilier</span></div>
+          <div class="td">Fleux</div>
+          <div class="td td-price">280 €</div>
+          <div class="td"><span class="td-tag status-warn">Commandé</span></div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Robot cuiseur Thermomix
+            <div class="td-sub">Occasion - bon état</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(196,113,74,0.08);color:var(--terracotta)">Cuisine</span></div>
+          <div class="td">Leboncoin</div>
+          <div class="td td-price">320 €</div>
+          <div class="td"><span class="td-tag status-ok">Reçu</span></div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Parure de lit lin lavé
+            <div class="td-sub">140×200 — Blanc cassé</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(184,154,106,0.08);color:var(--gold)">Textiles</span></div>
+          <div class="td">Harmony</div>
+          <div class="td td-price">89 €</div>
+          <div class="td"><span class="td-tag status-ok">Reçu</span></div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Suspension rotin naturel
+            <div class="td-sub">Ø 45cm</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(44,31,20,0.08);color:var(--espresso)">Luminaires</span></div>
+          <div class="td">La Redoute</div>
+          <div class="td td-price">65 €</div>
+          <div class="td"><span class="td-tag status-warn">Commandé</span></div>
+        </div>
+
+        <div class="table-row">
+          <div class="td td-name">Plante monstera XL
+            <div class="td-sub">Pot céramique inclus</div>
+          </div>
+          <div class="td"><span class="td-tag" style="background:rgba(122,140,126,0.08);color:var(--sage)">Déco</span></div>
+          <div class="td">Truffaut</div>
+          <div class="td td-price">55 €</div>
+          <div class="td"><span class="td-tag status-ok">Reçu</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-section">
+      <div>
+        <div class="tips-title">Conseils budget</div>
+        <div class="tip-item"><div class="tip-dot"></div>Ta cuisine a dépassé son enveloppe de 220 €. Tu peux compenser en réduisant le budget déco restant.</div>
+        <div class="tip-item"><div class="tip-dot"></div>Il te reste 940 € — priorise les luminaires avant la déco accessoire.</div>
+        <div class="tip-item"><div class="tip-dot"></div>Vide-greniers et Leboncoin peuvent réduire le budget mobilier de 30% sans compromis sur le style.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

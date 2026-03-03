@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mes Achats & Livraisons</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+    --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+    --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; display: flex; }
+
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--warm-black); padding: 40px 24px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+  .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); letter-spacing: 0.02em; margin-bottom: 32px; line-height: 1.2; }
+  .sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--terracotta); }
+  .nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+  .sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+  .progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill-mini { height: 100%; width: 67%; background: var(--terracotta); border-radius: 2px; }
+
+  .main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+  .page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+  .page-header::before { content: '04'; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 180px; font-weight: 300; color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none; }
+  .breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+  .breadcrumb span { color: rgba(247,243,238,0.6); }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+  .page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+  .page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); letter-spacing: 0.02em; }
+
+  /* STATS BAR */
+  .stats-bar { background: var(--cream); border-bottom: 1px solid var(--linen); padding: 24px 52px; display: flex; gap: 0; }
+  .stat-item { flex: 1; padding: 0 28px; border-right: 1px solid var(--linen); }
+  .stat-item:first-child { padding-left: 0; }
+  .stat-item:last-child { border-right: none; }
+  .stat-label { font-size: 8px; font-weight: 300; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-light); margin-bottom: 6px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; color: var(--espresso); line-height: 1; }
+  .stat-value.terracotta { color: var(--terracotta); }
+  .stat-value.sage { color: var(--sage); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-sub { font-size: 10px; font-weight: 200; color: var(--text-light); margin-top: 3px; }
+
+  /* CONTENT */
+  .content { padding: 44px 52px; }
+
+  .section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+  .section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+  /* LIVRAISONS URGENTES */
+  .urgent-banner {
+    background: rgba(196,113,74,0.08);
+    border: 1px solid rgba(196,113,74,0.2);
+    border-radius: 14px;
+    padding: 20px 28px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .urgent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .urgent-text { font-size: 12px; font-weight: 300; color: var(--terracotta); flex: 1; }
+  .urgent-text strong { font-weight: 400; }
+  .urgent-cta { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); cursor: pointer; white-space: nowrap; }
+
+  /* TIMELINE LIVRAISONS */
+  .delivery-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .delivery-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 14px;
+    padding: 22px 28px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .delivery-card:hover { transform: translateX(4px); box-shadow: 0 8px 24px rgba(44,31,20,0.06); }
+  .delivery-card.urgent { border-color: rgba(196,113,74,0.3); background: rgba(196,113,74,0.03); }
+  .delivery-card.delivered { opacity: 0.6; }
+
+  .delivery-status-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-delivered { background: rgba(122,140,126,0.12); }
+  .icon-transit { background: rgba(196,113,74,0.1); }
+  .icon-pending { background: rgba(184,154,106,0.1); }
+  .icon-cart { background: rgba(44,31,20,0.06); }
+
+  .delivery-info { min-width: 0; }
+  .delivery-name { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 3px; }
+  .delivery-meta { font-size: 10px; font-weight: 200; color: var(--text-light); display: flex; gap: 12px; flex-wrap: wrap; }
+  .delivery-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .delivery-price { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; color: var(--espresso); text-align: right; white-space: nowrap; }
+
+  .delivery-badge {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 300;
+    white-space: nowrap;
+  }
+  .badge-delivered { background: rgba(122,140,126,0.12); color: var(--sage); }
+  .badge-transit { background: rgba(196,113,74,0.12); color: var(--terracotta); }
+  .badge-pending { background: rgba(184,154,106,0.12); color: var(--gold); }
+  .badge-cart { background: rgba(44,31,20,0.07); color: var(--text-light); }
+
+  /* TRACKING MINI */
+  .tracking-mini {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .track-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .track-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--linen); border: 1px solid var(--sand); }
+  .track-dot.done { background: var(--espresso); border-color: var(--espresso); }
+  .track-dot.active { background: var(--terracotta); border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(196,113,74,0.2); }
+  .track-line { width: 48px; height: 1px; background: var(--linen); }
+  .track-line.done { background: var(--espresso); }
+  .track-label { font-size: 8px; font-weight: 200; color: var(--text-light); margin-top: 4px; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  /* ADD FORM */
+  .add-section {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 48px;
+  }
+  .add-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 20px; }
+  .add-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .add-field { display: flex; flex-direction: column; gap: 6px; }
+  .add-label { font-size: 8px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); }
+  .add-input {
+    background: var(--warm-white);
+    border: 1px solid var(--linen);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--espresso);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .add-input:focus { border-color: var(--sand); }
+  .add-input::placeholder { color: var(--sand); font-style: italic; }
+  .add-footer { display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-add { padding: 10px 24px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .btn-add:hover { opacity: 0.85; }
+  .btn-cancel { padding: 10px 20px; background: transparent; color: var(--text-light); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+
+  /* BOUTIQUES */
+  .boutiques-section { margin-bottom: 48px; }
+  .boutiques-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .boutique-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .boutique-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(44,31,20,0.06); }
+  .boutique-logo {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--linen);
+  }
+  .boutique-name { font-size: 13px; font-weight: 300; color: var(--espresso); }
+  .boutique-stats { display: flex; flex-direction: column; gap: 2px; }
+  .boutique-stat { font-size: 10px; font-weight: 200; color: var(--text-light); }
+  .boutique-amount { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; color: var(--espresso); }
+
+  /* TIPS */
+  .tips-dark {
+    background: var(--espresso);
+    border-radius: 14px;
+    padding: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .tip-col { display: flex; flex-direction: column; gap: 10px; }
+  .tip-col-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 4px; }
+  .tip-item { display: flex; gap: 10px; font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.45); line-height: 1.6; }
+  .tip-dot-sm { width: 4px; height: 4px; border-radius: 50%; background: var(--terracotta); margin-top: 7px; flex-shrink: 0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: fadeUp 0.4s ease forwards; }
+  .stats-bar { animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; }
+  .content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .content > *:nth-child(1) { animation-delay: 0.1s; }
+  .content > *:nth-child(2) { animation-delay: 0.15s; }
+  .content > *:nth-child(3) { animation-delay: 0.2s; }
+  .content > *:nth-child(4) { animation-delay: 0.25s; }
+  .content > *:nth-child(5) { animation-delay: 0.3s; }
+  .content > *:nth-child(6) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-section">Projet</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Tâches</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini"></div></div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mes Achats & Livraisons</span></div>
+    <div class="page-title">Mes Achats & Livraisons</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Chaque colis qui arrive, c'est ton appartement qui prend vie."</div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">Total dépensé</div>
+      <div class="stat-value">2 560 €</div>
+      <div class="stat-sub">14 articles</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">En livraison</div>
+      <div class="stat-value terracotta">3</div>
+      <div class="stat-sub">Colis en route</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Reçus</div>
+      <div class="stat-value sage">8</div>
+      <div class="stat-sub">Articles livrés</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Commandés</div>
+      <div class="stat-value gold">3</div>
+      <div class="stat-sub">En attente d'envoi</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Liste d'envies</div>
+      <div class="stat-value">5</div>
+      <div class="stat-sub">Articles à acheter</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ALERTE URGENTE -->
+    <div class="urgent-banner">
+      <div class="urgent-dot"></div>
+      <div class="urgent-text"><strong>Livraison aujourd'hui</strong> — Canapé Linen Maison du Monde · Créneau 9h–13h. Pense à libérer l'accès à l'immeuble.</div>
+      <div class="urgent-cta">Voir le suivi →</div>
+    </div>
+
+    <!-- LIVRAISONS -->
+    <div class="section-eyebrow">Suivi des livraisons</div>
+    <div class="delivery-timeline">
+
+      <!-- En cours aujourd'hui -->
+      <div class="delivery-card urgent">
+        <div class="delivery-status-icon icon-transit">🚚</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Canapé Linen 3 places — Beige naturel</div>
+          <div class="delivery-meta">
+            <span>🏪 Maison du Monde</span>
+            <span>📦 Réf. MDM-2024-88231</span>
+            <span>📅 Livraison aujourd'hui 9h–13h</span>
+          </div>
+          <div class="tracking-mini" style="margin-top:14px">
+            <div class="track-step"><div class="track-dot done"></div><div class="track-label">Commandé</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot done"></div><div class="track-label">Préparé</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot active"></div><div class="track-label">En route</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-label">Livré</div></div>
+          </div>
+        </div>
+        <div class="delivery-price">699 €</div>
+        <div class="delivery-badge badge-transit">En route</div>
+      </div>
+
+      <!-- Commandé -->
+      <div class="delivery-card">
+        <div class="delivery-status-icon icon-pending">📦</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Table basse marbre travertin Ø 80cm</div>
+          <div class="delivery-meta">
+            <span>🏪 Fleux</span>
+            <span>📅 Livraison estimée 7 mars</span>
+          </div>
+          <div class="tracking-mini" style="margin-top:14px">
+            <div class="track-step"><div class="track-dot done"></div><div class="track-label">Commandé</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot active"></div><div class="track-label">Préparé</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-label">En route</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-label">Livré</div></div>
+          </div>
+        </div>
+        <div class="delivery-price">280 €</div>
+        <div class="delivery-badge badge-pending">Confirmé</div>
+      </div>
+
+      <!-- Commandé -->
+      <div class="delivery-card">
+        <div class="delivery-status-icon icon-pending">📦</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Suspension rotin naturel Ø 45cm</div>
+          <div class="delivery-meta">
+            <span>🏪 La Redoute</span>
+            <span>📅 Livraison estimée 10 mars</span>
+          </div>
+        </div>
+        <div class="delivery-price">65 €</div>
+        <div class="delivery-badge badge-pending">Confirmé</div>
+      </div>
+
+      <!-- Livré -->
+      <div class="delivery-card delivered">
+        <div class="delivery-status-icon icon-delivered">✓</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Parure de lit lin lavé — Blanc cassé 140×200</div>
+          <div class="delivery-meta">
+            <span>🏪 Harmony</span>
+            <span>📅 Reçu le 26 fév.</span>
+          </div>
+        </div>
+        <div class="delivery-price">89 €</div>
+        <div class="delivery-badge badge-delivered">Livré</div>
+      </div>
+
+      <!-- Livré -->
+      <div class="delivery-card delivered">
+        <div class="delivery-status-icon icon-delivered">✓</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Monstera Deliciosa XL + pot céramique</div>
+          <div class="delivery-meta">
+            <span>🏪 Truffaut</span>
+            <span>📅 Reçu le 22 fév.</span>
+          </div>
+        </div>
+        <div class="delivery-price">55 €</div>
+        <div class="delivery-badge badge-delivered">Livré</div>
+      </div>
+
+      <!-- Livré -->
+      <div class="delivery-card delivered">
+        <div class="delivery-status-icon icon-delivered">✓</div>
+        <div class="delivery-info">
+          <div class="delivery-name">Robot cuiseur — Occasion bon état</div>
+          <div class="delivery-meta">
+            <span>🏪 Leboncoin</span>
+            <span>📅 Récupéré le 18 fév.</span>
+          </div>
+        </div>
+        <div class="delivery-price">320 €</div>
+        <div class="delivery-badge badge-delivered">Livré</div>
+      </div>
+
+    </div>
+
+    <!-- AJOUTER UN ACHAT -->
+    <div class="add-section">
+      <div class="add-title">+ Ajouter un achat</div>
+      <div class="add-grid">
+        <div class="add-field">
+          <div class="add-label">Nom de l'article</div>
+          <input class="add-input" type="text" placeholder="ex. Étagère murale en chêne">
+        </div>
+        <div class="add-field">
+          <div class="add-label">Boutique</div>
+          <input class="add-input" type="text" placeholder="ex. IKEA">
+        </div>
+        <div class="add-field">
+          <div class="add-label">Prix</div>
+          <input class="add-input" type="text" placeholder="ex. 129 €">
+        </div>
+        <div class="add-field">
+          <div class="add-label">Date de livraison</div>
+          <input class="add-input" type="text" placeholder="ex. 15 mars">
+        </div>
+      </div>
+      <div class="add-footer">
+        <button class="btn-cancel">Annuler</button>
+        <button class="btn-add">Ajouter</button>
+      </div>
+    </div>
+
+    <!-- PAR BOUTIQUE -->
+    <div class="boutiques-section">
+      <div class="section-eyebrow">Par boutique</div>
+      <div class="boutiques-grid">
+        <div class="boutique-card">
+          <div class="boutique-logo">🏪</div>
+          <div class="boutique-name">Maison du Monde</div>
+          <div class="boutique-stats">
+            <div class="boutique-stat">3 articles · 1 en livraison</div>
+          </div>
+          <div class="boutique-amount">769 €</div>
+        </div>
+        <div class="boutique-card">
+          <div class="boutique-logo">🛋</div>
+          <div class="boutique-name">Fleux</div>
+          <div class="boutique-stats">
+            <div class="boutique-stat">1 article · Commandé</div>
+          </div>
+          <div class="boutique-amount">280 €</div>
+        </div>
+        <div class="boutique-card">
+          <div class="boutique-logo">🌿</div>
+          <div class="boutique-name">Truffaut</div>
+          <div class="boutique-stats">
+            <div class="boutique-stat">2 articles · Reçus</div>
+          </div>
+          <div class="boutique-amount">78 €</div>
+        </div>
+        <div class="boutique-card">
+          <div class="boutique-logo">🔁</div>
+          <div class="boutique-name">Leboncoin</div>
+          <div class="boutique-stats">
+            <div class="boutique-stat">2 articles · Occasion</div>
+          </div>
+          <div class="boutique-amount">395 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-dark">
+      <div class="tip-col">
+        <div class="tip-col-title">Avant de commander</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Toujours vérifier les dimensions avec le plan de ton appartement.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Lire les avis livraison, pas juste les avis produit.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Comparer sur Pricehunter avant tout achat de plus de 100 €.</div>
+      </div>
+      <div class="tip-col">
+        <div class="tip-col-title">Le jour de la livraison</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Prendre des photos si le colis est endommagé avant d'ouvrir.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Vérifier que le bon de livraison correspond bien à ta commande.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Ne jamais signer "sous réserve" — c'est sans valeur légale.</div>
+      </div>
+      <div class="tip-col">
+        <div class="tip-col-title">Économiser malin</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Leboncoin et Vinted Maison pour réduire le budget de 30%.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>Les ventes privées Maisons du Monde : toujours en jan. et juin.</div>
+        <div class="tip-item"><div class="tip-dot-sm"></div>IKEA Family : réductions exclusives et livraison offerte parfois.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

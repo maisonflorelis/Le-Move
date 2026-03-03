@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mon Avancement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+    --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+    --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; display: flex; }
+
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--warm-black); padding: 40px 24px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+  .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); letter-spacing: 0.02em; margin-bottom: 32px; line-height: 1.2; }
+  .sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--terracotta); }
+  .nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+  .sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+  .progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill-mini { height: 100%; width: 67%; background: var(--terracotta); border-radius: 2px; }
+
+  .main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+  .page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+  .page-header::before { content: '05'; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 180px; font-weight: 300; color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none; }
+  .breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+  .breadcrumb span { color: rgba(247,243,238,0.6); }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+  .page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+  .page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); letter-spacing: 0.02em; }
+
+  .content { padding: 44px 52px; }
+
+  .section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+  .section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+  /* GRAND SCORE */
+  .score-hero {
+    background: var(--espresso);
+    border-radius: 20px;
+    padding: 48px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-hero::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+    right: -80px; top: -80px;
+  }
+  .score-hero::after {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+    right: -20px; top: -20px;
+  }
+
+  .score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .score-circle::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--terracotta);
+    border-right-color: var(--terracotta);
+    border-bottom-color: var(--terracotta);
+    transform: rotate(-30deg);
+  }
+  .score-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--cream); line-height: 1; }
+  .score-pct { font-size: 16px; color: var(--terracotta); }
+  .score-label { font-size: 8px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-top: 2px; }
+
+  .score-details { flex: 1; }
+  .score-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 6px; }
+  .score-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.45); font-style: italic; margin-bottom: 24px; }
+
+  .score-mini-stats { display: flex; gap: 28px; }
+  .score-mini { text-align: center; padding: 14px 18px; background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .score-mini-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: var(--cream); line-height: 1; }
+  .score-mini-label { font-size: 8px; font-weight: 200; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-top: 4px; }
+
+  .score-date { text-align: right; padding-left: 52px; border-left: 1px solid rgba(255,255,255,0.08); }
+  .score-date-label { font-size: 8px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-bottom: 8px; }
+  .score-date-value { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; color: var(--cream); line-height: 1.3; }
+  .score-days { font-size: 11px; font-weight: 200; color: var(--terracotta); margin-top: 6px; }
+
+  /* KANBAN */
+  .kanban { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+
+  .kanban-col { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; overflow: hidden; }
+
+  .kanban-header { padding: 18px 20px; border-bottom: 1px solid var(--linen); display: flex; align-items: center; justify-content: space-between; }
+  .kanban-title { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--espresso); display: flex; align-items: center; gap: 8px; }
+  .kanban-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-todo { background: var(--sand); }
+  .dot-doing { background: var(--terracotta); }
+  .dot-done { background: var(--sage); }
+  .kanban-count { font-size: 10px; font-weight: 300; color: var(--text-light); }
+
+  .kanban-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; min-height: 280px; }
+
+  .kanban-card {
+    background: var(--warm-white);
+    border: 1px solid var(--linen);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(44,31,20,0.07); }
+  .kanban-card.done-card { opacity: 0.55; }
+
+  .kcard-tag { font-size: 8px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 8px; }
+  .tag-deco { background: rgba(184,154,106,0.1); color: var(--gold); }
+  .tag-admin { background: rgba(44,31,20,0.07); color: var(--text-light); }
+  .tag-budget { background: rgba(122,140,126,0.1); color: var(--sage); }
+  .tag-urgent { background: rgba(196,113,74,0.1); color: var(--terracotta); }
+  .tag-move { background: rgba(196,113,74,0.08); color: var(--terracotta); }
+
+  .kcard-title { font-size: 12px; font-weight: 300; color: var(--espresso); line-height: 1.4; margin-bottom: 8px; }
+  .kcard-title.striked { text-decoration: line-through; color: var(--text-light); }
+  .kcard-meta { display: flex; align-items: center; justify-content: space-between; }
+  .kcard-date { font-size: 9px; font-weight: 200; color: var(--text-light); }
+  .kcard-priority { width: 6px; height: 6px; border-radius: 50%; }
+  .priority-high { background: var(--terracotta); }
+  .priority-mid { background: var(--gold); }
+  .priority-low { background: var(--sage); }
+
+  /* MODULES PROGRESS */
+  .modules-progress { margin-bottom: 48px; }
+  .modules-grid-prog { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .module-prog-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .module-prog-card:hover { transform: translateX(4px); }
+
+  .module-icon { font-size: 24px; flex-shrink: 0; }
+
+  .module-prog-info { flex: 1; min-width: 0; }
+  .module-prog-name { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 2px; }
+  .module-prog-sub { font-size: 10px; font-weight: 200; color: var(--text-light); margin-bottom: 10px; }
+  .module-bar { height: 3px; background: var(--linen); border-radius: 3px; overflow: hidden; }
+  .module-fill { height: 100%; border-radius: 3px; }
+
+  .module-prog-pct { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; flex-shrink: 0; }
+
+  /* JOURNAL */
+  .journal-section { margin-bottom: 48px; }
+  .journal-entries { display: flex; flex-direction: column; gap: 0; }
+
+  .journal-entry {
+    display: flex;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--linen);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .journal-entry:last-child { border-bottom: none; }
+  .journal-entry:hover { opacity: 0.75; }
+
+  .journal-date-col { min-width: 80px; text-align: right; }
+  .journal-day { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: var(--espresso); line-height: 1; }
+  .journal-month { font-size: 9px; font-weight: 200; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); }
+
+  .journal-line { width: 1px; background: var(--linen); position: relative; }
+  .journal-line::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--linen); position: absolute; top: 8px; left: 50%; transform: translateX(-50%); }
+  .journal-line.active::before { background: var(--terracotta); }
+
+  .journal-content { flex: 1; padding-top: 4px; }
+  .journal-title { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 4px; }
+  .journal-text { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; font-style: italic; }
+  .journal-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .jtag { font-size: 8px; font-weight: 300; padding: 2px 8px; border-radius: 10px; background: var(--linen); color: var(--text-light); letter-spacing: 0.05em; }
+
+  /* CELEBRATION */
+  .celebration {
+    background: var(--espresso);
+    border-radius: 16px;
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .celebration::before {
+    content: '🎉';
+    position: absolute;
+    right: 48px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 100px;
+    opacity: 0.08;
+  }
+  .celebration-text {}
+  .celebration-eyebrow { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 10px; }
+  .celebration-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-style: italic; font-weight: 300; color: var(--cream); line-height: 1.3; max-width: 420px; }
+  .celebration-sub { font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.4); margin-top: 10px; font-style: italic; }
+  .milestones { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+  .milestone { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.5); }
+  .milestone.achieved { color: var(--cream); }
+  .milestone-icon { font-size: 16px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: fadeUp 0.4s ease forwards; }
+  .content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .content > *:nth-child(1) { animation-delay: 0.1s; }
+  .content > *:nth-child(2) { animation-delay: 0.15s; }
+  .content > *:nth-child(3) { animation-delay: 0.2s; }
+  .content > *:nth-child(4) { animation-delay: 0.25s; }
+  .content > *:nth-child(5) { animation-delay: 0.3s; }
+  .content > *:nth-child(6) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-section">Projet</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mes Tâches</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini"></div></div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mon Avancement</span></div>
+    <div class="page-title">Mon Avancement</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Chaque tâche cochée est une pièce de plus qui prend vie."</div>
+  </div>
+
+  <div class="content">
+
+    <!-- GRAND SCORE -->
+    <div class="score-hero">
+      <div class="score-circle">
+        <div class="score-num">67<span class="score-pct">%</span></div>
+        <div class="score-label">Complété</div>
+      </div>
+      <div class="score-details">
+        <div class="score-title">Tu avances bien, Sophie.</div>
+        <div class="score-sub">"Le plus dur est derrière toi. Il ne reste plus que le beau."</div>
+        <div class="score-mini-stats">
+          <div class="score-mini">
+            <div class="score-mini-num">12</div>
+            <div class="score-mini-label">Tâches faites</div>
+          </div>
+          <div class="score-mini">
+            <div class="score-mini-num">4</div>
+            <div class="score-mini-label">En cours</div>
+          </div>
+          <div class="score-mini">
+            <div class="score-mini-num">2</div>
+            <div class="score-mini-label">En retard</div>
+          </div>
+          <div class="score-mini">
+            <div class="score-mini-num">J+18</div>
+            <div class="score-mini-label">Depuis le début</div>
+          </div>
+        </div>
+      </div>
+      <div class="score-date">
+        <div class="score-date-label">Jour J dans</div>
+        <div class="score-date-value">18<br>jours</div>
+        <div class="score-days">19 mars 2026</div>
+      </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div class="section-eyebrow">Vue Kanban</div>
+    <div class="kanban">
+
+      <!-- À FAIRE -->
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-todo"></div>À faire</div>
+          <div class="kanban-count">6 tâches</div>
+        </div>
+        <div class="kanban-body">
+          <div class="kanban-card">
+            <div class="kcard-tag tag-urgent">Urgent</div>
+            <div class="kcard-title">Souscrire abonnement internet</div>
+            <div class="kcard-meta"><div class="kcard-date">Avant le 5 mars</div><div class="kcard-priority priority-high"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-admin">Admin</div>
+            <div class="kcard-title">Prévenir CAF et impôts du changement d'adresse</div>
+            <div class="kcard-meta"><div class="kcard-date">Cette semaine</div><div class="kcard-priority priority-mid"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-deco">Déco</div>
+            <div class="kcard-title">Choisir les luminaires du salon</div>
+            <div class="kcard-meta"><div class="kcard-date">Ce week-end</div><div class="kcard-priority priority-mid"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-move">Déménagement</div>
+            <div class="kcard-title">Organiser l'état des lieux sortant</div>
+            <div class="kcard-meta"><div class="kcard-date">J-1</div><div class="kcard-priority priority-high"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EN COURS -->
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-doing"></div>En cours</div>
+          <div class="kanban-count">4 tâches</div>
+        </div>
+        <div class="kanban-body">
+          <div class="kanban-card">
+            <div class="kcard-tag tag-deco">Déco</div>
+            <div class="kcard-title">Peindre la chambre — couleur Farrow & Ball Elephant's Breath</div>
+            <div class="kcard-meta"><div class="kcard-date">En cours</div><div class="kcard-priority priority-high"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-budget">Budget</div>
+            <div class="kcard-title">Comparer les offres fibre Free vs Orange</div>
+            <div class="kcard-meta"><div class="kcard-date">Cette semaine</div><div class="kcard-priority priority-mid"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-deco">Déco</div>
+            <div class="kcard-title">Commander les rideaux — à faire après mesure fenêtres</div>
+            <div class="kcard-meta"><div class="kcard-date">En réflexion</div><div class="kcard-priority priority-low"></div></div>
+          </div>
+          <div class="kanban-card">
+            <div class="kcard-tag tag-admin">Admin</div>
+            <div class="kcard-title">Récupérer l'attestation d'assurance habitation Luko</div>
+            <div class="kcard-meta"><div class="kcard-date">Urgent</div><div class="kcard-priority priority-high"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAIT -->
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-done"></div>Terminé</div>
+          <div class="kanban-count">12 tâches</div>
+        </div>
+        <div class="kanban-body">
+          <div class="kanban-card done-card">
+            <div class="kcard-tag tag-admin">Admin</div>
+            <div class="kcard-title striked">Signer le bail et récupérer les clés</div>
+            <div class="kcard-meta"><div class="kcard-date">15 jan.</div></div>
+          </div>
+          <div class="kanban-card done-card">
+            <div class="kcard-tag tag-admin">Admin</div>
+            <div class="kcard-title striked">Souscrire assurance habitation</div>
+            <div class="kcard-meta"><div class="kcard-date">18 jan.</div></div>
+          </div>
+          <div class="kanban-card done-card">
+            <div class="kcard-tag tag-budget">Budget</div>
+            <div class="kcard-title striked">Commander canapé Maison du Monde</div>
+            <div class="kcard-meta"><div class="kcard-date">2 fév.</div></div>
+          </div>
+          <div class="kanban-card done-card">
+            <div class="kcard-tag tag-move">Déménagement</div>
+            <div class="kcard-title striked">Réserver le camion Kiloutou</div>
+            <div class="kcard-meta"><div class="kcard-date">5 fév.</div></div>
+          </div>
+          <div class="kanban-card done-card">
+            <div class="kcard-tag tag-admin">Admin</div>
+            <div class="kcard-title striked">Changer adresse à la banque</div>
+            <div class="kcard-meta"><div class="kcard-date">10 fév.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AVANCEMENT PAR MODULE -->
+    <div class="modules-progress">
+      <div class="section-eyebrow">Avancement par module</div>
+      <div class="modules-grid-prog">
+        <div class="module-prog-card">
+          <div class="module-icon">📋</div>
+          <div class="module-prog-info">
+            <div class="module-prog-name">Déménagement</div>
+            <div class="module-prog-sub">3 tâches restantes sur 14</div>
+            <div class="module-bar"><div class="module-fill" style="width:79%;background:var(--sage)"></div></div>
+          </div>
+          <div class="module-prog-pct" style="color:var(--sage)">79%</div>
+        </div>
+        <div class="module-prog-card">
+          <div class="module-icon">💰</div>
+          <div class="module-prog-info">
+            <div class="module-prog-name">Budget</div>
+            <div class="module-prog-sub">4 catégories sur 6 maîtrisées</div>
+            <div class="module-bar"><div class="module-fill" style="width:73%;background:var(--gold)"></div></div>
+          </div>
+          <div class="module-prog-pct" style="color:var(--gold)">73%</div>
+        </div>
+        <div class="module-prog-card">
+          <div class="module-icon">🎨</div>
+          <div class="module-prog-info">
+            <div class="module-prog-name">Moodboard & Déco</div>
+            <div class="module-prog-sub">2 pièces finalisées sur 4</div>
+            <div class="module-bar"><div class="module-fill" style="width:50%;background:var(--terracotta)"></div></div>
+          </div>
+          <div class="module-prog-pct" style="color:var(--terracotta)">50%</div>
+        </div>
+        <div class="module-prog-card">
+          <div class="module-icon">📦</div>
+          <div class="module-prog-info">
+            <div class="module-prog-name">Achats & Livraisons</div>
+            <div class="module-prog-sub">8 articles reçus sur 14</div>
+            <div class="module-bar"><div class="module-fill" style="width:57%;background:var(--espresso)"></div></div>
+          </div>
+          <div class="module-prog-pct" style="color:var(--espresso)">57%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOURNAL -->
+    <div class="journal-section">
+      <div class="section-eyebrow">Journal du projet</div>
+      <div class="journal-entries">
+
+        <div class="journal-entry">
+          <div class="journal-date-col">
+            <div class="journal-day">01</div>
+            <div class="journal-month">Mars</div>
+          </div>
+          <div class="journal-line active"></div>
+          <div class="journal-content">
+            <div class="journal-title">Livraison canapé ce matin — la pièce prend enfin forme</div>
+            <div class="journal-text">Le canapé arrive aujourd'hui entre 9h et 13h. J'ai mesuré trois fois, il devrait passer dans l'entrée. Les voisins du dessus ont prévenu qu'ils seraient là pour aider. Petite boule au ventre mais beaucoup d'excitation.</div>
+            <div class="journal-tags"><span class="jtag">Livraison</span><span class="jtag">Salon</span><span class="jtag">J-18</span></div>
+          </div>
+        </div>
+
+        <div class="journal-entry">
+          <div class="journal-date-col">
+            <div class="journal-day">26</div>
+            <div class="journal-month">Fév.</div>
+          </div>
+          <div class="journal-line"></div>
+          <div class="journal-content">
+            <div class="journal-title">Première nuit dans l'appartement — matelas posé à même le sol</div>
+            <div class="journal-text">Pas de canapé, pas de rideaux, mais une bougie et mon lit. C'était parfait. Ce silence-là, c'est le mien.</div>
+            <div class="journal-tags"><span class="jtag">Première nuit</span><span class="jtag">Milestone</span></div>
+          </div>
+        </div>
+
+        <div class="journal-entry">
+          <div class="journal-date-col">
+            <div class="journal-day">15</div>
+            <div class="journal-month">Jan.</div>
+          </div>
+          <div class="journal-line"></div>
+          <div class="journal-content">
+            <div class="journal-title">Signature du bail — ça y est, c'est officiel</div>
+            <div class="journal-text">J'ai signé à 14h30 chez le notaire. En sortant j'ai marché une heure dans Paris avec les clés dans la main. Je crois que je souriais sans m'en rendre compte.</div>
+            <div class="journal-tags"><span class="jtag">Début</span><span class="jtag">Bail</span><span class="jtag">Jour 1</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CÉLÉBRATION -->
+    <div class="celebration">
+      <div class="celebration-text">
+        <div class="celebration-eyebrow">Ta progression</div>
+        <div class="celebration-title">"67% accompli. Et chaque pourcentage compte."</div>
+        <div class="celebration-sub">Continue comme ça — ton chez-toi est en train de naître.</div>
+      </div>
+      <div class="milestones">
+        <div class="milestone achieved"><div class="milestone-icon">✓</div> Bail signé</div>
+        <div class="milestone achieved"><div class="milestone-icon">✓</div> Première nuit</div>
+        <div class="milestone achieved"><div class="milestone-icon">✓</div> Budget maîtrisé</div>
+        <div class="milestone"><div class="milestone-icon">○</div> Canapé installé</div>
+        <div class="milestone"><div class="milestone-icon">○</div> Appartement complet</div>
+        <div class="milestone"><div class="milestone-icon">○</div> Première soirée 🥂</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

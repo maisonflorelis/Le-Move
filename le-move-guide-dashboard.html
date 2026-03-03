@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Guide Notion : Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+    --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+    --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); }
+
+  /* HEADER */
+  .guide-header {
+    background: var(--espresso);
+    padding: 48px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .guide-header::before { content: 'Guide'; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 160px; font-weight: 300; color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none; font-style: italic; }
+  .guide-eyebrow { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 12px; }
+  .guide-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+  .guide-line { width: 36px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+  .guide-sub { font-size: 13px; font-weight: 200; color: rgba(247,243,238,0.45); font-style: italic; max-width: 520px; line-height: 1.7; }
+
+  /* PROGRESS TRACKER */
+  .progress-tracker {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--linen);
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .tracker-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .tracker-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 300;
+    border: 1px solid var(--linen);
+    color: var(--text-light);
+    transition: all 0.2s;
+  }
+  .tracker-step.done .tracker-num { background: var(--sage); border-color: var(--sage); color: #fff; }
+  .tracker-step.active .tracker-num { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+
+  .tracker-label { font-size: 10px; font-weight: 300; color: var(--text-light); letter-spacing: 0.05em; }
+  .tracker-step.active .tracker-label { color: var(--espresso); font-weight: 400; }
+  .tracker-step.done .tracker-label { color: var(--sage); }
+
+  .tracker-arrow { color: var(--linen); font-size: 14px; margin: 0 12px; flex-shrink: 0; }
+
+  /* MAIN LAYOUT */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 180px);
+  }
+
+  /* SIDEBAR NAV */
+  .side-nav {
+    background: var(--warm-white);
+    border-right: 1px solid var(--linen);
+    padding: 32px 24px;
+    position: sticky;
+    top: 73px;
+    height: calc(100vh - 73px);
+    overflow-y: auto;
+  }
+
+  .side-nav-title { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; padding-left: 8px; }
+
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+  .side-item:hover { background: var(--linen); }
+  .side-item.active { background: rgba(44,31,20,0.06); }
+
+  .side-item-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 300;
+    background: var(--linen);
+    color: var(--text-light);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .side-item.done .side-item-num { background: var(--sage); color: #fff; }
+  .side-item.active .side-item-num { background: var(--terracotta); color: #fff; }
+
+  .side-item-text { font-size: 11px; font-weight: 300; color: var(--text-light); line-height: 1.4; }
+  .side-item.active .side-item-text { color: var(--espresso); font-weight: 400; }
+
+  .side-divider { height: 1px; background: var(--linen); margin: 16px 0; }
+
+  .side-time { font-size: 9px; font-weight: 200; color: var(--text-light); padding: 8px 12px; font-style: italic; }
+
+  /* CONTENT AREA */
+  .content-area { padding: 48px 60px; max-width: 780px; }
+
+  /* STEP */
+  .step-block {
+    margin-bottom: 64px;
+    scroll-margin-top: 90px;
+  }
+
+  .step-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px; }
+
+  .step-badge {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--espresso);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--cream);
+    flex-shrink: 0;
+  }
+  .step-badge.done { background: var(--sage); }
+  .step-badge.terracotta { background: var(--terracotta); }
+
+  .step-header-text {}
+  .step-num { font-size: 9px; font-weight: 200; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 4px; }
+  .step-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.2; }
+  .step-time { font-size: 10px; font-weight: 200; color: var(--text-light); margin-top: 4px; font-style: italic; }
+
+  .step-intro { font-size: 13px; font-weight: 200; color: var(--text-light); line-height: 1.8; margin-bottom: 28px; font-style: italic; }
+
+  /* INSTRUCTION CARDS */
+  .instruction { background: var(--warm-white); border: 1px solid var(--linen); border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; }
+
+  .instr-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--espresso);
+    color: var(--cream);
+    font-size: 10px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .instr-content { flex: 1; }
+  .instr-text { font-size: 13px; font-weight: 300; color: var(--espresso); line-height: 1.6; margin-bottom: 8px; }
+  .instr-text strong { font-weight: 400; }
+
+  /* CODE / SHORTCUT */
+  .shortcut {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--espresso);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    padding: 3px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  .notion-block {
+    background: var(--linen);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--espresso);
+    margin-top: 8px;
+    display: inline-block;
+    letter-spacing: 0.02em;
+  }
+
+  /* TIP BOX */
+  .tip-box {
+    background: rgba(196,113,74,0.06);
+    border: 1px solid rgba(196,113,74,0.2);
+    border-left: 3px solid var(--terracotta);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 12px;
+    font-weight: 200;
+    color: var(--espresso);
+    line-height: 1.7;
+  }
+  .tip-box strong { font-weight: 400; color: var(--terracotta); }
+
+  .info-box {
+    background: rgba(122,140,126,0.06);
+    border: 1px solid rgba(122,140,126,0.2);
+    border-left: 3px solid var(--sage);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 12px;
+    font-weight: 200;
+    color: var(--espresso);
+    line-height: 1.7;
+  }
+  .info-box strong { font-weight: 400; color: var(--sage); }
+
+  /* VISUAL PREVIEW */
+  .visual-preview {
+    background: var(--warm-black);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+
+  .preview-bar {
+    background: rgba(255,255,255,0.06);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #FF5F57; }
+  .dot-y { background: #FFBD2E; }
+  .dot-g { background: #28C840; }
+  .preview-url { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.3); margin-left: 8px; }
+
+  .preview-content { padding: 24px; }
+
+  /* NOTION MOCKUP ELEMENTS */
+  .notion-page-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; font-style: italic; color: var(--cream); margin-bottom: 6px; }
+  .notion-emoji { font-size: 40px; margin-bottom: 8px; }
+  .notion-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+  .notion-callout { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 14px 16px; display: flex; gap: 10px; margin-bottom: 10px; }
+  .callout-emoji { font-size: 16px; flex-shrink: 0; }
+  .callout-text { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.6); line-height: 1.6; }
+  .notion-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .notion-col-block { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 14px; }
+  .col-label { font-size: 8px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-bottom: 6px; }
+  .col-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: var(--cream); line-height: 1; }
+  .col-sub { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.3); margin-top: 4px; }
+
+  .notion-prop { display: flex; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .prop-name { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.35); width: 120px; flex-shrink: 0; letter-spacing: 0.05em; }
+  .prop-value { font-size: 11px; font-weight: 300; color: rgba(247,243,238,0.6); }
+  .prop-tag { font-size: 9px; font-weight: 300; padding: 2px 8px; border-radius: 10px; }
+  .tag-sage { background: rgba(122,140,126,0.2); color: #7A8C7E; }
+  .tag-terra { background: rgba(196,113,74,0.2); color: #C4714A; }
+
+  /* COLOR SWATCH INLINE */
+  .color-inline { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .c-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); }
+  .c-label { font-size: 9px; font-weight: 200; color: var(--text-light); font-family: 'DM Mono', monospace; }
+
+  /* CHECKLIST */
+  .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .check-row { display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 300; color: var(--text-light); }
+  .check-box-guide { width: 16px; height: 16px; border: 1px solid var(--sand); border-radius: 4px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .check-box-guide.checked { background: var(--sage); border-color: var(--sage); }
+  .check-box-guide.checked::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 400; }
+
+  /* SECTION DIVIDER */
+  .section-divider { display: flex; align-items: center; gap: 16px; margin: 48px 0 32px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--linen); }
+  .section-divider-text { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); }
+
+  /* NEXT STEPS */
+  .next-steps {
+    background: var(--espresso);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-top: 48px;
+  }
+  .next-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 20px; }
+  .next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .next-card { background: rgba(255,255,255,0.06); border-radius: 10px; padding: 16px 20px; cursor: pointer; transition: background 0.2s; }
+  .next-card:hover { background: rgba(255,255,255,0.1); }
+  .next-card-num { font-size: 9px; font-weight: 200; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(247,243,238,0.3); margin-bottom: 6px; }
+  .next-card-title { font-size: 13px; font-weight: 300; color: var(--cream); }
+  .next-card-sub { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.35); margin-top: 3px; font-style: italic; }
+
+  /* SCRIPT JS */
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="guide-header">
+  <div class="guide-eyebrow">Le Move · Guide de construction Notion</div>
+  <div class="guide-title">Le Dashboard</div>
+  <div class="guide-line"></div>
+  <div class="guide-sub">"Pas besoin de savoir coder. Juste suivre les étapes une par une. Dans 45 minutes, ton dashboard existe."</div>
+</div>
+
+<!-- PROGRESS TRACKER -->
+<div class="progress-tracker">
+  <div class="tracker-step done" onclick="scrollTo('step1')">
+    <div class="tracker-num">✓</div>
+    <div class="tracker-label">Créer la page</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step active" onclick="scrollTo('step2')">
+    <div class="tracker-num">2</div>
+    <div class="tracker-label">Cover & titre</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step" onclick="scrollTo('step3')">
+    <div class="tracker-num">3</div>
+    <div class="tracker-label">Citation d'intro</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step" onclick="scrollTo('step4')">
+    <div class="tracker-num">4</div>
+    <div class="tracker-label">Bloc de stats</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step" onclick="scrollTo('step5')">
+    <div class="tracker-num">5</div>
+    <div class="tracker-label">Navigation</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step" onclick="scrollTo('step6')">
+    <div class="tracker-num">6</div>
+    <div class="tracker-label">Checklist rapide</div>
+  </div>
+  <div class="tracker-arrow">›</div>
+  <div class="tracker-step" onclick="scrollTo('step7')">
+    <div class="tracker-num">7</div>
+    <div class="tracker-label">Finitions</div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <div class="side-nav">
+    <div class="side-nav-title">Dans ce guide</div>
+
+    <div class="side-item done" onclick="document.getElementById('step1').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">1</div>
+      <div class="side-item-text">Créer ta première page Notion</div>
+    </div>
+    <div class="side-item active" onclick="document.getElementById('step2').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">2</div>
+      <div class="side-item-text">Ajouter la cover & le titre</div>
+    </div>
+    <div class="side-item" onclick="document.getElementById('step3').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">3</div>
+      <div class="side-item-text">La citation d'introduction</div>
+    </div>
+    <div class="side-item" onclick="document.getElementById('step4').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">4</div>
+      <div class="side-item-text">Le bloc de statistiques</div>
+    </div>
+    <div class="side-item" onclick="document.getElementById('step5').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">5</div>
+      <div class="side-item-text">La navigation entre modules</div>
+    </div>
+    <div class="side-item" onclick="document.getElementById('step6').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">6</div>
+      <div class="side-item-text">La checklist rapide</div>
+    </div>
+    <div class="side-item" onclick="document.getElementById('step7').scrollIntoView({behavior:'smooth'})">
+      <div class="side-item-num">7</div>
+      <div class="side-item-text">Les finitions visuelles</div>
+    </div>
+
+    <div class="side-divider"></div>
+    <div class="side-time">⏱ Durée estimée : 45 min</div>
+    <div class="side-time">📱 Fonctionne sur Mac, PC et mobile</div>
+    <div class="side-time">✦ Notion gratuit suffit</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- INTRO -->
+    <div style="margin-bottom:48px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--text-light);line-height:1.7;margin-bottom:16px;">
+        "Avant de commencer, une chose importante : Notion c'est comme un document Word mais en beaucoup mieux. Chaque ligne est un 'bloc' que tu peux déplacer, styliser, transformer. C'est tout ce qu'il faut comprendre."
+      </div>
+      <div class="info-box">
+        <strong>Prérequis :</strong> Crée un compte gratuit sur notion.so si ce n'est pas encore fait. Ça prend 2 minutes avec ton email. Pas besoin de carte bancaire.
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 1 ═══ -->
+    <div class="step-block" id="step1">
+      <div class="step-header">
+        <div class="step-badge done">1</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 01</div>
+          <div class="step-title">Créer ta première page Notion</div>
+          <div class="step-time">⏱ 2 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">Le point de départ. On crée la page principale qui va contenir tout le template.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Dans la barre latérale gauche de Notion, clique sur <strong>+ Nouvelle page</strong> (tout en bas à gauche).</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Une page vide s'ouvre. Tape le titre : <strong>Le Move</strong> et appuie sur <span class="shortcut">Entrée</span></div>
+          <div class="notion-block">Le Move</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Clique sur l'icône ☺ à gauche du titre pour choisir un emoji. Tape <strong>house</strong> dans la recherche et sélectionne 🏠</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>Astuce :</strong> Pour retrouver facilement cette page, fais un clic droit dessus dans la sidebar et choisis "Ajouter aux favoris". Elle apparaîtra tout en haut de ta barre latérale.
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <div class="section-divider-text">Cover & identité visuelle</div>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- ═══ ÉTAPE 2 ═══ -->
+    <div class="step-block" id="step2">
+      <div class="step-header">
+        <div class="step-badge terracotta">2</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 02</div>
+          <div class="step-title">Ajouter la cover & le titre</div>
+          <div class="step-time">⏱ 10 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">C'est ce qui donne le ton de tout le template. La cover est la première chose que l'utilisateur voit — elle doit être parfaite.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Survole le haut de ta page. Un bouton <strong>"Ajouter une couverture"</strong> apparaît. Clique dessus.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Une image par défaut s'affiche. Clique sur <strong>"Changer de couverture"</strong> en bas à droite de l'image.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Va sur <strong>unsplash.com</strong> dans un autre onglet. Cherche l'un de ces termes et télécharge l'image qui te correspond le mieux :</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+            <div class="notion-block">"apartment natural light linen"</div>
+            <div class="notion-block">"minimalist living room warm"</div>
+            <div class="notion-block">"window natural light apartment"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">4</div>
+        <div class="instr-content">
+          <div class="instr-text">De retour dans Notion, clique sur <strong>"Importer"</strong> dans le panneau de cover et uploade ton image. Puis ajuste le cadrage en glissant l'image vers le haut ou le bas.</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>Notre palette de couleurs à respecter</strong> — toutes tes images doivent rester dans ces tons pour la cohérence :
+        <div class="color-inline" style="margin-top:12px;">
+          <div class="c-dot" style="background:#F7F3EE;border-color:rgba(44,31,20,0.2)"></div><div class="c-label">#F7F3EE — Craie</div>
+          <div class="c-dot" style="background:#D4C4B0"></div><div class="c-label">#D4C4B0 — Lin</div>
+          <div class="c-dot" style="background:#7A8C7E"></div><div class="c-label">#7A8C7E — Sauge</div>
+          <div class="c-dot" style="background:#C4714A"></div><div class="c-label">#C4714A — Terracotta</div>
+          <div class="c-dot" style="background:#2C1F14"></div><div class="c-label">#2C1F14 — Espresso</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 3 ═══ -->
+    <div class="step-block" id="step3">
+      <div class="step-header">
+        <div class="step-badge">3</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 03</div>
+          <div class="step-title">La citation d'introduction</div>
+          <div class="step-time">⏱ 5 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">La première chose que l'utilisatrice lit en arrivant sur son dashboard. Ce petit texte fait toute la différence émotionnelle.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Sous ton titre, tape <span class="shortcut">/</span> pour ouvrir le menu des blocs Notion.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Tape <strong>"citation"</strong> et sélectionne le bloc <strong>Citation</strong> (l'icône avec des guillemets).</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Colle ce texte dans le bloc citation :</div>
+          <div class="notion-block" style="display:block;margin-top:8px;line-height:1.6">"Un intérieur qui te ressemble commence par un projet bien tenu."</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">4</div>
+        <div class="instr-content">
+          <div class="instr-text">Appuie sur <span class="shortcut">Entrée</span> et ajoute en texte simple, en italique (<span class="shortcut">Cmd+I</span> ou <span class="shortcut">Ctrl+I</span>) :</div>
+          <div class="notion-block" style="display:block;margin-top:8px">Bonjour, Sophie. Aujourd'hui c'est le bon moment.</div>
+          <div style="font-size:11px;font-weight:200;color:var(--text-light);margin-top:8px;font-style:italic;">💡 L'utilisatrice remplacera "Sophie" par son prénom lors de la configuration initiale.</div>
+        </div>
+      </div>
+
+      <div class="visual-preview">
+        <div class="preview-bar">
+          <div class="preview-dot dot-r"></div><div class="preview-dot dot-y"></div><div class="preview-dot dot-g"></div>
+          <div class="preview-url">notion.so / Le Move</div>
+        </div>
+        <div class="preview-content">
+          <div class="notion-emoji">🏠</div>
+          <div class="notion-page-title">Le Move</div>
+          <div class="notion-divider"></div>
+          <div class="notion-callout">
+            <div class="callout-emoji">❝</div>
+            <div class="callout-text">"Un intérieur qui te ressemble commence par un projet bien tenu."<br><em style="color:rgba(247,243,238,0.4)">Bonjour, Sophie. Aujourd'hui c'est le bon moment.</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 4 ═══ -->
+    <div class="step-block" id="step4">
+      <div class="step-header">
+        <div class="step-badge">4</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 04</div>
+          <div class="step-title">Le bloc de statistiques</div>
+          <div class="step-time">⏱ 10 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">Les chiffres clés visibles en un coup d'œil. Dans Notion, on utilise des colonnes pour créer cet effet de dashboard.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Tape <span class="shortcut">/</span> et cherche <strong>"colonnes"</strong>. Sélectionne <strong>3 colonnes</strong>.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Dans la <strong>colonne 1</strong>, tape <span class="shortcut">/</span> → <strong>Texte</strong> et écris en gras (<span class="shortcut">Cmd+B</span>) :</div>
+          <div class="notion-block" style="display:block;margin-top:6px">Budget total<br>3 500 €</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Dans la <strong>colonne 2</strong>, même chose :</div>
+          <div class="notion-block" style="display:block;margin-top:6px">Dépensé<br>2 560 €</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">4</div>
+        <div class="instr-content">
+          <div class="instr-text">Dans la <strong>colonne 3</strong> :</div>
+          <div class="notion-block" style="display:block;margin-top:6px">Jour J dans<br>18 jours</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">5</div>
+        <div class="instr-content">
+          <div class="instr-text">Pour donner de la couleur : sélectionne le chiffre "2 560 €", clique sur le <strong>A</strong> dans la barre de formatage et choisis <strong>"Orange" pour le fond</strong>. Ça crée l'effet "alerte budget".</div>
+        </div>
+      </div>
+
+      <div class="visual-preview">
+        <div class="preview-bar">
+          <div class="preview-dot dot-r"></div><div class="preview-dot dot-y"></div><div class="preview-dot dot-g"></div>
+          <div class="preview-url">notion.so / Le Move</div>
+        </div>
+        <div class="preview-content">
+          <div class="notion-columns">
+            <div class="notion-col-block">
+              <div class="col-label">Budget total</div>
+              <div class="col-value">3 500 €</div>
+              <div class="col-sub">Enveloppe globale</div>
+            </div>
+            <div class="notion-col-block" style="border:1px solid rgba(196,113,74,0.3)">
+              <div class="col-label">Dépensé</div>
+              <div class="col-value" style="color:var(--terracotta)">2 560 €</div>
+              <div class="col-sub">73% du budget</div>
+            </div>
+            <div class="notion-col-block">
+              <div class="col-label">Jour J dans</div>
+              <div class="col-value">18 j</div>
+              <div class="col-sub">19 mars 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>Le truc pro :</strong> Entoure ce bloc de 3 colonnes avec un bloc <strong>Callout</strong> (via <span class="shortcut">/callout</span>) et choisis l'emoji 📊. Ça donne l'effet "widget" qu'on voit dans les templates premium.
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 5 ═══ -->
+    <div class="step-block" id="step5">
+      <div class="step-header">
+        <div class="step-badge">5</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 05</div>
+          <div class="step-title">La navigation entre modules</div>
+          <div class="step-time">⏱ 8 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">Les liens vers les 6 sous-pages. C'est la colonne vertébrale de ton template — l'utilisatrice doit pouvoir naviguer en un clic.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Tape <span class="shortcut">/</span> → <strong>"galerie"</strong> ou <strong>"vue liée"</strong>. Mais la méthode la plus simple : crée d'abord tes 6 sous-pages, puis fais-les apparaître comme liens.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Tape <span class="shortcut">/</span> → <strong>Page</strong> et crée une sous-page. Nomme-la <strong>"💰 Mon Budget"</strong>. Répète pour les 5 autres :</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+            <div class="notion-block">💰 Mon Budget</div>
+            <div class="notion-block">🎨 Mon Moodboard</div>
+            <div class="notion-block">📦 Mes Achats & Livraisons</div>
+            <div class="notion-block">✓ Mes Tâches</div>
+            <div class="notion-block">📊 Mon Avancement</div>
+            <div class="notion-block">🚚 Mon Déménagement</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Pour afficher ces sous-pages en <strong>grille visuelle</strong> plutôt qu'en liste : sélectionne toutes ces pages, clique sur les <strong>⋮⋮⋮</strong> à gauche de l'une d'elles, puis <strong>"Transformer en"</strong> → <strong>Galerie</strong>.</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Astuce navigation :</strong> Tu peux aussi utiliser les blocs <strong>Bouton</strong> (nouveau dans Notion) pour créer de vrais boutons cliquables vers chaque module. C'est plus visuel et plus premium.
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 6 ═══ -->
+    <div class="step-block" id="step6">
+      <div class="step-header">
+        <div class="step-badge">6</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 06</div>
+          <div class="step-title">La checklist "Cette semaine"</div>
+          <div class="step-time">⏱ 5 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">Le bloc le plus utilisé au quotidien. Des cases à cocher simples, mais avec le bon formatage elles deviennent addictives.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text">Tape <span class="shortcut">/</span> → <strong>"À faire"</strong> et crée un premier élément de checklist.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text">Ajoute ces 5 tâches exemples que l'utilisatrice pourra modifier :</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+            <div class="notion-block">☐ Souscrire abonnement internet</div>
+            <div class="notion-block">☐ Peindre la chambre</div>
+            <div class="notion-block">☐ Choisir les luminaires du salon</div>
+            <div class="notion-block">☐ Organiser l'état des lieux sortant</div>
+            <div class="notion-block">☑ Signer le bail ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text">Coche la dernière tâche "Signer le bail" pour montrer à l'utilisatrice comment ça fonctionne. Les tâches cochées apparaissent en grisé avec une barre — c'est satisfaisant.</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>Le truc premium :</strong> Mets ce bloc dans un <span class="shortcut">/callout</span> avec l'emoji 📋 et un fond de couleur gris clair. Ça crée un widget visuel propre plutôt qu'une liste basique.
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 7 ═══ -->
+    <div class="step-block" id="step7">
+      <div class="step-header">
+        <div class="step-badge">7</div>
+        <div class="step-header-text">
+          <div class="step-num">Étape 07</div>
+          <div class="step-title">Les finitions visuelles</div>
+          <div class="step-time">⏱ 5 minutes</div>
+        </div>
+      </div>
+
+      <div class="step-intro">Les petits détails qui font la différence entre un template ordinaire et un template premium.</div>
+
+      <div class="instruction">
+        <div class="instr-num">1</div>
+        <div class="instr-content">
+          <div class="instr-text"><strong>Police :</strong> Clique sur les <strong>⋯</strong> en haut à droite → <strong>Style de texte</strong> → choisis <strong>"Serif"</strong>. Ça applique une typographie plus élégante à toute la page.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">2</div>
+        <div class="instr-content">
+          <div class="instr-text"><strong>Largeur :</strong> Dans les mêmes paramètres, active <strong>"Pleine largeur"</strong>. La page prend tout l'espace disponible — look beaucoup plus dashboard.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">3</div>
+        <div class="instr-content">
+          <div class="instr-text"><strong>Séparateurs :</strong> Entre chaque section, tape <span class="shortcut">/</span> → <strong>"Diviseur"</strong>. Ces lignes fines structurent la page sans la surcharger.</div>
+        </div>
+      </div>
+
+      <div class="instruction">
+        <div class="instr-num">4</div>
+        <div class="instr-content">
+          <div class="instr-text"><strong>Titres de section :</strong> Avant chaque bloc, ajoute un titre <strong>H2</strong> (<span class="shortcut">/h2</span>) en texte minuscule et change sa couleur en gris. Exemple :</div>
+          <div class="notion-block" style="display:block;margin-top:6px">vue d'ensemble · cette semaine · navigation</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Résultat final :</strong> Ta page dashboard doit avoir cette structure de haut en bas — Cover photo → Titre + Emoji → Citation → Stats (3 colonnes) → Séparateur → Navigation (galerie de pages) → Séparateur → Checklist de la semaine. Simple, lisible, premium.
+      </div>
+
+      <!-- CHECKLIST FINALE -->
+      <div style="background:var(--warm-white);border:1px solid var(--linen);border-radius:14px;padding:28px;margin-top:24px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;font-weight:300;color:var(--espresso);margin-bottom:16px;">Checklist de validation</div>
+        <div class="check-list">
+          <div class="check-row"><div class="check-box-guide checked" onclick="this.classList.toggle('checked')"></div>Page créée avec emoji 🏠</div>
+          <div class="check-row"><div class="check-box-guide checked" onclick="this.classList.toggle('checked')"></div>Cover photo ajoutée et cadrée</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>Citation d'intro dans un bloc Citation</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>Bloc stats en 3 colonnes</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>6 sous-pages créées et nommées</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>Checklist "Cette semaine" avec 5 tâches</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>Police Serif activée + pleine largeur</div>
+          <div class="check-row"><div class="check-box-guide" onclick="this.classList.toggle('checked')"></div>Séparateurs entre les sections</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="next-steps">
+      <div class="next-title">Dashboard terminé. Et maintenant ?</div>
+      <div class="next-grid">
+        <div class="next-card">
+          <div class="next-card-num">Guide 02</div>
+          <div class="next-card-title">💰 Mon Budget</div>
+          <div class="next-card-sub">Base de données, catégories, jauges visuelles</div>
+        </div>
+        <div class="next-card">
+          <div class="next-card-num">Guide 03</div>
+          <div class="next-card-title">🎨 Mon Moodboard</div>
+          <div class="next-card-sub">Galerie d'images, intégration Pinterest</div>
+        </div>
+        <div class="next-card">
+          <div class="next-card-num">Guide 04</div>
+          <div class="next-card-title">📦 Mes Achats</div>
+          <div class="next-card-sub">Base de données avec filtres et statuts</div>
+        </div>
+        <div class="next-card">
+          <div class="next-card-num">Guide 05</div>
+          <div class="next-card-title">🚚 Mon Déménagement</div>
+          <div class="next-card-sub">Checklists chronologiques et contacts</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Checkbox interactif
+  document.querySelectorAll('.check-box-guide').forEach(box => {
+    box.addEventListener('click', () => box.classList.toggle('checked'));
+  });
+</script>
+
+</body>
+</html>
