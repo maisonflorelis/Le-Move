@@ -316,12 +316,12 @@
   .feat-check { color: var(--sage); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
   .pricing-card.featured .feat-check { color: var(--terracotta); }
   .feat-x { color: var(--sand); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
-  .pricing-btn { width: 100%; padding: 13px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none; text-align: center; }
-  .pricing-btn-outline { background: transparent; border: 1px solid var(--linen); color: var(--text-light); }
+  .pricing-btn { width: 100%; padding: 13px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: none; text-align: center; display: block; text-decoration: none; -webkit-appearance: none; outline: none; }
+  .pricing-btn-outline { background: transparent; border: 1px solid var(--linen); color: var(--text-light); outline: none; -webkit-tap-highlight-color: transparent; }
   .pricing-btn-outline:hover { border-color: var(--espresso); color: var(--espresso); }
   .pricing-btn-filled { background: var(--terracotta); color: #fff; }
   .pricing-btn-filled:hover { background: #b5613d; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(196,113,74,0.25); }
-  .pricing-btn-dark { background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.6); }
+  .pricing-btn-dark { background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.6); outline: none; -webkit-tap-highlight-color: transparent; }
   .pricing-btn-dark:hover { background: rgba(255,255,255,0.14); color: var(--cream); }
 
   /* ── FAQ ─────────────────────────────────────────────────────────── */
@@ -399,6 +399,9 @@
   .flip-back-label { font-size: 8px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.5; }
   .flip-back-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; line-height: 1.5; }
   .flip-back-cta { font-size: 10px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-top: 8px; }
+
+  a.pricing-btn, a.cta-btn-main, a.cta-btn-ghost { text-decoration: none; }
+  a.pricing-btn:visited, a.cta-btn-main:visited { color: inherit; }
 </style>
 </head>
 <body>
@@ -745,7 +748,7 @@
         <div class="pricing-feat"><span class="feat-x">✕</span>Suivi achats & livraisons</div>
         <div class="pricing-feat"><span class="feat-x">✕</span>Avancement Kanban</div>
       </div>
-      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/aFa00jbPq0Cb8pL54v6EU02" target="_blank">Choisir Essentiel</a>
+      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/aFa00jbPq0Cb8pL54v6EU02" target="_blank" onclick="window.open('https://buy.stripe.com/aFa00jbPq0Cb8pL54v6EU02','_blank');return false;">Choisir Essentiel</a>
     </div>
     <div class="pricing-card featured">
       <div class="pricing-plan">Complet</div>
@@ -760,7 +763,7 @@
         <div class="pricing-feat"><span class="feat-check">✓</span>Compte personnel sécurisé</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
-      <a class="pricing-btn pricing-btn-dark" href="https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01" target="_blank">Créer mon espace, 39€</a>
+      <a class="pricing-btn pricing-btn-dark" href="https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01" target="_blank" onclick="window.open('https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01','_blank');return false;">Créer mon espace, 39€</a>
     </div>
     <div class="pricing-card">
       <div class="pricing-plan">Premium</div>
@@ -775,7 +778,7 @@
         <div class="pricing-feat"><span class="feat-check">✓</span>Support prioritaire</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
-      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank">Créer mon espace, 56€</a>
+      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank" onclick="window.open('https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00','_blank');return false;">Créer mon espace, 56€</a>
     </div>
   </div>
 </section>
@@ -823,8 +826,8 @@
     <div class="cta-title">Ton premier chez-toi<br>mérite d'être bien organisé.</div>
     <div class="cta-sub">Le Move est prêt. Il n'attend que toi.</div>
     <div class="cta-actions">
-      <button class="cta-btn-main" href="https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01" target="_blank">Créer mon espace, 39€</button>
-      <button class="cta-btn-ghost">Voir l'aperçu complet</button>
+      <a class="cta-btn-main" href="https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01" target="_blank" onclick="window.open('https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01','_blank');return false;">Créer mon espace, 39€</a>
+      <a class="cta-btn-ghost" href="#preview">Voir l'aperçu complet</a>
     </div>
     <div class="cta-note">Accès à vie · Compte personnel sécurisé · Mises à jour incluses · Remboursement 7 jours</div>
   </div>
@@ -886,3 +889,4 @@ function showPreview(index) {
 </script>
 </body>
 </html>
+
