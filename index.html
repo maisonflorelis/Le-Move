@@ -105,9 +105,21 @@
 
   /* HERO RIGHT — COLLAGE */
   .hero-right {
-    background: #EDE8E1;
+    background: #1A1410;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    height: 100%;
     overflow: hidden;
     padding: 20px;
+  }
+  @media (max-width: 768px) {
+    .hero-right {
+      height: 440px !important;
+      width: 100% !important;
+      padding: 16px !important;
+    }
   }
   .collage-cell { overflow: hidden; position: relative; }
   .collage-1 { grid-row: span 2; background: #EDE8E1; }
@@ -540,7 +552,7 @@
       <div class="trust-item"><span class="trust-icon">🔄</span> Mises à jour incluses</div>
     </div>
   </div>
-  <div class="hero-right" style="background:#1A1410; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:12px; height:100%;">
+  <div class="hero-right">
     <!-- Stat 1 -->
     <div class="flip-wrap" style="border-radius:16px; box-shadow:0 8px 24px rgba(44,31,20,0.12);">
       <div class="flip-inner">
@@ -996,20 +1008,5 @@ function showPreview(index) {
   });
 }
 </script>
-
-<style>
-@media (max-width: 768px) {
-  .hero { flex-direction: column !important; height: auto !important; min-height: auto !important; }
-  .hero-left { width: 100% !important; flex: none !important; }
-  .hero-right { 
-    width: 100% !important; 
-    height: 400px !important;
-    flex: none !important;
-  }
-  .hero-right > div[style] {
-    width: 100% !important;
-  }
-}
-</style>
 </body>
 </html>
