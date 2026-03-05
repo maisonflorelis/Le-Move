@@ -404,98 +404,98 @@
   a.pricing-btn:visited, a.cta-btn-main:visited { color: inherit; }
 
   
-  /* ═══════════════════════════════════════════════════════
-     MOBILE RESPONSIVE — max-width: 768px
-  ═══════════════════════════════════════════════════════ */
+  
+  /* ═══════════════════════════════════════════════════
+     MOBILE — max-width: 768px
+  ═══════════════════════════════════════════════════ */
   @media (max-width: 768px) {
 
-    /* NAV */
+    /* ── NAV ── */
     nav { padding: 14px 20px; }
     .nav-links { display: none; }
     .nav-cta { padding: 8px 14px; font-size: 9px; white-space: nowrap; }
 
-    /* HERO — stack vertically */
+    /* ── HERO ── */
     .hero { display: flex !important; flex-direction: column !important; min-height: auto !important; }
-    .hero-left { padding: 36px 24px 32px !important; width: 100% !important; }
-    .hero-right { width: 100% !important; height: 360px !important; }
-    .hero-title { font-size: 44px !important; line-height: 1.05 !important; }
+    .hero-left { width: 100% !important; padding: 36px 24px !important; }
+    .hero-right { width: 100% !important; height: 380px !important; }
+    .hero-title { font-size: 48px !important; }
     .hero-desc { font-size: 13px !important; }
     .hero-price { font-size: 44px !important; }
     .hero-actions { flex-direction: column !important; gap: 10px !important; }
-    .btn-primary-hero, .btn-secondary-hero { width: 100% !important; text-align: center !important; font-size: 10px !important; }
+    .btn-primary-hero, .btn-secondary-hero { width: 100% !important; text-align: center !important; padding: 14px !important; font-size: 10px !important; }
     .hero-trust { flex-wrap: wrap !important; gap: 8px !important; }
+    .flip-front, .flip-back { padding: 14px 12px !important; gap: 6px !important; border-radius: 10px !important; }
+    .flip-front div[style*="font-size:58px"], .flip-back div[style*="font-size:58px"] { font-size: 32px !important; }
+    .flip-front div[style*="font-size:11px"] { font-size: 10px !important; }
 
-    /* HIDE hero logo MF on mobile — too big */
-    .hero-lemove-brand, .cta-mf-logo { display: none !important; }
-
-    /* FLIP CARDS */
-    .flip-front, .flip-back { padding: 14px 12px !important; gap: 4px !important; }
-    .flip-front > div:first-child { font-size: 32px !important; }
-
-    /* AGENCY BANNER */
+    /* ── AGENCY BANNER ── */
     .agency-banner { flex-direction: column !important; padding: 20px 24px !important; gap: 10px !important; text-align: center !important; }
 
-    /* HOW IT WORKS */
-    .how-it-works > div { flex-direction: column !important; padding: 52px 24px !important; }
+    /* ── HOW IT WORKS ── */
+    .how-it-works { padding: 0 !important; }
+    .how-it-works > div { flex-direction: column !important; padding: 48px 24px !important; gap: 40px !important; }
+    .hiw-left, .hiw-right { width: 100% !important; }
     .hiw-title { font-size: 38px !important; }
-    .hiw-cards { grid-template-columns: 1fr !important; }
+    .hiw-steps { gap: 24px !important; }
+    .hiw-cards { grid-template-columns: 1fr !important; gap: 12px !important; }
 
-    /* FEATURES */
-    section#features { padding: 0 !important; }
-    .features-header { padding: 52px 24px 32px !important; }
+    /* ── FEATURES ── */
+    section[id="features"] { padding: 0 !important; }
+    .features-header { padding: 48px 24px 32px !important; flex-direction: column !important; gap: 20px !important; }
     .features-title { font-size: 38px !important; }
-    .features-grid { grid-template-columns: 1fr !important; padding: 0 24px 52px !important; gap: 16px !important; }
+    .features-grid { grid-template-columns: 1fr !important; padding: 0 24px 48px !important; gap: 16px !important; }
+    .feature-card { padding: 24px 20px !important; }
 
-    /* PERSONA */
-    section.persona-section, .persona-section { flex-direction: column !important; padding: 52px 24px !important; }
+    /* ── PERSONA ── */
+    .persona-section { flex-direction: column !important; padding: 48px 24px !important; gap: 32px !important; }
     .persona-left, .persona-right { width: 100% !important; }
     .persona-title-big { font-size: 38px !important; }
+    .persona-cards { gap: 12px !important; }
+    .persona-card { padding: 20px !important; }
 
-    /* PREVIEW */
-    .preview-section { padding: 52px 24px !important; }
-    .preview-header { margin-bottom: 32px !important; }
-    .preview-tabs { flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; }
-    .preview-tab { font-size: 9px !important; padding: 6px 10px !important; }
-    .preview-frame-container { border-radius: 10px !important; }
-    .preview-iframe { height: 380px !important; }
+    /* ── STATS (features numbers) ── */
+    .stats-row { flex-direction: column !important; gap: 16px !important; padding: 40px 24px !important; }
 
-    /* TESTIMONIALS — single column */
-    .testimonials-section { padding: 52px 0 !important; }
-    .testimonials-header { padding: 0 24px 40px !important; }
-    .testimonials-title { font-size: 38px !important; }
-    .testimonials-grid {
-      display: flex !important;
-      flex-direction: column !important;
-      padding: 0 24px !important;
-      gap: 16px !important;
-    }
-    .testimonial-card { width: 100% !important; transform: none !important; }
+    /* ── PREVIEW ── */
+    .preview-section { padding: 48px 20px !important; }
+    .preview-header { padding: 0 0 24px !important; }
+    .preview-title { font-size: 32px !important; }
+    .preview-tabs { flex-wrap: wrap !important; gap: 8px !important; justify-content: center !important; margin: 0 0 24px !important; padding: 0 !important; }
+    .preview-frames { padding: 0 !important; }
+    .preview-iframe { height: 480px !important; }
 
-    /* PRICING — single column */
-    .pricing-section { padding: 52px 0 !important; }
-    .pricing-header { padding: 0 24px 40px !important; }
+    /* ── TESTIMONIALS ── */
+    .testimonials { padding: 0 !important; }
+    .test-header { padding: 48px 24px 32px !important; }
+    .test-title { font-size: 38px !important; }
+    .test-grid { grid-template-columns: 1fr !important; padding: 0 24px 48px !important; gap: 16px !important; }
+    .test-card { padding: 24px 20px !important; }
+
+    /* ── PRICING ── */
+    section[id="pricing"] { padding: 0 !important; }
+    .pricing-header { padding: 48px 24px 32px !important; }
     .pricing-title { font-size: 38px !important; }
-    .pricing-grid { grid-template-columns: 1fr !important; padding: 0 24px !important; gap: 16px !important; max-width: 400px !important; margin: 0 auto !important; }
+    .pricing-grid { grid-template-columns: 1fr !important; padding: 0 24px 48px !important; gap: 16px !important; max-width: 100% !important; }
+    .pricing-card { padding: 28px 24px !important; }
+    .pricing-price { font-size: 52px !important; }
 
-    /* FAQ */
-    .faq-section { padding: 52px 24px !important; }
+    /* ── FAQ ── */
+    .faq { padding: 48px 24px !important; }
     .faq-title { font-size: 38px !important; }
     .faq-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
 
-    /* FINAL CTA */
-    .final-cta-inner { padding: 52px 24px !important; }
+    /* ── FINAL CTA ── */
+    .final-cta-inner { padding: 60px 24px !important; }
     .cta-title { font-size: 38px !important; }
-    .cta-actions { flex-direction: column !important; gap: 12px !important; align-items: stretch !important; }
-    .cta-btn-main, .cta-btn-ghost { width: 100% !important; text-align: center !important; display: block !important; }
+    .cta-actions { flex-direction: column !important; gap: 12px !important; align-items: center !important; }
+    .cta-btn-main, .cta-btn-ghost { width: 100% !important; text-align: center !important; max-width: 320px !important; }
 
-    /* FOOTER */
-    footer { flex-wrap: wrap !important; padding: 32px 24px !important; gap: 16px !important; }
-    .footer-links { flex-wrap: wrap !important; gap: 10px !important; }
-
-    /* GLOBAL overflow fix */
-    body { overflow-x: hidden !important; }
-    section, div { max-width: 100vw; }
+    /* ── FOOTER ── */
+    footer { padding: 32px 24px !important; flex-wrap: wrap !important; gap: 16px !important; flex-direction: column !important; }
+    .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
   }
+
 </style>
 </head>
 <body>
@@ -886,7 +886,7 @@
     </div>
     <div class="faq-item">
       <div class="faq-q">Comment je reçois mon accès ? <span class="faq-arrow">→</span></div>
-           <div class="faq-a">Immédiatement après le paiement, tu reçois un email avec tes identifiants. Tu te connectes et ton espace est déjà prêt.</div>
+      <div class="faq-a">Immédiatement après le paiement, tu reçois un email avec tes identifiants. Tu te connectes et ton espace est déjà prêt.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Mes données sont-elles sauvegardées ? <span class="faq-arrow">→</span></div>
@@ -979,4 +979,3 @@ function showPreview(index) {
 </script>
 </body>
 </html>
-
