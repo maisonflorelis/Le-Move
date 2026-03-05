@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -45,6 +45,21 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding-top: 68px;
+  }
+  @media (max-width: 768px) {
+    .hero {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto auto !important;
+      min-height: auto !important;
+      padding-top: 60px !important;
+    }
+    .hero-left {
+      padding: 32px 24px !important;
+    }
+    .hero-right {
+      height: 420px !important;
+      width: 100% !important;
+    }
   }
   .hero-left {
     background: var(--espresso);
