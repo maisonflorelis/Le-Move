@@ -996,5 +996,20 @@ function showPreview(index) {
   });
 }
 </script>
+
+<style>
+@media (max-width: 768px) {
+  .hero { flex-direction: column !important; height: auto !important; min-height: auto !important; }
+  .hero-left { width: 100% !important; flex: none !important; }
+  .hero-right { 
+    width: 100% !important; 
+    height: 400px !important;
+    flex: none !important;
+  }
+  .hero-right > div[style] {
+    width: 100% !important;
+  }
+}
+</style>
 </body>
 </html>
