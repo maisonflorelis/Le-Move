@@ -237,23 +237,54 @@
   .content > *:nth-child(5) { animation-delay: 0.3s; }
   .content > *:nth-child(6) { animation-delay: 0.35s; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function initModule(activeNavId) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return null; }
+  if (activeNavId) {
+    const el = document.getElementById(activeNavId);
+    if (el) { el.classList.add('active'); const dot = el.querySelector('.nav-dot'); if (dot) dot.style.background = 'var(--terracotta)'; }
+  }
+  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  const name = profile?.prenom || session.user.email.split('@')[0];
+  const userEl = document.getElementById('sidebarUser');
+  if (userEl) userEl.textContent = name;
+  return session.user;
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'app.html';
+}
+</script>
 </head>
 <body>
 
 <aside class="sidebar">
-  <div class="sidebar-logo">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="sidebar-logo" onclick="window.location.href='app.html'" style="cursor:pointer">
+    Le Move
+    <span>Ton premier chez-toi</span>
+  </div>
   <div class="nav-section">Navigation</div>
-  <div class="nav-item"><div class="nav-dot"></div>Dashboard</div>
-  <div class="nav-item"><div class="nav-dot"></div>Mon Budget</div>
-  <div class="nav-item"><div class="nav-dot"></div>Mon Moodboard</div>
-  <div class="nav-item active"><div class="nav-dot"></div>Mes Achats</div>
-  <div class="nav-section">Projet</div>
-  <div class="nav-item"><div class="nav-dot"></div>Mes Tâches</div>
-  <div class="nav-item"><div class="nav-dot"></div>Mon Avancement</div>
-  <div class="nav-item"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" id="nav-budget" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" id="nav-demenagement" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" id="nav-moodboard" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" id="nav-achats" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" id="nav-avancement" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
   <div class="sidebar-footer">
     <div class="progress-mini">Avancement global</div>
-    <div class="progress-bar-mini"><div class="progress-fill-mini"></div></div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini" id="sidebarProgress"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand);letter-spacing:0.1em" id="sidebarUser"></div>
+      <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);cursor:pointer;letter-spacing:0.08em" onclick="logout()">Quitter</div>
+    </div>
   </div>
 </aside>
 
@@ -504,5 +535,7 @@
   </div>
 </main>
 
+
+<script>initModule("nav-achats");</script>
 </body>
 </html>
