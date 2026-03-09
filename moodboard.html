@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mon Moodboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EE;
+    --warm-white: #FDFAF6;
+    --linen: #E8E0D5;
+    --sand: #C9BAA8;
+    --espresso: #2C1F14;
+    --warm-black: #1A1410;
+    --sage: #7A8C7E;
+    --terracotta: #C4714A;
+    --gold: #B89A6A;
+    --text-light: #8A7968;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--espresso);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+    background: var(--warm-black); padding: 40px 24px;
+    display: flex; flex-direction: column; gap: 8px; z-index: 100;
+  }
+  .sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); letter-spacing: 0.02em; margin-bottom: 32px; line-height: 1.2; cursor: pointer; }
+  .sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--terracotta); }
+  .nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+  .sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+  .progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .progress-fill-mini { height: 100%; width: 67%; background: var(--terracotta); border-radius: 2px; }
+
+  .main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+  .page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+  .page-header::before { content: '03'; position: absolute; right: 40px; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 180px; font-weight: 300; color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none; }
+  .breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+  .breadcrumb span { color: rgba(247,243,238,0.6); }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+  .page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+  .page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); letter-spacing: 0.02em; }
+
+  /* STYLE TABS */
+  .style-tabs {
+    background: var(--cream);
+    border-bottom: 1px solid var(--linen);
+    padding: 0 52px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 18px 24px;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+  .tab:hover { color: var(--espresso); }
+  .tab.active { color: var(--espresso); border-bottom-color: var(--terracotta); font-weight: 400; }
+
+  /* CONTENT */
+  .content { padding: 44px 52px; }
+
+  .section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+  .section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+  /* PALETTE */
+  .palette-section {
+    background: var(--espresso);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .palette-info { min-width: 180px; }
+  .palette-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 6px; }
+  .palette-desc { font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.45); line-height: 1.6; font-style: italic; }
+
+  .palette-colors { display: flex; gap: 12px; flex: 1; }
+
+  .color-swatch {
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .color-swatch:hover { transform: scale(1.04); }
+
+  .swatch-color { height: 80px; }
+  .swatch-info { padding: 10px 12px; background: rgba(255,255,255,0.05); }
+  .swatch-name { font-size: 10px; font-weight: 300; color: var(--cream); margin-bottom: 2px; }
+  .swatch-hex { font-size: 9px; font-weight: 200; color: rgba(247,243,238,0.4); letter-spacing: 0.08em; font-family: monospace; }
+
+  /* PINTEREST EMBED ZONE */
+  .pinterest-zone {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .pinterest-left { flex: 1; }
+  .pinterest-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 8px; }
+  .pinterest-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+
+  .pinterest-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #E60023;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+  }
+  .pinterest-btn:hover { opacity: 0.85; }
+
+  .pinterest-preview {
+    width: 280px;
+    height: 160px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8f0e8, #e8d8c8);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .pin-cell { border-radius: 2px; }
+  .pin-1 { background: linear-gradient(135deg, #D4C4B0, #BCA990); }
+  .pin-2 { background: linear-gradient(135deg, #7A8C7E, #5A6E5E); }
+  .pin-3 { background: linear-gradient(135deg, #C4714A, #A8522E); }
+  .pin-4 { background: linear-gradient(135deg, #2C1F14, #4A3728); }
+
+  .pin-overlay {
+    position: relative;
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* MOODBOARD GRID — la pièce principale */
+  .rooms-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .room-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--linen);
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .room-chip:hover { border-color: var(--sand); color: var(--espresso); }
+  .room-chip.active { background: var(--espresso); border-color: var(--espresso); color: var(--cream); }
+
+  /* MOODBOARD ASYMÉTRIQUE */
+  .moodboard-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 0.9fr;
+    grid-template-rows: 220px 180px;
+    gap: 10px;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .mood-block {
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.25s;
+  }
+  .mood-block:hover { transform: scale(1.01); z-index: 2; }
+
+  .mood-block-1 {
+    grid-row: span 2;
+    background: linear-gradient(160deg, #D4C4B0 0%, #A89278 100%);
+  }
+  .mood-block-2 { background: linear-gradient(135deg, #E8DDD0, #D4C5B2); }
+  .mood-block-3 {
+    grid-row: span 2;
+    background: linear-gradient(160deg, #2C1F14 0%, #4A3728 100%);
+  }
+  .mood-block-4 { background: linear-gradient(135deg, #7A8C7E, #5A6E5E); }
+  .mood-block-5 { background: linear-gradient(135deg, #C4714A, #A8522E); }
+
+  /* Faux photo elements dans les blocs */
+  .mood-block-1::before {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+  }
+  .mood-block-1::after {
+    content: 'Canapé en lin naturel';
+    position: absolute;
+    bottom: 14px; left: 14px;
+    font-size: 10px;
+    font-weight: 200;
+    color: rgba(44,31,20,0.5);
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  .mood-block-3::after {
+    content: 'Table basse travertin';
+    position: absolute;
+    bottom: 14px; left: 14px;
+    font-size: 10px;
+    font-weight: 200;
+    color: rgba(247,243,238,0.4);
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  .mood-block-4::after {
+    content: 'Monstera & céramique';
+    position: absolute;
+    bottom: 10px; left: 12px;
+    font-size: 9px;
+    font-weight: 200;
+    color: rgba(247,243,238,0.5);
+    font-style: italic;
+  }
+
+  .mood-block-5::after {
+    content: 'Suspension rotin';
+    position: absolute;
+    bottom: 10px; left: 12px;
+    font-size: 9px;
+    font-weight: 200;
+    color: rgba(247,243,238,0.5);
+    font-style: italic;
+  }
+
+  .mood-block-2::after {
+    content: 'Zellige blanc cassé';
+    position: absolute;
+    bottom: 10px; left: 12px;
+    font-size: 9px;
+    font-weight: 200;
+    color: rgba(44,31,20,0.4);
+    font-style: italic;
+  }
+
+  .mood-add {
+    border: 1.5px dashed var(--sand);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+  }
+  .mood-add:hover { border-color: var(--espresso); background: rgba(44,31,20,0.03); }
+  .mood-add-icon { font-size: 24px; color: var(--sand); }
+  .mood-add-text { font-size: 10px; font-weight: 200; color: var(--text-light); letter-spacing: 0.08em; font-style: italic; }
+
+  .moodboard-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .caption-text { font-size: 10px; font-weight: 200; color: var(--text-light); font-style: italic; }
+  .caption-link { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); cursor: pointer; }
+  .caption-link:hover { color: var(--terracotta); }
+
+  /* INSPIRATIONS LISTE */
+  .inspo-section { margin-bottom: 40px; }
+  .inspo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+  .inspo-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .inspo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(44,31,20,0.08); }
+
+  .inspo-thumb { height: 120px; }
+  .inspo-thumb-1 { background: linear-gradient(135deg, #E8DDD0 0%, #C9BAA8 100%); }
+  .inspo-thumb-2 { background: linear-gradient(135deg, #7A8C7E 0%, #4A6050 100%); }
+  .inspo-thumb-3 { background: linear-gradient(135deg, #2C1F14 0%, #5A3A20 100%); }
+  .inspo-thumb-4 { background: linear-gradient(135deg, #C4714A 0%, #8A4020 100%); }
+  .inspo-thumb-5 { background: linear-gradient(135deg, #B89A6A 0%, #8A7040 100%); }
+  .inspo-thumb-6 { background: linear-gradient(135deg, #D4C4B0 0%, #9A8870 100%); }
+
+  .inspo-info { padding: 14px 16px; }
+  .inspo-source { font-size: 8px; font-weight: 200; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); margin-bottom: 4px; }
+  .inspo-title { font-size: 12px; font-weight: 300; color: var(--espresso); line-height: 1.4; }
+  .inspo-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+  .inspo-tag { font-size: 8px; font-weight: 300; padding: 2px 8px; border-radius: 10px; background: var(--linen); color: var(--text-light); letter-spacing: 0.05em; }
+
+  /* NOTES STYLE */
+  .style-notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .style-note-card {
+    background: var(--cream);
+    border: 1px solid var(--linen);
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .note-icon { font-size: 24px; margin-bottom: 12px; }
+  .note-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 8px; }
+  .note-text { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.8; font-style: italic; }
+
+  /* DARK FOOTER */
+  .moodboard-footer {
+    background: var(--espresso);
+    border-radius: 14px;
+    padding: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .footer-text { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--cream); max-width: 400px; line-height: 1.5; }
+  .footer-sub { font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.4); margin-top: 8px; font-style: italic; }
+  .footer-action {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .footer-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: none;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--terracotta); color: #fff; }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(247,243,238,0.6); }
+  .footer-btn:hover { opacity: 0.8; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: fadeUp 0.4s ease forwards; }
+  .style-tabs { animation: fadeUp 0.4s 0.05s ease forwards; opacity: 0; }
+  .content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+  .content > *:nth-child(1) { animation-delay: 0.1s; }
+  .content > *:nth-child(2) { animation-delay: 0.15s; }
+  .content > *:nth-child(3) { animation-delay: 0.2s; }
+  .content > *:nth-child(4) { animation-delay: 0.25s; }
+  .content > *:nth-child(5) { animation-delay: 0.3s; }
+  .content > *:nth-child(6) { animation-delay: 0.35s; }
+  .content > *:nth-child(7) { animation-delay: 0.4s; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function initModule(activeNavId) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return null; }
+  if (activeNavId) {
+    const el = document.getElementById(activeNavId);
+    if (el) { el.classList.add('active'); const dot = el.querySelector('.nav-dot'); if (dot) dot.style.background = 'var(--terracotta)'; }
+  }
+  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  const name = profile?.prenom || session.user.email.split('@')[0];
+  const userEl = document.getElementById('sidebarUser');
+  if (userEl) userEl.textContent = name;
+  return session.user;
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'app.html';
+}
+</script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'" style="cursor:pointer">
+    Le Move
+    <span>Ton premier chez-toi</span>
+  </div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" id="nav-budget" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" id="nav-demenagement" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" id="nav-moodboard" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" id="nav-achats" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" id="nav-avancement" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"><div class="progress-fill-mini" id="sidebarProgress"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand);letter-spacing:0.1em" id="sidebarUser"></div>
+      <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);cursor:pointer;letter-spacing:0.08em" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mon Moodboard</span></div>
+    <div class="page-title">Mon Moodboard</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Ton intérieur commence dans ta tête avant de commencer dans tes murs."</div>
+  </div>
+
+  <!-- TABS PAR PIÈCE -->
+  <div class="style-tabs">
+    <div class="tab active">Tout l'appartement</div>
+    <div class="tab">Salon</div>
+    <div class="tab">Chambre</div>
+    <div class="tab">Cuisine</div>
+    <div class="tab">Salle de bain</div>
+    <div class="tab">Entrée</div>
+    <div class="tab">+ Ajouter une pièce</div>
+  </div>
+
+  <div class="content">
+
+    <!-- PALETTE -->
+    <div class="section-eyebrow">Ma palette de couleurs</div>
+    <div class="palette-section">
+      <div class="palette-info">
+        <div class="palette-title">Palette Principale</div>
+        <div class="palette-desc">"Chaleur naturelle, matières honnêtes. Un intérieur qui sent le bois et le lin."</div>
+      </div>
+      <div class="palette-colors">
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#F7F3EE"></div>
+          <div class="swatch-info"><div class="swatch-name">Craie</div><div class="swatch-hex">#F7F3EE</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#D4C4B0"></div>
+          <div class="swatch-info"><div class="swatch-name">Lin</div><div class="swatch-hex">#D4C4B0</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#7A8C7E"></div>
+          <div class="swatch-info"><div class="swatch-name">Sauge</div><div class="swatch-hex">#7A8C7E</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#C4714A"></div>
+          <div class="swatch-info"><div class="swatch-name">Terracotta</div><div class="swatch-hex">#C4714A</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#B89A6A"></div>
+          <div class="swatch-info"><div class="swatch-name">Or doux</div><div class="swatch-hex">#B89A6A</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-color" style="background:#2C1F14"></div>
+          <div class="swatch-info"><div class="swatch-name">Espresso</div><div class="swatch-hex">#2C1F14</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PINTEREST -->
+    <div class="section-eyebrow">Intégration Pinterest</div>
+    <div class="pinterest-zone">
+      <div class="pinterest-left">
+        <div class="pinterest-title">Connecte ton tableau Pinterest</div>
+        <div class="pinterest-desc">
+          Glisse directement tes épingles préférées depuis Pinterest dans cette zone.<br>
+          Colle le lien d'une épingle ou d'un tableau entier pour l'intégrer à ton moodboard.
+        </div>
+        <button class="pinterest-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          Lier mon tableau Pinterest
+        </button>
+      </div>
+      <div class="pinterest-preview">
+        <div class="pin-cell pin-1"></div>
+        <div class="pin-cell pin-2"></div>
+        <div class="pin-cell pin-3"></div>
+        <div class="pin-cell pin-4"></div>
+      </div>
+    </div>
+
+    <!-- MOODBOARD PRINCIPAL -->
+    <div class="section-eyebrow">Mon moodboard</div>
+
+    <div class="rooms-nav">
+      <div class="room-chip active">Salon</div>
+      <div class="room-chip">Chambre</div>
+      <div class="room-chip">Cuisine</div>
+      <div class="room-chip">Salle de bain</div>
+      <div class="room-chip">+ Nouvelle pièce</div>
+    </div>
+
+    <div class="moodboard-layout">
+      <div class="mood-block mood-block-1"></div>
+      <div class="mood-block mood-block-2"></div>
+      <div class="mood-block mood-block-3"></div>
+      <div class="mood-block mood-block-4"></div>
+      <div class="mood-block mood-block-5"></div>
+      <div class="mood-add">
+        <div class="mood-add-icon">+</div>
+        <div class="mood-add-text">Ajouter une image</div>
+      </div>
+    </div>
+
+    <div class="moodboard-caption">
+      <div class="caption-text">6 images · Salon · Dernière mise à jour il y a 2 jours</div>
+      <div class="caption-link">Voir en plein écran →</div>
+    </div>
+
+    <!-- INSPIRATIONS -->
+    <div class="inspo-section">
+      <div class="section-eyebrow">Inspirations sauvegardées</div>
+      <div class="inspo-grid">
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-1"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">Pinterest · Interior Design</div>
+            <div class="inspo-title">Salon minimaliste avec canapé en lin et table travertin</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Salon</span>
+              <span class="inspo-tag">Lin</span>
+              <span class="inspo-tag">Minimaliste</span>
+            </div>
+          </div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-2"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">AD France · Déco</div>
+            <div class="inspo-title">Plantes et céramiques — l'appartement vivant</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Plantes</span>
+              <span class="inspo-tag">Céramique</span>
+              <span class="inspo-tag">Organique</span>
+            </div>
+          </div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-3"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">Pinterest · Architecture</div>
+            <div class="inspo-title">Détails sombres et contrastes — le style parisien</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Contraste</span>
+              <span class="inspo-tag">Parisien</span>
+            </div>
+          </div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-4"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">Maison du Monde · Look</div>
+            <div class="inspo-title">Terracotta & rideaux lin — chaleur méditerranéenne</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Terracotta</span>
+              <span class="inspo-tag">Méditerranée</span>
+            </div>
+          </div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-5"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">Instagram · @interior.minimal</div>
+            <div class="inspo-title">Suspension en rotin et lumière dorée du soir</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Luminaire</span>
+              <span class="inspo-tag">Rotin</span>
+            </div>
+          </div>
+        </div>
+        <div class="inspo-card">
+          <div class="inspo-thumb inspo-thumb-6"></div>
+          <div class="inspo-info">
+            <div class="inspo-source">Pinterest · Bedroom Inspo</div>
+            <div class="inspo-title">Chambre cocooning — lit bas, linge froissé, bougie</div>
+            <div class="inspo-tags">
+              <span class="inspo-tag">Chambre</span>
+              <span class="inspo-tag">Cocooning</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES DE STYLE -->
+    <div class="section-eyebrow">Mes notes de style</div>
+    <div class="style-notes">
+      <div class="style-note-card">
+        <div class="note-icon">🌿</div>
+        <div class="note-title">Ce que j'aime</div>
+        <div class="note-text">Matières naturelles — lin, rotin, bois clair, céramique. Beaucoup de lumière naturelle. Des plantes comme seul élément de couleur vive. Un canapé confortable qu'on a envie de ne plus quitter.</div>
+      </div>
+      <div class="style-note-card">
+        <div class="note-icon">✗</div>
+        <div class="note-title">Ce que je veux éviter</div>
+        <div class="note-text">Trop de couleurs différentes dans une même pièce. Le style scandinave trop froid et impersonnel. Les meubles "ikea basique" sans caractère. Le blanc pur trop stérile — toujours du blanc cassé.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="moodboard-footer">
+      <div>
+        <div class="footer-text">"Chaque image que tu sauvegardes ici raconte qui tu es avant même que ton appartement existe."</div>
+        <div class="footer-sub">Construis ton univers visuel, pièce par pièce.</div>
+      </div>
+      <div class="footer-action">
+        <button class="footer-btn btn-primary">+ Ajouter une inspiration</button>
+        <button class="footer-btn btn-secondary">Exporter le moodboard</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+
+<script>initModule("nav-moodboard");</script>
+</body>
+</html>
