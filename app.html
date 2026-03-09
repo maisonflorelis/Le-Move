@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le Move — Mon Espace</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -630,3 +631,15 @@ async function uploadPhoto(file) {
   const path = `avatars/${currentUser.id}.${ext}`;
   const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
   if (error) { console.error('Upload error:', error); return null; }
+  const { data } = sb.storage.from('profiles').getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+});
+
+init();
+</script>
+</body>
+</html>
