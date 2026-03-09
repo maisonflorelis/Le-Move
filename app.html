@@ -404,7 +404,15 @@ async function login() {
 
 async function resetPassword() {
   const email = document.getElementById('authEmail').value;
-  if (!email) { alert('Entre ton email d\'abord.'); return; }
+  const errEl = document.getElementById('authError');
+  if (!email) { errEl.textContent = "Entre ton email d'abord."; errEl.style.display = 'block'; return; }
+  const redirectTo = window.location.origin + window.location.pathname;
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.style.display = 'block'; return; }
+  errEl.style.background = '#F0FDF4'; errEl.style.borderColor = '#86EFAC'; errEl.style.color = '#16A34A';
+  errEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+  errEl.style.display = 'block';
+}
   await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
   alert('Email de réinitialisation envoyé !');
 }
