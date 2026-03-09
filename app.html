@@ -501,7 +501,14 @@ function renderModules() {
 }
 
 function openModule(id) {
-  alert(`Module "${id}" — Page en construction. 🚧`);
+  const pages = {
+    'budget': 'budget.html',
+    'demenagement': 'demenagement.html',
+    'moodboard': 'moodboard.html',
+    'achats': 'achats.html',
+    'avancement': 'avancement.html',
+  };
+  if (pages[id]) window.location.href = pages[id];
 }
 
 function updateProgress() {
