@@ -10,485 +10,152 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
-    --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+    --espresso: #2C1F14; --sage: #7A8C7E;
     --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
   }
   body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; }
 
-  /* ── AUTH SCREEN ── */
-  .auth-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--espresso);
-    position: relative;
-    overflow: hidden;
-  }
-  .auth-screen::before {
-    content: '';
-    position: absolute;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.04);
-    top: -200px; right: -200px;
-  }
-  .auth-screen::after {
-    content: '';
-    position: absolute;
-    width: 400px; height: 400px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.04);
-    bottom: -100px; left: -100px;
-  }
-  .auth-card {
-    background: var(--cream);
-    border-radius: 20px;
-    padding: 48px;
-    width: 100%;
-    max-width: 420px;
-    position: relative;
-    z-index: 1;
-  }
-  .auth-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 28px;
-    color: var(--espresso);
-    margin-bottom: 4px;
-  }
-  .auth-sub {
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 32px;
-  }
-  .auth-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--espresso);
-    margin-bottom: 24px;
-  }
+  /* ── AUTH ── */
+  .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--espresso); position: relative; overflow: hidden; }
+  .auth-screen::before { content: ''; position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); top: -200px; right: -200px; }
+  .auth-screen::after { content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); bottom: -100px; left: -100px; }
+  .auth-card { background: var(--cream); border-radius: 20px; padding: 48px; width: 100%; max-width: 420px; position: relative; z-index: 1; }
+  .auth-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 28px; color: var(--espresso); margin-bottom: 4px; }
+  .auth-sub { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 32px; }
+  .auth-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; margin-bottom: 24px; }
   .auth-field { margin-bottom: 16px; }
-  .auth-label {
-    font-size: 10px;
-    font-weight: 300;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    display: block;
-    margin-bottom: 8px;
-  }
-  .auth-input {
-    width: 100%;
-    padding: 12px 16px;
-    background: var(--warm-white);
-    border: 1px solid var(--linen);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--espresso);
-    outline: none;
-    transition: border-color 0.2s;
-  }
+  .auth-label { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 8px; }
+  .auth-input { width: 100%; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; color: var(--espresso); outline: none; transition: border-color 0.2s; }
   .auth-input:focus { border-color: var(--terracotta); }
-  .auth-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--espresso);
-    color: var(--cream);
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: opacity 0.2s;
-  }
+  .auth-btn { width: 100%; padding: 14px; background: var(--espresso); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
   .auth-btn:hover { opacity: 0.85; }
-  .auth-error {
-    background: #FEF2F2;
-    border: 1px solid #FCA5A5;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: #DC2626;
-    margin-top: 12px;
-    display: none;
-  }
-  .auth-forgot {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 11px;
-    color: var(--text-light);
-    cursor: pointer;
-    text-decoration: underline;
-  }
+  .auth-error { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #DC2626; margin-top: 12px; display: none; }
+  .auth-forgot { text-align: center; margin-top: 16px; font-size: 11px; color: var(--text-light); cursor: pointer; text-decoration: underline; }
 
-  /* ── APP SCREEN ── */
+  /* ── APP ── */
   .app-screen { display: none; }
 
   /* NAV */
-  .app-nav {
-    background: var(--espresso);
-    padding: 0 48px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+  .app-nav { background: var(--espresso); padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .nav-brand { display: flex; align-items: center; gap: 12px; }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); }
   .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); }
-  .nav-plan-badge {
-    font-size: 8px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(247,243,238,0.5);
-    background: rgba(255,255,255,0.07);
-    padding: 4px 10px;
-    border-radius: 20px;
-  }
-  .nav-right { display: flex; align-items: center; gap: 16px; }
-  .nav-user { font-size: 12px; font-weight: 300; color: rgba(247,243,238,0.6); }
-  .nav-logout {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(247,243,238,0.35);
-    cursor: pointer;
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-  }
+  .nav-plan-badge { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.5); background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 20px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: white; cursor: pointer; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); transition: border-color 0.2s; flex-shrink: 0; }
+  .nav-avatar:hover { border-color: rgba(255,255,255,0.4); }
+  .nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .nav-logout { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(247,243,238,0.35); cursor: pointer; transition: color 0.2s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
   .nav-logout:hover { color: rgba(247,243,238,0.7); }
 
-  /* WELCOME BANNER */
-  .welcome-banner {
-    background: var(--warm-white);
-    border-bottom: 1px solid var(--linen);
-    padding: 32px 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .welcome-greeting {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--espresso);
-    line-height: 1.2;
-  }
+  /* WELCOME */
+  .welcome-banner { background: var(--warm-white); border-bottom: 1px solid var(--linen); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; }
+  .welcome-greeting { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; font-style: italic; line-height: 1.2; }
   .welcome-greeting span { color: var(--terracotta); }
-  .welcome-sub {
-    font-size: 12px;
-    font-weight: 200;
-    color: var(--text-light);
-    margin-top: 6px;
-    font-style: italic;
-  }
-  .welcome-progress {
-    text-align: right;
-  }
-  .progress-label {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 8px;
-  }
-  .progress-bar-wrap {
-    width: 180px;
-    height: 4px;
-    background: var(--linen);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: var(--terracotta);
-    border-radius: 2px;
-    transition: width 1s ease;
-    width: 0%;
-  }
-  .progress-pct {
-    font-size: 11px;
-    color: var(--text-light);
-    margin-top: 6px;
-    font-style: italic;
-  }
+  .welcome-sub { font-size: 12px; font-weight: 200; color: var(--text-light); margin-top: 6px; font-style: italic; }
+  .welcome-meta { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .welcome-progress { text-align: right; }
+  .progress-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+  .progress-bar-wrap { width: 180px; height: 4px; background: var(--linen); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--terracotta); border-radius: 2px; transition: width 1s ease; width: 0%; }
+  .progress-pct { font-size: 11px; color: var(--text-light); margin-top: 6px; font-style: italic; }
 
-  /* MAIN CONTENT */
+  /* CONTENT */
   .app-content { padding: 40px 48px; max-width: 1200px; }
-
-  /* SECTION TITLE */
-  .section-label {
-    font-size: 9px;
-    font-weight: 300;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .section-label { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
   .section-label::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
 
-  /* MODULES GRID */
-  .modules-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 48px;
-  }
-
-  .module-card {
-    background: var(--warm-white);
-    border: 1px solid var(--linen);
-    border-radius: 16px;
-    padding: 28px;
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .module-card:hover:not(.locked) {
-    border-color: var(--sand);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(44,31,20,0.08);
-  }
-  .module-card.locked {
-    opacity: 0.5;
-    cursor: default;
-  }
-  .module-card.locked::after {
-    content: '🔒';
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 14px;
-  }
-  .module-card.featured {
-    background: var(--espresso);
-    border-color: var(--espresso);
-  }
-
-  .module-num {
-    font-size: 9px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 16px;
-  }
+  /* MODULES */
+  .modules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .module-card { background: var(--warm-white); border: 1px solid var(--linen); border-radius: 16px; padding: 28px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+  .module-card:hover:not(.locked) { border-color: var(--sand); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(44,31,20,0.08); }
+  .module-card.locked { opacity: 0.5; cursor: default; }
+  .module-card.locked::after { content: '🔒'; position: absolute; top: 16px; right: 16px; font-size: 14px; }
+  .module-card.featured { background: var(--espresso); border-color: var(--espresso); }
+  .module-num { font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
   .module-card.featured .module-num { color: rgba(247,243,238,0.35); }
-
   .module-icon { font-size: 28px; margin-bottom: 14px; }
-
-  .module-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--espresso);
-    margin-bottom: 8px;
-    line-height: 1.2;
-  }
+  .module-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
   .module-card.featured .module-title { color: var(--cream); }
-
-  .module-desc {
-    font-size: 11px;
-    font-weight: 200;
-    color: var(--text-light);
-    line-height: 1.7;
-  }
+  .module-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; }
   .module-card.featured .module-desc { color: rgba(247,243,238,0.5); }
-
-  .module-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 16px;
-  }
-  .module-tag {
-    font-size: 9px;
-    font-weight: 300;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: var(--linen);
-    color: var(--text-light);
-  }
+  .module-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .module-tag { font-size: 9px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: var(--linen); color: var(--text-light); }
   .module-card.featured .module-tag { background: rgba(255,255,255,0.1); color: rgba(247,243,238,0.5); }
-
-  .module-arrow {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--linen);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    transition: all 0.2s;
-  }
+  .module-arrow { position: absolute; bottom: 20px; right: 20px; width: 28px; height: 28px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
   .module-card:hover:not(.locked) .module-arrow { background: var(--terracotta); color: white; }
   .module-card.featured .module-arrow { background: rgba(255,255,255,0.1); color: var(--cream); }
 
-  /* UPGRADE CARD */
-  .upgrade-card {
-    background: linear-gradient(135deg, var(--terracotta), #A85A35);
-    border-radius: 16px;
-    padding: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 48px;
-  }
-  .upgrade-text {}
-  .upgrade-label {
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 8px;
-  }
-  .upgrade-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    font-style: italic;
-    color: white;
-    margin-bottom: 6px;
-  }
+  /* UPGRADE */
+  .upgrade-card { background: linear-gradient(135deg, var(--terracotta), #A85A35); border-radius: 16px; padding: 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; }
+  .upgrade-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+  .upgrade-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; color: white; margin-bottom: 6px; }
   .upgrade-desc { font-size: 12px; font-weight: 200; color: rgba(255,255,255,0.7); }
-  .upgrade-btn {
-    background: white;
-    color: var(--terracotta);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: opacity 0.2s;
-  }
+  .upgrade-btn { background: white; color: var(--terracotta); border: none; padding: 12px 24px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; }
   .upgrade-btn:hover { opacity: 0.9; }
 
-  /* TUTORIAL OVERLAY */
-  .tutorial-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(44,31,20,0.7);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-  }
-  .tutorial-card {
-    background: var(--cream);
-    border-radius: 20px;
-    padding: 48px;
-    max-width: 520px;
-    width: 90%;
-    position: relative;
-  }
-  .tutorial-step-indicator {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    margin-bottom: 24px;
-    display: flex;
-    gap: 6px;
-  }
-  .tut-dot {
-    width: 24px; height: 3px;
-    border-radius: 2px;
-    background: var(--linen);
-    transition: background 0.3s;
-  }
+  /* ── OVERLAYS ── */
+  .overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .overlay-card { background: var(--cream); border-radius: 20px; padding: 48px; max-width: 520px; width: 90%; position: relative; max-height: 90vh; overflow-y: auto; }
+
+  /* TUTORIAL */
+  .tut-dots { display: flex; gap: 6px; margin-bottom: 24px; }
+  .tut-dot { width: 24px; height: 3px; border-radius: 2px; background: var(--linen); transition: background 0.3s; }
   .tut-dot.active { background: var(--terracotta); }
   .tut-dot.done { background: var(--sage); }
-
-  .tutorial-icon { font-size: 40px; margin-bottom: 16px; }
-  .tutorial-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--espresso);
-    margin-bottom: 12px;
-    line-height: 1.2;
-  }
-  .tutorial-text {
-    font-size: 13px;
-    font-weight: 200;
-    color: var(--text-light);
-    line-height: 1.8;
-    margin-bottom: 32px;
-    font-style: italic;
-  }
-  .tutorial-actions { display: flex; align-items: center; justify-content: space-between; }
-  .tut-skip {
-    font-size: 11px;
-    color: var(--text-light);
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    text-decoration: underline;
-  }
-  .tut-next {
-    background: var(--espresso);
-    color: var(--cream);
-    border: none;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
+  .tut-icon { font-size: 40px; margin-bottom: 16px; }
+  .tut-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; font-style: italic; margin-bottom: 12px; line-height: 1.2; }
+  .tut-text { font-size: 13px; font-weight: 200; color: var(--text-light); line-height: 1.8; margin-bottom: 32px; font-style: italic; }
+  .tut-actions { display: flex; align-items: center; justify-content: space-between; }
+  .tut-skip { font-size: 11px; color: var(--text-light); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; text-decoration: underline; }
+  .tut-next { background: var(--espresso); color: var(--cream); border: none; padding: 12px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
   .tut-next:hover { opacity: 0.85; }
 
+  /* ONBOARDING */
+  .onb-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
+  .onb-sub { font-size: 12px; font-weight: 200; color: var(--text-light); margin-bottom: 28px; font-style: italic; line-height: 1.6; }
+  .onb-field { margin-bottom: 18px; }
+  .onb-label { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 8px; }
+  .onb-input, .onb-select { width: 100%; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+  .onb-input:focus, .onb-select:focus { border-color: var(--terracotta); }
+  .onb-photo-area { display: flex; align-items: center; gap: 16px; }
+  .onb-photo-preview { width: 64px; height: 64px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden; flex-shrink: 0; border: 2px solid var(--sand); }
+  .onb-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .onb-photo-btn { padding: 10px 18px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-size: 11px; color: var(--text-light); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .onb-photo-btn:hover { border-color: var(--sand); color: var(--espresso); }
+  .onb-submit { width: 100%; padding: 14px; background: var(--espresso); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+  .onb-submit:hover { opacity: 0.85; }
+  .onb-skip { display: block; text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-light); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; width: 100%; }
+
+  /* PROFILE PANEL */
+  .profile-panel-overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.3); z-index: 299; display: none; }
+  .profile-panel-overlay.open { display: block; }
+  .profile-panel { position: fixed; top: 0; right: -400px; width: 380px; height: 100vh; background: var(--warm-white); box-shadow: -8px 0 40px rgba(44,31,20,0.12); z-index: 300; transition: right 0.3s ease; overflow-y: auto; }
+  .profile-panel.open { right: 0; }
+  .profile-header { background: var(--espresso); padding: 32px 28px; position: relative; }
+  .profile-close { position: absolute; top: 18px; right: 18px; background: none; border: none; color: rgba(255,255,255,0.4); font-size: 18px; cursor: pointer; }
+  .profile-close:hover { color: rgba(255,255,255,0.8); }
+  .profile-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); cursor: pointer; position: relative; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-avatar-hint { font-size: 10px; color: rgba(255,255,255,0.35); }
+  .profile-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); }
+  .profile-email-txt { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .profile-body { padding: 28px; }
+  .profile-section-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--linen); }
+  .profile-field { margin-bottom: 16px; }
+  .profile-label { font-size: 10px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 6px; }
+  .profile-input, .profile-select { width: 100%; padding: 10px 14px; background: var(--cream); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+  .profile-input:focus, .profile-select:focus { border-color: var(--terracotta); }
+  .profile-save { width: 100%; padding: 12px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 4px; transition: opacity 0.2s; }
+  .profile-save:hover { opacity: 0.85; }
+  .profile-saved-msg { text-align: center; font-size: 11px; color: var(--sage); margin-top: 10px; display: none; }
+  .profile-logout { width: 100%; padding: 12px; background: none; color: var(--text-light); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
+  .profile-logout:hover { border-color: var(--sand); color: var(--espresso); }
+
   /* LOADING */
-  .loading-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--espresso);
-  }
-  .loading-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 36px;
-    color: var(--cream);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
+  .loading-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--espresso); }
+  .loading-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 36px; color: var(--cream); animation: pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
   /* MOBILE */
@@ -498,7 +165,8 @@
     .app-content { padding: 24px 20px; }
     .modules-grid { grid-template-columns: 1fr; }
     .upgrade-card { flex-direction: column; gap: 16px; }
-    .tutorial-card { padding: 32px 24px; }
+    .overlay-card { padding: 32px 24px; }
+    .profile-panel { width: 100%; right: -100%; }
   }
 </style>
 </head>
@@ -509,7 +177,7 @@
   <div class="loading-logo">Le Move</div>
 </div>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div class="auth-screen" id="authScreen" style="display:none;">
   <div class="auth-card">
     <div class="auth-logo">Le Move</div>
@@ -529,10 +197,9 @@
   </div>
 </div>
 
-<!-- APP SCREEN -->
+<!-- APP -->
 <div class="app-screen" id="appScreen">
 
-  <!-- NAV -->
   <nav class="app-nav">
     <div class="nav-brand">
       <div class="nav-logo">Le Move</div>
@@ -540,16 +207,16 @@
       <div class="nav-plan-badge" id="navPlanBadge">Plan —</div>
     </div>
     <div class="nav-right">
-      <div class="nav-user" id="navUser"></div>
+      <div class="nav-avatar" id="navAvatar" onclick="openProfile()">?</div>
       <button class="nav-logout" onclick="logout()">Déconnexion</button>
     </div>
   </nav>
 
-  <!-- WELCOME BANNER -->
   <div class="welcome-banner">
     <div>
       <div class="welcome-greeting">Bonjour, <span id="userName">—</span> 👋</div>
       <div class="welcome-sub">Ton espace est prêt. Par où tu commences ?</div>
+      <div class="welcome-meta" id="welcomeMeta"></div>
     </div>
     <div class="welcome-progress">
       <div class="progress-label">Progression</div>
@@ -560,38 +227,125 @@
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="app-content">
-
-    <!-- MODULES -->
     <div class="section-label">Tes modules</div>
-    <div class="modules-grid" id="modulesGrid">
-      <!-- injected by JS -->
-    </div>
-
-    <!-- UPGRADE CARD (shown if not premium) -->
+    <div class="modules-grid" id="modulesGrid"></div>
     <div class="upgrade-card" id="upgradeCard" style="display:none;">
-      <div class="upgrade-text">
+      <div>
         <div class="upgrade-label">Passe au niveau supérieur</div>
         <div class="upgrade-title">Débloque tous les modules.</div>
         <div class="upgrade-desc">Accède à 100% des fonctionnalités Le Move.</div>
       </div>
       <button class="upgrade-btn" onclick="window.open('https://lemove.fr#pricing','_blank')">Voir les offres →</button>
     </div>
-
   </div>
 </div>
 
-<!-- TUTORIAL OVERLAY -->
-<div class="tutorial-overlay" id="tutorialOverlay" style="display:none;">
-  <div class="tutorial-card">
-    <div class="tutorial-step-indicator" id="tutDots"></div>
-    <div class="tutorial-icon" id="tutIcon"></div>
-    <div class="tutorial-title" id="tutTitle"></div>
-    <div class="tutorial-text" id="tutText"></div>
-    <div class="tutorial-actions">
-      <button class="tut-skip" onclick="closeTutorial()">Passer le tutoriel</button>
+<!-- TUTORIAL -->
+<div class="overlay" id="tutorialOverlay" style="display:none;">
+  <div class="overlay-card">
+    <div class="tut-dots" id="tutDots"></div>
+    <div class="tut-icon" id="tutIcon"></div>
+    <div class="tut-title" id="tutTitle"></div>
+    <div class="tut-text" id="tutText"></div>
+    <div class="tut-actions">
+      <button class="tut-skip" onclick="endTutorial()">Passer →</button>
       <button class="tut-next" id="tutNextBtn" onclick="nextTutorial()">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="overlay" id="onboardingOverlay" style="display:none;">
+  <div class="overlay-card">
+    <div style="font-size:32px;margin-bottom:12px;">✨</div>
+    <div class="onb-title">Personnalise ton espace.</div>
+    <div class="onb-sub">Quelques infos pour que Le Move soit vraiment toi — ça prend 30 secondes.</div>
+
+    <div class="onb-field">
+      <label class="onb-label">Ta photo de profil</label>
+      <div class="onb-photo-area">
+        <div class="onb-photo-preview" id="onbPhotoPreview">😊</div>
+        <div>
+          <button class="onb-photo-btn" onclick="document.getElementById('onbPhotoInput').click()">Choisir une photo</button>
+          <input type="file" id="onbPhotoInput" accept="image/*" style="display:none" onchange="previewPhoto(this,'onb')">
+          <div style="font-size:10px;color:var(--text-light);margin-top:6px;">JPG ou PNG · Max 2 Mo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Ton prénom</label>
+      <input type="text" class="onb-input" id="onbPrenom" placeholder="Ex : Sophie">
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Date d'emménagement prévue</label>
+      <input type="date" class="onb-input" id="onbDate">
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Type de logement</label>
+      <select class="onb-select" id="onbType">
+        <option value="">— Choisir —</option>
+        <option value="Studio">Studio</option>
+        <option value="T1">T1 / 1 pièce</option>
+        <option value="T2">T2 / 2 pièces</option>
+        <option value="T3">T3 / 3 pièces</option>
+        <option value="T4+">T4 et plus</option>
+        <option value="Maison">Maison</option>
+      </select>
+    </div>
+
+    <button class="onb-submit" onclick="saveOnboarding()">Enregistrer mon profil →</button>
+    <button class="onb-skip" onclick="closeOnboarding()">Passer pour l'instant</button>
+  </div>
+</div>
+
+<!-- PROFILE PANEL -->
+<div class="profile-panel-overlay" id="profilePanelOverlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profilePanel">
+  <div class="profile-header">
+    <button class="profile-close" onclick="closeProfile()">✕</button>
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('profilePhotoInput').click()">
+        ?
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">
+      </div>
+      <div class="profile-avatar-hint">Clique pour changer la photo</div>
+      <div class="profile-name" id="profileName">—</div>
+      <div class="profile-email-txt" id="profileEmailTxt">—</div>
+    </div>
+  </div>
+  <div class="profile-body">
+    <div class="profile-section-title">Mes informations</div>
+    <div class="profile-field">
+      <label class="profile-label">Prénom</label>
+      <input type="text" class="profile-input" id="profilePrenom" placeholder="Ton prénom">
+    </div>
+    <div class="profile-field">
+      <label class="profile-label">Date d'emménagement</label>
+      <input type="date" class="profile-input" id="profileDate">
+    </div>
+    <div class="profile-field">
+      <label class="profile-label">Type de logement</label>
+      <select class="profile-select" id="profileType">
+        <option value="">— Choisir —</option>
+        <option value="Studio">Studio</option>
+        <option value="T1">T1 / 1 pièce</option>
+        <option value="T2">T2 / 2 pièces</option>
+        <option value="T3">T3 / 3 pièces</option>
+        <option value="T4+">T4 et plus</option>
+        <option value="Maison">Maison</option>
+      </select>
+    </div>
+    <button class="profile-save" onclick="saveProfile()">Sauvegarder les modifications</button>
+    <div class="profile-saved-msg" id="profileSavedMsg">✓ Profil mis à jour !</div>
+
+    <div style="margin-top:32px;">
+      <div class="profile-section-title">Mon compte</div>
+      <div style="font-size:12px;color:var(--text-light);margin-bottom:16px;line-height:1.7;">Pour changer ton mot de passe, utilise le lien "Mot de passe oublié" sur la page de connexion.</div>
+      <button class="profile-logout" onclick="logout()">Se déconnecter</button>
     </div>
   </div>
 </div>
@@ -602,101 +356,29 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ── MODULES DEFINITION ──
-// Plans: essentiel=22€, complet=39€, premium=56€
 const ALL_MODULES = [
-  {
-    id: 'budget',
-    icon: '💰',
-    title: 'Mon Budget',
-    desc: 'Budget total, dépensé, restant. Suivi par catégorie avec alertes dépassement.',
-    tags: ['Finances', 'Planning'],
-    plans: ['essentiel', 'complet', 'premium'],
-    file: 'le-move-budget.html',
-  },
-  {
-    id: 'demenagement',
-    icon: '📦',
-    title: 'Mon Déménagement',
-    desc: 'Checklist par phase : Signature → Préparation → Démarches → Jour J → Installation.',
-    tags: ['Organisation', 'Checklist'],
-    plans: ['essentiel', 'complet', 'premium'],
-    file: 'le-move-demenagement.html',
-  },
-  {
-    id: 'moodboard',
-    icon: '🎨',
-    title: 'Moodboard & Inspirations',
-    desc: 'Palette de couleurs, intégration Pinterest, inspirations sauvegardées, notes de style.',
-    tags: ['Déco', 'Inspiration'],
-    plans: ['complet', 'premium'],
-    file: 'le-move-moodboard.html',
-  },
-  {
-    id: 'achats',
-    icon: '🚚',
-    title: 'Mes Achats & Livraisons',
-    desc: 'Suivi de toutes tes commandes — Commandé → Préparé → En route → Livré.',
-    tags: ['Achats', 'Suivi'],
-    plans: ['complet', 'premium'],
-    file: 'le-move-achats.html',
-  },
-  {
-    id: 'avancement',
-    icon: '✅',
-    title: 'Mon Avancement',
-    desc: 'Vue Kanban de toutes tes tâches — tâches faites, en cours, en retard, jour J.',
-    tags: ['Gestion', 'Tâches'],
-    plans: ['complet', 'premium'],
-    file: 'le-move-avancement.html',
-  },
-  {
-    id: 'guide-pdf',
-    icon: '📘',
-    title: 'Guide PDF "Bien s\'installer"',
-    desc: 'Guide complet téléchargeable pour réussir ton installation de A à Z.',
-    tags: ['PDF', 'Guide'],
-    plans: ['premium'],
-    file: null,
-  },
-  {
-    id: 'checklist-print',
-    icon: '🖨️',
-    title: 'Checklist Imprimable A4',
-    desc: 'Checklist premium au format A4 à imprimer et cocher au mur.',
-    tags: ['Imprimable', 'Checklist'],
-    plans: ['premium'],
-    file: null,
-  },
+  { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Suivi par catégorie avec alertes dépassement.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'demenagement', icon: '📦', title: 'Mon Déménagement', desc: 'Checklist par phase : Signature → Préparation → Démarches → Jour J → Installation.', tags: ['Organisation', 'Checklist'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'moodboard', icon: '🎨', title: 'Moodboard & Inspirations', desc: 'Palette de couleurs, intégration Pinterest, inspirations sauvegardées, notes de style.', tags: ['Déco', 'Inspiration'], plans: ['complet', 'premium'] },
+  { id: 'achats', icon: '🚚', title: 'Mes Achats & Livraisons', desc: 'Suivi de toutes tes commandes — Commandé → Préparé → En route → Livré.', tags: ['Achats', 'Suivi'], plans: ['complet', 'premium'] },
+  { id: 'avancement', icon: '✅', title: 'Mon Avancement', desc: 'Vue Kanban de toutes tes tâches — faites, en cours, en retard, countdown jour J.', tags: ['Gestion', 'Tâches'], plans: ['complet', 'premium'] },
+  { id: 'guide-pdf', icon: '📘', title: 'Guide PDF "Bien s\'installer"', desc: 'Guide complet téléchargeable pour réussir ton installation de A à Z.', tags: ['PDF', 'Guide'], plans: ['premium'] },
+  { id: 'checklist-print', icon: '🖨️', title: 'Checklist Imprimable A4', desc: 'Checklist premium au format A4 à imprimer et cocher au mur.', tags: ['Imprimable', 'Checklist'], plans: ['premium'] },
 ];
 
-// ── TUTORIAL STEPS ──
 const TUTORIAL_STEPS = [
-  {
-    icon: '🎉',
-    title: 'Bienvenue dans ton espace !',
-    text: 'Le Move est ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, livraisons — tout est centralisé ici.',
-  },
-  {
-    icon: '📦',
-    title: 'Tes modules t\'attendent.',
-    text: 'Chaque module correspond à une partie de ton emménagement. Commence par le budget ou le planning déménagement — c\'est là que tout commence.',
-  },
-  {
-    icon: '✅',
-    title: 'Suis ta progression.',
-    text: 'La barre en haut suit ton avancement. Plus tu coches de tâches dans chaque module, plus elle avance. Objectif : 100% avant le jour J !',
-  },
-  {
-    icon: '🚀',
-    title: 'C\'est parti !',
-    text: 'Ton espace est prêt. Ton premier chez-toi mérite d\'être bien organisé — et maintenant tu as tout ce qu\'il faut pour y arriver.',
-  },
+  { icon: '🎉', title: 'Bienvenue dans ton espace !', text: 'Le Move est ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, livraisons — tout est centralisé ici.' },
+  { icon: '📦', title: 'Tes modules t\'attendent.', text: 'Chaque module correspond à une partie de ton emménagement. Commence par le budget ou le planning déménagement — c\'est là que tout commence.' },
+  { icon: '✅', title: 'Suis ta progression.', text: 'La barre en haut suit ton avancement. Plus tu coches de tâches dans chaque module, plus elle avance. Objectif : 100% avant le jour J !' },
+  { icon: '✨', title: 'Personnalisons ton espace !', text: 'On va te demander ton prénom et ta date d\'emménagement pour que Le Move soit vraiment toi.' },
 ];
 
-let tutorialStep = 0;
+let tutStep = 0;
 let currentUser = null;
 let currentPlan = 'essentiel';
+let currentProfile = {};
+let pendingPhotoFile = null;
+let pendingPhotoTarget = null;
 
 // ── INIT ──
 async function init() {
@@ -709,31 +391,24 @@ async function init() {
   }
 }
 
-// ── LOGIN ──
+// ── AUTH ──
 async function login() {
   const email = document.getElementById('authEmail').value;
   const password = document.getElementById('authPassword').value;
   const errEl = document.getElementById('authError');
   errEl.style.display = 'none';
-
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) {
-    errEl.textContent = 'Email ou mot de passe incorrect.';
-    errEl.style.display = 'block';
-    return;
-  }
+  if (error) { errEl.textContent = 'Email ou mot de passe incorrect.'; errEl.style.display = 'block'; return; }
   await loadApp(data.user);
 }
 
-// ── RESET PASSWORD ──
 async function resetPassword() {
   const email = document.getElementById('authEmail').value;
   if (!email) { alert('Entre ton email d\'abord.'); return; }
-  await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://lemove.fr/app' });
+  await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
   alert('Email de réinitialisation envoyé !');
 }
 
-// ── LOGOUT ──
 async function logout() {
   await sb.auth.signOut();
   location.reload();
@@ -743,52 +418,72 @@ async function logout() {
 async function loadApp(user) {
   currentUser = user;
 
-  // Get plan from Users table
   const { data: userData } = await sb.from('Users').select('Plan').eq('Email', user.email).single();
   currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
 
-  // Update UI
-  const firstName = user.email.split('@')[0].split('.')[0];
-  const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-  document.getElementById('userName').textContent = displayName;
-  document.getElementById('navUser').textContent = user.email;
+  const { data: profileData } = await sb.from('Profiles').select('*').eq('id', user.id).single();
+  currentProfile = profileData || {};
+
+  const fallbackName = user.email.split('@')[0].split('.')[0];
+  const displayName = currentProfile.prenom || (fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1));
+
   document.getElementById('navPlanBadge').textContent = 'Plan ' + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
-
-  // Render modules
+  refreshAvatarUI(displayName, currentProfile.photo_url);
+  document.getElementById('userName').textContent = displayName;
+  refreshWelcomeMeta();
   renderModules();
+  if (currentPlan !== 'premium') document.getElementById('upgradeCard').style.display = 'flex';
 
-  // Show upgrade card if not premium
-  if (currentPlan !== 'premium') {
-    document.getElementById('upgradeCard').style.display = 'flex';
-  }
-
-  // Show app
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
 
-  // Show tutorial if first visit
-  const tutorialSeen = localStorage.getItem('lemove_tutorial_' + user.id);
-  if (!tutorialSeen) {
-    setTimeout(() => showTutorial(), 600);
-  }
-
-  // Animate progress bar
+  const seen = localStorage.getItem('lemove_tutorial_' + user.id);
+  if (!seen) setTimeout(() => showTutorial(), 600);
   setTimeout(() => updateProgress(), 800);
 }
 
-// ── RENDER MODULES ──
+// ── WELCOME META ──
+function refreshWelcomeMeta() {
+  const el = document.getElementById('welcomeMeta');
+  if (!currentProfile.date_emmenagement) { el.textContent = ''; return; }
+  const date = new Date(currentProfile.date_emmenagement);
+  const diff = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
+  const log = currentProfile.type_logement ? ` · ${currentProfile.type_logement}` : '';
+  if (diff > 0) el.textContent = `📅 Jour J dans ${diff} jours${log}`;
+  else if (diff === 0) el.textContent = `📅 C'est aujourd'hui !${log}`;
+  else el.textContent = `📅 Emménagement effectué${log}`;
+}
+
+// ── AVATAR ──
+function refreshAvatarUI(name, photoUrl) {
+  const initial = name ? name[0].toUpperCase() : '?';
+  const navAv = document.getElementById('navAvatar');
+  const profAv = document.getElementById('profileAvatar');
+
+  if (photoUrl) {
+    navAv.innerHTML = `<img src="${photoUrl}" alt="">`;
+    profAv.innerHTML = `<img src="${photoUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  } else {
+    navAv.textContent = initial;
+    profAv.innerHTML = `${initial}<input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  }
+
+  document.getElementById('profileName').textContent = name || '—';
+  document.getElementById('profileEmailTxt').textContent = currentUser?.email || '—';
+  document.getElementById('profilePrenom').value = currentProfile.prenom || '';
+  document.getElementById('profileDate').value = currentProfile.date_emmenagement || '';
+  document.getElementById('profileType').value = currentProfile.type_logement || '';
+}
+
+// ── MODULES ──
 function renderModules() {
   const grid = document.getElementById('modulesGrid');
   grid.innerHTML = '';
-
   ALL_MODULES.forEach((mod, i) => {
     const hasAccess = mod.plans.includes(currentPlan);
-    const isFeatured = i === 0;
-
     const card = document.createElement('div');
-    card.className = `module-card${isFeatured && hasAccess ? ' featured' : ''}${!hasAccess ? ' locked' : ''}`;
-
+    card.className = `module-card${i === 0 && hasAccess ? ' featured' : ''}${!hasAccess ? ' locked' : ''}`;
     card.innerHTML = `
       <div class="module-num">Module ${String(i + 1).padStart(2, '0')}</div>
       <div class="module-icon">${mod.icon}</div>
@@ -800,74 +495,135 @@ function renderModules() {
       </div>
       ${hasAccess ? '<div class="module-arrow">→</div>' : ''}
     `;
-
-    if (hasAccess) {
-      card.onclick = () => openModule(mod.id);
-    }
-
+    if (hasAccess) card.onclick = () => openModule(mod.id);
     grid.appendChild(card);
   });
 }
 
-// ── OPEN MODULE ──
 function openModule(id) {
-  // Each module would be a separate page — for now, placeholder
   alert(`Module "${id}" — Page en construction. 🚧`);
 }
 
-// ── PROGRESS ──
 function updateProgress() {
-  const accessibleModules = ALL_MODULES.filter(m => m.plans.includes(currentPlan)).length;
-  const total = ALL_MODULES.length;
-  const pct = Math.round((accessibleModules / total) * 40); // max 40% from plan alone
+  const accessible = ALL_MODULES.filter(m => m.plans.includes(currentPlan)).length;
+  const pct = Math.round((accessible / ALL_MODULES.length) * 40);
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('progressPct').textContent = pct + '% complété';
 }
 
 // ── TUTORIAL ──
 function showTutorial() {
-  tutorialStep = 0;
-  renderTutorialStep();
+  tutStep = 0;
+  renderTutStep();
   document.getElementById('tutorialOverlay').style.display = 'flex';
 }
 
-function renderTutorialStep() {
-  const step = TUTORIAL_STEPS[tutorialStep];
-  document.getElementById('tutIcon').textContent = step.icon;
-  document.getElementById('tutTitle').textContent = step.title;
-  document.getElementById('tutText').textContent = step.text;
-
-  const isLast = tutorialStep === TUTORIAL_STEPS.length - 1;
-  document.getElementById('tutNextBtn').textContent = isLast ? 'C\'est parti ! →' : 'Suivant →';
-
-  // Dots
-  const dots = document.getElementById('tutDots');
-  dots.innerHTML = TUTORIAL_STEPS.map((_, i) =>
-    `<div class="tut-dot ${i < tutorialStep ? 'done' : i === tutorialStep ? 'active' : ''}"></div>`
+function renderTutStep() {
+  const s = TUTORIAL_STEPS[tutStep];
+  document.getElementById('tutIcon').textContent = s.icon;
+  document.getElementById('tutTitle').textContent = s.title;
+  document.getElementById('tutText').textContent = s.text;
+  const isLast = tutStep === TUTORIAL_STEPS.length - 1;
+  document.getElementById('tutNextBtn').textContent = isLast ? 'Personnaliser mon espace →' : 'Suivant →';
+  document.getElementById('tutDots').innerHTML = TUTORIAL_STEPS.map((_, i) =>
+    `<div class="tut-dot ${i < tutStep ? 'done' : i === tutStep ? 'active' : ''}"></div>`
   ).join('');
 }
 
 function nextTutorial() {
-  if (tutorialStep < TUTORIAL_STEPS.length - 1) {
-    tutorialStep++;
-    renderTutorialStep();
-  } else {
-    closeTutorial();
-  }
+  if (tutStep < TUTORIAL_STEPS.length - 1) { tutStep++; renderTutStep(); }
+  else endTutorial();
 }
 
-function closeTutorial() {
+function endTutorial() {
   document.getElementById('tutorialOverlay').style.display = 'none';
-  if (currentUser) {
-    localStorage.setItem('lemove_tutorial_' + currentUser.id, 'seen');
-  }
+  localStorage.setItem('lemove_tutorial_' + currentUser.id, 'seen');
+  if (!currentProfile.prenom) setTimeout(() => document.getElementById('onboardingOverlay').style.display = 'flex', 300);
 }
 
-// Enter key on password field
+// ── ONBOARDING ──
+async function saveOnboarding() {
+  const prenom = document.getElementById('onbPrenom').value.trim();
+  const date = document.getElementById('onbDate').value;
+  const type = document.getElementById('onbType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'onb') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+  closeOnboarding();
+}
+
+function closeOnboarding() {
+  document.getElementById('onboardingOverlay').style.display = 'none';
+}
+
+// ── PROFILE PANEL ──
+function openProfile() {
+  document.getElementById('profilePanel').classList.add('open');
+  document.getElementById('profilePanelOverlay').classList.add('open');
+}
+
+function closeProfile() {
+  document.getElementById('profilePanel').classList.remove('open');
+  document.getElementById('profilePanelOverlay').classList.remove('open');
+}
+
+async function saveProfile() {
+  const prenom = document.getElementById('profilePrenom').value.trim();
+  const date = document.getElementById('profileDate').value;
+  const type = document.getElementById('profileType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'profile') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+
+  const msg = document.getElementById('profileSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+}
+
+// ── PHOTO PREVIEW ──
+function previewPhoto(input, target) {
+  if (!input.files[0]) return;
+  pendingPhotoFile = input.files[0];
+  pendingPhotoTarget = target;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (target === 'onb') {
+      document.getElementById('onbPhotoPreview').innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+      document.getElementById('navAvatar').innerHTML = `<img src="${e.target.result}" alt="">`;
+    }
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function uploadPhoto(file) {
+  const ext = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}.${ext}`;
+  const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
+  if (error) { console.error('Upload error:', error); return null; }
+  const { data } = sb.storage.from('profiles').getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('authPassword')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') login();
-  });
+  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 });
 
 init();
