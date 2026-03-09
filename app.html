@@ -413,9 +413,6 @@ async function resetPassword() {
   errEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
   errEl.style.display = 'block';
 }
-  await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
-  alert('Email de réinitialisation envoyé !');
-}
 
 async function logout() {
   await sb.auth.signOut();
@@ -633,15 +630,3 @@ async function uploadPhoto(file) {
   const path = `avatars/${currentUser.id}.${ext}`;
   const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
   if (error) { console.error('Upload error:', error); return null; }
-  const { data } = sb.storage.from('profiles').getPublicUrl(path);
-  return data.publicUrl + '?t=' + Date.now();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-});
-
-init();
-</script>
-</body>
-</html>
