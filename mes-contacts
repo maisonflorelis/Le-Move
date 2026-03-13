@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Mes Contacts</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+  --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+  --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  --ink: #1C1410; --paper: #FAF7F2; --paper-line: #E8E2D9;
+  --ink-blue: #2A3F5F; --ink-red: #8B2020;
+}
+body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; display: flex; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--warm-black); padding: 40px 24px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 32px; line-height: 1.2; cursor: pointer; }
+.sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+.nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+.nav-item.active .nav-dot { background: var(--terracotta); }
+.nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+.sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+.progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+.progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+/* HEADER */
+.page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+.page-header::before { content: '📒'; position: absolute; right: 52px; top: 50%; transform: translateY(-50%); font-size: 120px; opacity: 0.06; pointer-events: none; }
+.breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+.breadcrumb span { color: rgba(247,243,238,0.6); }
+.page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+.page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+.page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); }
+
+/* LAYOUT */
+.content { padding: 40px 52px; display: grid; grid-template-columns: 1fr 420px; gap: 32px; align-items: start; }
+.section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+/* ══════════════════════════════ */
+/* CONTACTS SIDE */
+/* ══════════════════════════════ */
+.contacts-side {}
+
+.cat-section { margin-bottom: 32px; }
+.cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cat-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--espresso); display: flex; align-items: center; gap: 10px; }
+.cat-icon { font-size: 16px; }
+.cat-add-btn { width: 24px; height: 24px; border-radius: 50%; background: var(--linen); border: none; font-size: 14px; color: var(--text-light); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.cat-add-btn:hover { background: var(--espresso); color: white; }
+
+.contact-row { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--cream); border: 1px solid var(--linen); border-radius: 10px; margin-bottom: 8px; transition: all 0.2s; cursor: pointer; }
+.contact-row:hover { border-color: var(--sand); box-shadow: 0 4px 12px rgba(44,31,20,0.06); transform: translateX(4px); }
+.contact-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: white; flex-shrink: 0; }
+.contact-details { flex: 1; min-width: 0; }
+.contact-name { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.contact-role { font-size: 10px; font-weight: 200; color: var(--text-light); }
+.contact-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
+.contact-row:hover .contact-actions { opacity: 1; }
+.action-btn { width: 28px; height: 28px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; background: var(--linen); color: var(--text-light); }
+.action-btn:hover { background: var(--espresso); color: white; }
+.action-btn.call { background: rgba(122,140,126,0.12); color: var(--sage); }
+.action-btn.call:hover { background: var(--sage); color: white; }
+.action-btn.rdv { background: rgba(196,113,74,0.1); color: var(--terracotta); }
+.action-btn.rdv:hover { background: var(--terracotta); color: white; }
+
+.empty-cat { padding: 12px 16px; border: 1px dashed var(--linen); border-radius: 10px; font-size: 11px; font-weight: 200; color: var(--text-light); font-style: italic; text-align: center; margin-bottom: 8px; }
+
+/* ══════════════════════════════ */
+/* CARNET / AGENDA SIDE */
+/* ══════════════════════════════ */
+.agenda-side { position: sticky; top: 24px; }
+
+/* The notebook */
+.notebook {
+  background: var(--paper);
+  border-radius: 4px 12px 12px 4px;
+  box-shadow:
+    -4px 0 0 #C4A882,
+    -8px 0 0 #D4B892,
+    0 4px 32px rgba(44,31,20,0.15),
+    0 1px 4px rgba(44,31,20,0.1);
+  position: relative;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* Spine */
+.notebook::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 32px;
+  background: linear-gradient(90deg, #8B6914 0%, #B89A6A 40%, #C4A882 100%);
+  z-index: 2;
+}
+
+/* Spiral holes */
+.spiral {
+  position: absolute;
+  left: 16px;
+  top: 0; bottom: 0;
+  width: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 20px 0;
+  gap: 0;
+}
+.spiral-hole {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--warm-black);
+  border: 2px solid #6B4F10;
+  flex-shrink: 0;
+  margin: 6px 0;
+}
+
+/* Lined paper */
+.notebook-paper {
+  margin-left: 32px;
+  padding: 0;
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 27px,
+      var(--paper-line) 27px,
+      var(--paper-line) 28px
+    );
+  background-color: var(--paper);
+  background-position: 0 36px;
+}
+
+/* Red margin line */
+.notebook-paper::before {
+  content: '';
+  position: absolute;
+  left: 44px; top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(180, 60, 60, 0.25);
+  z-index: 1;
+}
+
+/* Notebook header */
+.notebook-header {
+  padding: 16px 20px 12px 56px;
+  border-bottom: 2px solid rgba(180,60,60,0.2);
+  position: relative;
+  z-index: 2;
+  background: var(--paper);
+}
+.notebook-month {
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.notebook-year {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  color: var(--text-light);
+}
+.notebook-nav {
+  position: absolute;
+  right: 16px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; gap: 4px;
+}
+.nb-nav-btn {
+  width: 26px; height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--linen);
+  background: white;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-light);
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.nb-nav-btn:hover { background: var(--espresso); color: white; border-color: var(--espresso); }
+
+/* Days row */
+.notebook-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 16px 4px 56px;
+  gap: 2px;
+  position: relative;
+  z-index: 2;
+}
+.day-label {
+  font-family: 'Caveat', cursive;
+  font-size: 12px;
+  color: var(--text-light);
+  text-align: center;
+}
+
+/* Calendar grid */
+.notebook-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 4px 16px 16px 56px;
+  gap: 2px;
+  position: relative;
+  z-index: 2;
+}
+.nb-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  padding: 2px;
+}
+.nb-day:hover { background: rgba(196,113,74,0.08); }
+.nb-day.other-month .nb-day-num { color: var(--sand); }
+.nb-day.today .nb-day-num {
+  background: var(--terracotta);
+  color: white;
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nb-day.selected { background: rgba(196,113,74,0.1); }
+.nb-day-num {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  color: var(--espresso);
+  line-height: 1;
+}
+.nb-day-dots { display: flex; gap: 2px; margin-top: 2px; }
+.nb-dot { width: 4px; height: 4px; border-radius: 50%; }
+.nb-dot-presentiel { background: var(--terracotta); }
+.nb-dot-visio { background: var(--ink-blue); }
+
+/* RDV List */
+.notebook-rdvs {
+  padding: 0 16px 20px 56px;
+  position: relative;
+  z-index: 2;
+}
+.rdv-date-label {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  margin-top: 16px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.rdv-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--paper-line);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.rdv-entry:hover { opacity: 0.75; }
+.rdv-time-col {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: var(--text-light);
+  min-width: 44px;
+  line-height: 1.3;
+}
+.rdv-dot-col { padding-top: 4px; }
+.rdv-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rdv-dot-presentiel { background: var(--terracotta); }
+.rdv-dot-visio { background: var(--ink-blue); }
+.rdv-info { flex: 1; }
+.rdv-title-hand {
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.rdv-meta-hand {
+  font-family: 'Caveat', cursive;
+  font-size: 13px;
+  color: var(--text-light);
+}
+.rdv-type-badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.badge-presentiel { background: rgba(196,113,74,0.1); color: var(--terracotta); }
+.badge-visio { background: rgba(42,63,95,0.08); color: var(--ink-blue); }
+
+.rdv-empty {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: var(--sand);
+  font-style: italic;
+  padding: 16px 0;
+  text-align: center;
+}
+
+/* Add RDV btn */
+.add-rdv-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 16px 56px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px dashed var(--sand);
+  border-radius: 8px;
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+  width: calc(100% - 72px);
+  position: relative;
+  z-index: 2;
+}
+.add-rdv-btn:hover { border-color: var(--terracotta); color: var(--terracotta); background: rgba(196,113,74,0.04); }
+
+/* ══════════════════════════════ */
+/* MODALS */
+/* ══════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.6); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal-card { background: var(--cream); border-radius: 20px; padding: 36px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; animation: popIn 0.25s ease; }
+@keyframes popIn { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 20px; color: var(--text-light); cursor: pointer; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; margin-bottom: 20px; }
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-field { display: flex; flex-direction: column; gap: 5px; }
+.modal-label { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); }
+.modal-input, .modal-select, .modal-textarea { width: 100%; padding: 10px 14px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+.modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color: var(--terracotta); }
+.modal-textarea { resize: vertical; min-height: 70px; }
+.modal-save { width: 100%; padding: 12px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 4px; transition: opacity 0.2s; }
+.modal-save:hover { opacity: 0.85; }
+.modal-delete { width: 100%; padding: 10px; background: transparent; color: var(--terracotta); border: 1px solid rgba(196,113,74,0.2); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; margin-top: 6px; transition: all 0.2s; }
+.modal-delete:hover { background: rgba(196,113,74,0.06); }
+
+/* Type toggle */
+.type-toggle { display: flex; gap: 8px; }
+.type-opt { flex: 1; padding: 9px; border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--warm-white); color: var(--text-light); }
+.type-opt.selected-presentiel { background: rgba(196,113,74,0.1); border-color: var(--terracotta); color: var(--terracotta); }
+.type-opt.selected-visio { background: rgba(42,63,95,0.08); border-color: var(--ink-blue); color: var(--ink-blue); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .page-header { padding: 32px 20px 24px; }
+  .content { padding: 24px 20px; grid-template-columns: 1fr; }
+  .agenda-side { position: static; }
+  .modal-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="nav-item" onclick="window.location.href='repertoire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mes Contacts</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mes Contacts</span></div>
+    <div class="page-title">Mes Contacts</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Tous tes interlocuteurs clés au même endroit."</div>
+  </div>
+
+  <div class="content">
+
+    <!-- CONTACTS -->
+    <div class="contacts-side">
+      <div class="section-eyebrow">Mes contacts clés</div>
+      <div id="contactsList"></div>
+    </div>
+
+    <!-- AGENDA CARNET -->
+    <div class="agenda-side">
+      <div class="section-eyebrow">Mon agenda rendez-vous</div>
+      <div class="notebook">
+        <!-- Spiral -->
+        <div class="spiral" id="spiral"></div>
+
+        <div class="notebook-paper">
+          <!-- Header -->
+          <div class="notebook-header">
+            <div class="notebook-month" id="nbMonth">Mars</div>
+            <div class="notebook-year" id="nbYear">2026</div>
+            <div class="notebook-nav">
+              <button class="nb-nav-btn" onclick="changeMonth(-1)">‹</button>
+              <button class="nb-nav-btn" onclick="changeMonth(1)">›</button>
+            </div>
+          </div>
+
+          <!-- Day labels -->
+          <div class="notebook-days">
+            <div class="day-label">L</div><div class="day-label">M</div>
+            <div class="day-label">M</div><div class="day-label">J</div>
+            <div class="day-label">V</div><div class="day-label">S</div>
+            <div class="day-label">D</div>
+          </div>
+
+          <!-- Calendar grid -->
+          <div class="notebook-grid" id="nbGrid"></div>
+
+          <!-- RDV list -->
+          <div class="notebook-rdvs" id="nbRdvs"></div>
+
+          <!-- Add RDV -->
+          <button class="add-rdv-btn" onclick="openRdvModal()">
+            ✦ Ajouter un rendez-vous
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeContactModal()">✕</button>
+    <div class="modal-title" id="contactModalTitle">Ajouter un contact</div>
+    <div class="modal-form">
+      <input type="hidden" id="cId">
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-label">Prénom / Nom *</div>
+          <input type="text" class="modal-input" id="cNom" placeholder="Ex : Marie Dupont">
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Rôle</div>
+          <input type="text" class="modal-input" id="cRole" placeholder="Ex : Propriétaire, Agence...">
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-label">Téléphone</div>
+          <input type="tel" class="modal-input" id="cTel" placeholder="06 XX XX XX XX">
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Email</div>
+          <input type="email" class="modal-input" id="cEmail" placeholder="email@exemple.fr">
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-label">Catégorie</div>
+          <select class="modal-select" id="cCat">
+            <option value="Logement">🏠 Logement</option>
+            <option value="Déménagement">🚛 Déménagement</option>
+            <option value="Artisans">🔧 Artisans</option>
+            <option value="Fournisseurs">⚡ Fournisseurs</option>
+            <option value="Administratif">📋 Administratif</option>
+            <option value="Autres">📌 Autres</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Entreprise</div>
+          <input type="text" class="modal-input" id="cEntreprise" placeholder="Nom de l'entreprise">
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Notes</div>
+        <textarea class="modal-textarea" id="cNotes" placeholder="Infos utiles, horaires, codes..."></textarea>
+      </div>
+    </div>
+    <button class="modal-save" onclick="saveContact()">Sauvegarder</button>
+    <button class="modal-delete" id="cDeleteBtn" onclick="deleteContact()" style="display:none">Supprimer ce contact</button>
+  </div>
+</div>
+
+<!-- RDV MODAL -->
+<div class="modal-overlay" id="rdvModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeRdvModal()">✕</button>
+    <div class="modal-title" id="rdvModalTitle">Nouveau rendez-vous</div>
+    <div class="modal-form">
+      <input type="hidden" id="rId">
+      <div class="modal-field">
+        <div class="modal-label">Titre *</div>
+        <input type="text" class="modal-input" id="rTitre" placeholder="Ex : État des lieux, Visite appartement...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Type de rendez-vous</div>
+        <div class="type-toggle">
+          <div class="type-opt selected-presentiel" id="typePresent" onclick="selectType('presentiel')">📍 Présentiel</div>
+          <div class="type-opt" id="typeVisio" onclick="selectType('visio')">💻 Visio / Zoom</div>
+        </div>
+        <input type="hidden" id="rType" value="presentiel">
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <div class="modal-label">Date *</div>
+          <input type="date" class="modal-input" id="rDate">
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Heure</div>
+          <input type="time" class="modal-input" id="rHeure" value="10:00">
+        </div>
+      </div>
+      <div class="modal-field" id="adresseField">
+        <div class="modal-label">Adresse</div>
+        <input type="text" class="modal-input" id="rAdresse" placeholder="Adresse du rendez-vous">
+      </div>
+      <div class="modal-field" id="lienField" style="display:none">
+        <div class="modal-label">Lien de réunion</div>
+        <input type="text" class="modal-input" id="rLien" placeholder="https://zoom.us/...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Avec qui</div>
+        <input type="text" class="modal-input" id="rContact" placeholder="Nom du contact">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Notes</div>
+        <textarea class="modal-textarea" id="rNotes" placeholder="Documents à apporter, questions à poser..."></textarea>
+      </div>
+    </div>
+    <button class="modal-save" onclick="saveRdv()">Enregistrer</button>
+    <button class="modal-delete" id="rDeleteBtn" onclick="deleteRdv()" style="display:none">Supprimer ce RDV</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let allContacts = [];
+let allRdvs = [];
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let selectedDate = null;
+
+const CAT_COLORS = {
+  'Logement': '#C4714A', 'Déménagement': '#7A8C7E', 'Artisans': '#B89A6A',
+  'Fournisseurs': '#2A3F5F', 'Administratif': '#8A7968', 'Autres': '#C9BAA8'
+};
+const CAT_ICONS = {
+  'Logement': '🏠', 'Déménagement': '🚛', 'Artisans': '🔧',
+  'Fournisseurs': '⚡', 'Administratif': '📋', 'Autres': '📌'
+};
+
+// ── AUTH ──
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+  currentUser = session.user;
+  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  document.getElementById('sidebarUser').textContent = profile?.prenom || session.user.email.split('@')[0];
+  await Promise.all([loadContacts(), loadRdvs()]);
+  buildSpiral();
+  renderCalendar();
+})();
+
+async function logout() { await sb.auth.signOut(); window.location.href = 'app.html'; }
+
+// ── SPIRAL ──
+function buildSpiral() {
+  const s = document.getElementById('spiral');
+  for (let i = 0; i < 18; i++) {
+    const hole = document.createElement('div');
+    hole.className = 'spiral-hole';
+    s.appendChild(hole);
+  }
+}
+
+// ── CONTACTS ──
+async function loadContacts() {
+  const { data } = await sb.from('mes_contacts').select('*').eq('user_id', currentUser.id).order('categorie').order('nom');
+  allContacts = data || [];
+  renderContacts();
+}
+
+function renderContacts() {
+  const cats = ['Logement', 'Déménagement', 'Artisans', 'Fournisseurs', 'Administratif', 'Autres'];
+  const list = document.getElementById('contactsList');
+  list.innerHTML = cats.map(cat => {
+    const items = allContacts.filter(c => c.categorie === cat);
+    return `
+      <div class="cat-section">
+        <div class="cat-header">
+          <div class="cat-title">
+            <span class="cat-icon">${CAT_ICONS[cat]}</span>
+            ${cat}
+          </div>
+          <button class="cat-add-btn" onclick="openContactModal(null, '${cat}')">+</button>
+        </div>
+        ${items.length === 0
+          ? `<div class="empty-cat">Aucun contact — clique sur + pour en ajouter</div>`
+          : items.map(c => `
+            <div class="contact-row" onclick="openContactModal('${c.id}')">
+              <div class="contact-avatar" style="background:${CAT_COLORS[cat] || '#C9BAA8'}">
+                ${c.nom[0].toUpperCase()}
+              </div>
+              <div class="contact-details">
+                <div class="contact-name">${c.nom}${c.entreprise ? ` — ${c.entreprise}` : ''}</div>
+                <div class="contact-role">${c.role || cat}</div>
+              </div>
+              <div class="contact-actions">
+                ${c.telephone ? `<a href="tel:${c.telephone}" onclick="event.stopPropagation()" class="action-btn call" title="Appeler">📞</a>` : ''}
+                ${c.email ? `<a href="mailto:${c.email}" onclick="event.stopPropagation()" class="action-btn" title="Email">✉️</a>` : ''}
+                <button class="action-btn rdv" onclick="event.stopPropagation(); openRdvModal('${c.nom}')" title="RDV">📅</button>
+              </div>
+            </div>
+          `).join('')
+        }
+      </div>
+    `;
+  }).join('');
+}
+
+// ── CALENDAR ──
+async function loadRdvs() {
+  const { data } = await sb.from('mes_rdvs').select('*').eq('user_id', currentUser.id).order('date').order('heure');
+  allRdvs = data || [];
+}
+
+const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+function renderCalendar() {
+  document.getElementById('nbMonth').textContent = MONTHS[currentMonth];
+  document.getElementById('nbYear').textContent = currentYear;
+
+  const grid = document.getElementById('nbGrid');
+  const today = new Date();
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay = new Date(currentYear, currentMonth + 1, 0);
+  let startDow = firstDay.getDay();
+  if (startDow === 0) startDow = 7;
+
+  let cells = [];
+  // Prev month padding
+  for (let i = startDow - 1; i > 0; i--) {
+    const d = new Date(currentYear, currentMonth, 1 - i);
+    cells.push({ date: d, current: false });
+  }
+  // Current month
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    cells.push({ date: new Date(currentYear, currentMonth, d), current: true });
+  }
+  // Next month padding
+  const remaining = 42 - cells.length;
+  for (let d = 1; d <= remaining; d++) {
+    cells.push({ date: new Date(currentYear, currentMonth + 1, d), current: false });
+  }
+
+  grid.innerHTML = cells.map(({ date, current }) => {
+    const isToday = date.toDateString() === today.toDateString();
+    const dateStr = date.toISOString().split('T')[0];
+    const dayRdvs = allRdvs.filter(r => r.date === dateStr);
+    const dots = dayRdvs.map(r => `<div class="nb-dot ${r.type === 'visio' ? 'nb-dot-visio' : 'nb-dot-presentiel'}"></div>`).join('');
+    const isSelected = selectedDate === dateStr;
+    return `
+      <div class="nb-day ${!current ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}"
+           onclick="selectDay('${dateStr}')">
+        <div class="nb-day-num">${date.getDate()}</div>
+        ${dots ? `<div class="nb-day-dots">${dots}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  renderRdvList();
+}
+
+function selectDay(dateStr) {
+  selectedDate = selectedDate === dateStr ? null : dateStr;
+  renderCalendar();
+}
+
+function renderRdvList() {
+  const container = document.getElementById('nbRdvs');
+  let rdvs = allRdvs;
+  if (selectedDate) {
+    rdvs = allRdvs.filter(r => r.date === selectedDate);
+  } else {
+    // Show upcoming
+    const today = new Date().toISOString().split('T')[0];
+    rdvs = allRdvs.filter(r => r.date >= today).slice(0, 8);
+  }
+
+  if (rdvs.length === 0) {
+    container.innerHTML = `<div class="rdv-empty">${selectedDate ? 'Aucun RDV ce jour' : 'Aucun rendez-vous à venir'}</div>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  rdvs.forEach(r => {
+    if (!grouped[r.date]) grouped[r.date] = [];
+    grouped[r.date].push(r);
+  });
+
+  container.innerHTML = Object.entries(grouped).map(([date, items]) => {
+    const d = new Date(date + 'T12:00:00');
+    const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    return `
+      <div class="rdv-date-label">${label}</div>
+      ${items.map(r => `
+        <div class="rdv-entry" onclick="openRdvModal(null, '${r.id}')">
+          <div class="rdv-time-col">${r.heure || '—'}</div>
+          <div class="rdv-dot-col"><div class="rdv-dot ${r.type === 'visio' ? 'rdv-dot-visio' : 'rdv-dot-presentiel'}"></div></div>
+          <div class="rdv-info">
+            <div class="rdv-title-hand">${r.titre}</div>
+            <div class="rdv-meta-hand">${r.contact || ''}${r.adresse ? ' · ' + r.adresse : ''}${r.lien ? ' · Visio' : ''}</div>
+          </div>
+          <div class="rdv-type-badge ${r.type === 'visio' ? 'badge-visio' : 'badge-presentiel'}">${r.type === 'visio' ? 'Visio' : 'Présentiel'}</div>
+        </div>
+      `).join('')}
+    `;
+  }).join('');
+}
+
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  selectedDate = null;
+  renderCalendar();
+}
+
+// ── CONTACT MODAL ──
+function openContactModal(id, defaultCat = 'Logement') {
+  const contact = id ? allContacts.find(c => c.id === id) : null;
+  document.getElementById('cId').value = contact?.id || '';
+  document.getElementById('contactModalTitle').textContent = contact ? 'Modifier le contact' : 'Ajouter un contact';
+  document.getElementById('cNom').value = contact?.nom || '';
+  document.getElementById('cRole').value = contact?.role || '';
+  document.getElementById('cTel').value = contact?.telephone || '';
+  document.getElementById('cEmail').value = contact?.email || '';
+  document.getElementById('cCat').value = contact?.categorie || defaultCat;
+  document.getElementById('cEntreprise').value = contact?.entreprise || '';
+  document.getElementById('cNotes').value = contact?.notes || '';
+  document.getElementById('cDeleteBtn').style.display = contact ? 'block' : 'none';
+  document.getElementById('contactModal').classList.add('open');
+}
+
+function closeContactModal() { document.getElementById('contactModal').classList.remove('open'); }
+
+async function saveContact() {
+  const id = document.getElementById('cId').value;
+  const data = {
+    user_id: currentUser.id,
+    nom: document.getElementById('cNom').value,
+    role: document.getElementById('cRole').value,
+    telephone: document.getElementById('cTel').value,
+    email: document.getElementById('cEmail').value,
+    categorie: document.getElementById('cCat').value,
+    entreprise: document.getElementById('cEntreprise').value,
+    notes: document.getElementById('cNotes').value,
+  };
+  if (id) await sb.from('mes_contacts').update(data).eq('id', id);
+  else await sb.from('mes_contacts').insert(data);
+  closeContactModal();
+  await loadContacts();
+  renderContacts();
+}
+
+async function deleteContact() {
+  const id = document.getElementById('cId').value;
+  if (!confirm('Supprimer ce contact ?')) return;
+  await sb.from('mes_contacts').delete().eq('id', id);
+  closeContactModal();
+  await loadContacts();
+  renderContacts();
+}
+
+// ── RDV MODAL ──
+function openRdvModal(contactName = null, rdvId = null) {
+  const rdv = rdvId ? allRdvs.find(r => r.id === rdvId) : null;
+  document.getElementById('rId').value = rdv?.id || '';
+  document.getElementById('rdvModalTitle').textContent = rdv ? 'Modifier le RDV' : 'Nouveau rendez-vous';
+  document.getElementById('rTitre').value = rdv?.titre || '';
+  document.getElementById('rDate').value = rdv?.date || (selectedDate || new Date().toISOString().split('T')[0]);
+  document.getElementById('rHeure').value = rdv?.heure || '10:00';
+  document.getElementById('rContact').value = rdv?.contact || contactName || '';
+  document.getElementById('rAdresse').value = rdv?.adresse || '';
+  document.getElementById('rLien').value = rdv?.lien || '';
+  document.getElementById('rNotes').value = rdv?.notes || '';
+  document.getElementById('rDeleteBtn').style.display = rdv ? 'block' : 'none';
+  selectType(rdv?.type || 'presentiel');
+  document.getElementById('rdvModal').classList.add('open');
+}
+
+function closeRdvModal() { document.getElementById('rdvModal').classList.remove('open'); }
+
+function selectType(type) {
+  document.getElementById('rType').value = type;
+  document.getElementById('typePresent').className = `type-opt ${type === 'presentiel' ? 'selected-presentiel' : ''}`;
+  document.getElementById('typeVisio').className = `type-opt ${type === 'visio' ? 'selected-visio' : ''}`;
+  document.getElementById('adresseField').style.display = type === 'presentiel' ? 'flex' : 'none';
+  document.getElementById('lienField').style.display = type === 'visio' ? 'flex' : 'none';
+}
+
+async function saveRdv() {
+  const id = document.getElementById('rId').value;
+  const data = {
+    user_id: currentUser.id,
+    titre: document.getElementById('rTitre').value,
+    type: document.getElementById('rType').value,
+    date: document.getElementById('rDate').value,
+    heure: document.getElementById('rHeure').value,
+    contact: document.getElementById('rContact').value,
+    adresse: document.getElementById('rAdresse').value,
+    lien: document.getElementById('rLien').value,
+    notes: document.getElementById('rNotes').value,
+  };
+  if (id) await sb.from('mes_rdvs').update(data).eq('id', id);
+  else await sb.from('mes_rdvs').insert(data);
+  closeRdvModal();
+  await loadRdvs();
+  renderCalendar();
+}
+
+async function deleteRdv() {
+  const id = document.getElementById('rId').value;
+  if (!confirm('Supprimer ce RDV ?')) return;
+  await sb.from('mes_rdvs').delete().eq('id', id);
+  closeRdvModal();
+  await loadRdvs();
+  renderCalendar();
+}
+
+// Close modals on overlay click
+['contactModal','rdvModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) document.getElementById(id).classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
