@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Annuaire Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+  --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+  --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+}
+body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; display: flex; }
+
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--warm-black); padding: 40px 24px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 32px; line-height: 1.2; cursor: pointer; }
+.sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+.nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+.nav-item.active .nav-dot { background: var(--terracotta); }
+.nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+.sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+.progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+.progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+.page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+.page-header::before { content: '📋'; position: absolute; right: 52px; top: 50%; transform: translateY(-50%); font-size: 120px; opacity: 0.06; pointer-events: none; }
+.breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+.breadcrumb span { color: rgba(247,243,238,0.6); }
+.page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+.page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+.page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); }
+
+/* FILTERS */
+.filters-bar { background: var(--cream); border-bottom: 1px solid var(--linen); padding: 20px 52px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 50; }
+.filter-search { flex: 1; min-width: 200px; padding: 10px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--espresso); outline: none; transition: border-color 0.2s; }
+.filter-search:focus { border-color: var(--terracotta); }
+.filter-btn { padding: 8px 16px; border: 1px solid var(--linen); border-radius: 20px; font-size: 11px; font-weight: 300; color: var(--text-light); cursor: pointer; transition: all 0.2s; background: var(--warm-white); white-space: nowrap; }
+.filter-btn:hover { border-color: var(--sand); color: var(--espresso); }
+.filter-btn.active { background: var(--espresso); color: var(--cream); border-color: var(--espresso); }
+.add-contact-btn { padding: 9px 18px; background: var(--terracotta); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; display: none; }
+.add-contact-btn:hover { opacity: 0.85; }
+
+/* CONTENT */
+.content { padding: 40px 52px; }
+.section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+/* PARTNER SPOTLIGHT */
+.partners-section { margin-bottom: 40px; }
+.partners-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+.partner-card {
+  background: linear-gradient(135deg, var(--espresso) 0%, #3D2E20 100%);
+  border-radius: 16px; padding: 28px; position: relative; overflow: hidden; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.partner-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(44,31,20,0.2); }
+.partner-card::before { content: ''; position: absolute; width: 200px; height: 200px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05); right: -60px; top: -60px; }
+.partner-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--terracotta); color: white; font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; font-weight: 400; }
+.partner-badge::before { content: '✦'; font-size: 10px; }
+.partner-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 4px; }
+.partner-cat { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(247,243,238,0.4); margin-bottom: 10px; }
+.partner-desc { font-size: 11px; font-weight: 200; color: rgba(247,243,238,0.6); line-height: 1.7; margin-bottom: 18px; }
+.partner-ville { font-size: 10px; font-weight: 200; color: rgba(247,243,238,0.4); display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+.partner-actions { display: flex; gap: 8px; }
+.partner-btn { padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+.partner-btn-main { background: var(--terracotta); color: white; border: none; }
+.partner-btn-main:hover { background: #A85A35; }
+.partner-btn-ghost { background: transparent; color: rgba(247,243,238,0.5); border: 1px solid rgba(255,255,255,0.12); }
+.partner-btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--cream); }
+.partner-admin-btns { position: absolute; top: 14px; right: 14px; display: none; gap: 6px; }
+.partner-card:hover .partner-admin-btns.visible { display: flex; }
+.admin-btn-sm { padding: 4px 10px; border-radius: 4px; font-size: 9px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+.admin-edit { background: rgba(255,255,255,0.15); color: white; }
+.admin-delete { background: rgba(196,113,74,0.3); color: var(--terracotta); }
+
+/* CONTACTS GRID */
+.contacts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 40px; }
+.contact-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; padding: 22px; cursor: pointer; transition: all 0.2s; position: relative; }
+.contact-card:hover { border-color: var(--sand); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(44,31,20,0.06); }
+.contact-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; margin-bottom: 12px; font-weight: 300; }
+.badge-verified { background: rgba(122,140,126,0.12); color: var(--sage); }
+.badge-community { background: rgba(184,154,106,0.1); color: var(--gold); }
+.contact-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 4px; }
+.contact-cat { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+.contact-desc { font-size: 10px; font-weight: 200; color: var(--text-light); line-height: 1.6; margin-bottom: 14px; }
+.contact-info { display: flex; flex-direction: column; gap: 5px; }
+.contact-info-item { font-size: 10px; font-weight: 200; color: var(--text-light); display: flex; align-items: center; gap: 6px; }
+.contact-info-item a { color: var(--terracotta); text-decoration: none; }
+.contact-info-item a:hover { text-decoration: underline; }
+.contact-admin-btns { position: absolute; top: 12px; right: 12px; display: none; gap: 6px; }
+.contact-card:hover .contact-admin-btns.visible { display: flex; }
+.admin-btn-sm2 { padding: 4px 10px; border-radius: 4px; font-size: 9px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+.admin-edit2 { background: var(--linen); color: var(--espresso); }
+.admin-delete2 { background: rgba(196,113,74,0.1); color: var(--terracotta); }
+
+/* SUGGEST SECTION */
+.suggest-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; padding: 28px; margin-bottom: 40px; }
+.suggest-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; margin-bottom: 6px; }
+.suggest-sub { font-size: 11px; font-weight: 200; color: var(--text-light); margin-bottom: 20px; line-height: 1.6; }
+.suggest-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.suggest-field { display: flex; flex-direction: column; gap: 6px; }
+.suggest-label { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); }
+.suggest-input, .suggest-select, .suggest-textarea { width: 100%; padding: 10px 14px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+.suggest-input:focus, .suggest-select:focus, .suggest-textarea:focus { border-color: var(--terracotta); }
+.suggest-textarea { resize: vertical; min-height: 80px; }
+.suggest-full { grid-column: 1 / -1; }
+.suggest-btn { padding: 11px 24px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.suggest-btn:hover { opacity: 0.85; }
+.suggest-msg { font-size: 11px; color: var(--sage); margin-top: 8px; display: none; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.6); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal-card { background: var(--cream); border-radius: 20px; padding: 40px; max-width: 560px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 20px; color: var(--text-light); cursor: pointer; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; font-weight: 300; margin-bottom: 20px; }
+.modal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-field { display: flex; flex-direction: column; gap: 6px; }
+.modal-label { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); }
+.modal-input, .modal-select, .modal-textarea { width: 100%; padding: 10px 14px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+.modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color: var(--terracotta); }
+.modal-textarea { resize: vertical; min-height: 80px; }
+.modal-full { grid-column: 1 / -1; }
+.modal-save { width: 100%; padding: 13px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+.modal-save:hover { opacity: 0.85; }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 48px; }
+.empty-icon { font-size: 40px; opacity: 0.3; margin-bottom: 12px; }
+.empty-text { font-size: 13px; font-weight: 200; color: var(--text-light); font-style: italic; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+.content > *:nth-child(1) { animation-delay: 0.1s; }
+.content > *:nth-child(2) { animation-delay: 0.15s; }
+.content > *:nth-child(3) { animation-delay: 0.2s; }
+.content > *:nth-child(4) { animation-delay: 0.25s; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .page-header, .content { padding: 24px 20px; }
+  .filters-bar { padding: 16px 20px; }
+  .partners-grid, .contacts-grid { grid-template-columns: 1fr; }
+  .suggest-form, .modal-form { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Annuaire Pro</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Annuaire Pro</span></div>
+    <div class="page-title">Annuaire Pro</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Prestataires vérifiés et partenaires Le Move pour ton emménagement."</div>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" class="filter-search" id="searchInput" placeholder="Rechercher un contact, une ville..." oninput="filterContacts()">
+    <div class="filter-btn active" data-cat="all" onclick="filterCat(this, 'all')">Tous</div>
+    <div class="filter-btn" data-cat="Déménagement" onclick="filterCat(this, 'Déménagement')">🚛 Déménagement</div>
+    <div class="filter-btn" data-cat="Décoration" onclick="filterCat(this, 'Décoration')">🎨 Décoration</div>
+    <div class="filter-btn" data-cat="Travaux" onclick="filterCat(this, 'Travaux')">🔧 Travaux</div>
+    <div class="filter-btn" data-cat="Nettoyage" onclick="filterCat(this, 'Nettoyage')">🧹 Nettoyage</div>
+    <div class="filter-btn" data-cat="Administratif" onclick="filterCat(this, 'Administratif')">📋 Administratif</div>
+    <button class="add-contact-btn" id="addContactBtn" onclick="openModal()">+ Ajouter</button>
+  </div>
+
+  <div class="content">
+
+    <!-- PARTNERS -->
+    <div class="partners-section" id="partnersSection">
+      <div class="section-eyebrow">✦ Partenaires Le Move</div>
+      <div class="partners-grid" id="partnersGrid">
+        <div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Aucun partenaire pour l'instant.</div></div>
+      </div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="section-eyebrow">Contacts vérifiés & communauté</div>
+    <div class="contacts-grid" id="contactsGrid">
+      <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📋</div><div class="empty-text">Aucun contact pour l'instant.</div></div>
+    </div>
+
+    <!-- SUGGEST -->
+    <div class="section-eyebrow">Suggérer un contact</div>
+    <div class="suggest-card">
+      <div class="suggest-title">Tu connais un bon prestataire ?</div>
+      <div class="suggest-sub">Partage-le avec la communauté Le Move. Tous les contacts suggérés sont vérifiés avant d'être publiés.</div>
+      <div class="suggest-form">
+        <div class="suggest-field">
+          <div class="suggest-label">Nom de l'entreprise</div>
+          <input type="text" class="suggest-input" id="sNom" placeholder="Ex : Déménagements Martin">
+        </div>
+        <div class="suggest-field">
+          <div class="suggest-label">Catégorie</div>
+          <select class="suggest-select" id="sCat">
+            <option value="Déménagement">Déménagement</option>
+            <option value="Décoration">Décoration</option>
+            <option value="Travaux">Travaux</option>
+            <option value="Nettoyage">Nettoyage</option>
+            <option value="Administratif">Administratif</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="suggest-field">
+          <div class="suggest-label">Ville</div>
+          <input type="text" class="suggest-input" id="sVille" placeholder="Ex : Paris">
+        </div>
+        <div class="suggest-field">
+          <div class="suggest-label">Téléphone ou site web</div>
+          <input type="text" class="suggest-input" id="sContact" placeholder="Ex : 06 XX XX XX XX">
+        </div>
+        <div class="suggest-field suggest-full">
+          <div class="suggest-label">Pourquoi tu recommandes ce contact ?</div>
+          <textarea class="suggest-textarea" id="sDesc" placeholder="Ex : Très professionnel, prix honnêtes, ponctuel..."></textarea>
+        </div>
+        <div class="suggest-full" style="display:flex;justify-content:flex-end;gap:10px;align-items:center">
+          <div class="suggest-msg" id="suggestMsg">✓ Suggestion envoyée, merci !</div>
+          <button class="suggest-btn" onclick="suggestContact()">Envoyer ma suggestion →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Ajouter un contact</div>
+    <div class="modal-form">
+      <input type="hidden" id="modalId">
+      <div class="modal-field">
+        <div class="modal-label">Nom *</div>
+        <input type="text" class="modal-input" id="mNom" placeholder="Nom de l'entreprise">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Catégorie *</div>
+        <select class="modal-select" id="mCat">
+          <option value="Déménagement">Déménagement</option>
+          <option value="Décoration">Décoration</option>
+          <option value="Travaux">Travaux</option>
+          <option value="Nettoyage">Nettoyage</option>
+          <option value="Administratif">Administratif</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Type</div>
+        <select class="modal-select" id="mType">
+          <option value="partner">✦ Partenaire Le Move</option>
+          <option value="verified">✓ Vérifié</option>
+          <option value="community">Communauté</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Ville</div>
+        <input type="text" class="modal-input" id="mVille" placeholder="Paris, Lyon...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Téléphone</div>
+        <input type="text" class="modal-input" id="mTel" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Email</div>
+        <input type="text" class="modal-input" id="mEmail" placeholder="contact@exemple.fr">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Site web</div>
+        <input type="text" class="modal-input" id="mSite" placeholder="https://...">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Ordre d'affichage</div>
+        <input type="number" class="modal-input" id="mOrdre" placeholder="0 = premier" value="0">
+      </div>
+      <div class="modal-field modal-full">
+        <div class="modal-label">Description</div>
+        <textarea class="modal-textarea" id="mDesc" placeholder="Description du prestataire..."></textarea>
+      </div>
+    </div>
+    <button class="modal-save" onclick="saveContact()">Sauvegarder</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
+let isAdmin = false;
+let allContacts = [];
+let currentCat = 'all';
+
+// ── AUTH ──
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+
+  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  document.getElementById('sidebarUser').textContent = profile?.prenom || session.user.email.split('@')[0];
+
+  isAdmin = session.user.email === ADMIN_EMAIL;
+  if (isAdmin) {
+    document.getElementById('addContactBtn').style.display = 'block';
+    document.querySelectorAll('.partner-admin-btns, .contact-admin-btns').forEach(el => el.classList.add('visible'));
+  }
+
+  await loadContacts();
+})();
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'app.html';
+}
+
+// ── LOAD ──
+async function loadContacts() {
+  const { data } = await sb.from('contacts').select('*').eq('actif', true).order('ordre').order('created_at');
+  allContacts = data || [];
+  renderContacts(allContacts);
+}
+
+function renderContacts(contacts) {
+  const partners = contacts.filter(c => c.type === 'partner');
+  const others = contacts.filter(c => c.type !== 'partner');
+
+  // Partners
+  const pg = document.getElementById('partnersGrid');
+  document.getElementById('partnersSection').style.display = partners.length === 0 && !isAdmin ? 'none' : 'block';
+  if (partners.length === 0) {
+    pg.innerHTML = isAdmin
+      ? `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Ajoute ton premier partenaire.</div></div>`
+      : '';
+  } else {
+    pg.innerHTML = partners.map(p => `
+      <div class="partner-card">
+        <div class="partner-admin-btns ${isAdmin ? 'visible' : ''}">
+          <button class="admin-btn-sm admin-edit" onclick="editContact(event, '${p.id}')">✏️</button>
+          <button class="admin-btn-sm admin-delete" onclick="deleteContact(event, '${p.id}')">🗑</button>
+        </div>
+        <div class="partner-badge">Partenaire Le Move</div>
+        <div class="partner-name">${p.nom}</div>
+        <div class="partner-cat">${p.categorie}${p.ville ? ' · ' + p.ville : ''}</div>
+        ${p.description ? `<div class="partner-desc">${p.description}</div>` : ''}
+        <div class="partner-ville">📍 ${p.ville || 'France'}</div>
+        <div class="partner-actions">
+          ${p.telephone ? `<a href="tel:${p.telephone}" class="partner-btn partner-btn-main">📞 Appeler</a>` : ''}
+          ${p.site_web ? `<a href="${p.site_web}" target="_blank" class="partner-btn partner-btn-ghost">Site web →</a>` : ''}
+          ${p.email ? `<a href="mailto:${p.email}" class="partner-btn partner-btn-ghost">Email</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Others
+  const cg = document.getElementById('contactsGrid');
+  if (others.length === 0) {
+    cg.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📋</div><div class="empty-text">Aucun contact pour l'instant.<br>Sois le premier à en suggérer un !</div></div>`;
+  } else {
+    cg.innerHTML = others.map(c => {
+      const badgeClass = c.type === 'verified' ? 'badge-verified' : 'badge-community';
+      const badgeLabel = c.type === 'verified' ? '✓ Vérifié' : '👥 Communauté';
+      return `
+        <div class="contact-card">
+          <div class="contact-admin-btns ${isAdmin ? 'visible' : ''}">
+            <button class="admin-btn-sm2 admin-edit2" onclick="editContact(event, '${c.id}')">✏️</button>
+            <button class="admin-btn-sm2 admin-delete2" onclick="deleteContact(event, '${c.id}')">🗑</button>
+          </div>
+          <div class="contact-badge ${badgeClass}">${badgeLabel}</div>
+          <div class="contact-name">${c.nom}</div>
+          <div class="contact-cat">${c.categorie}${c.ville ? ' · ' + c.ville : ''}</div>
+          ${c.description ? `<div class="contact-desc">${c.description}</div>` : ''}
+          <div class="contact-info">
+            ${c.telephone ? `<div class="contact-info-item">📞 <a href="tel:${c.telephone}">${c.telephone}</a></div>` : ''}
+            ${c.email ? `<div class="contact-info-item">✉️ <a href="mailto:${c.email}">${c.email}</a></div>` : ''}
+            ${c.site_web ? `<div class="contact-info-item">🌐 <a href="${c.site_web}" target="_blank">Site web</a></div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+}
+
+// ── FILTERS ──
+function filterCat(btn, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterContacts();
+}
+
+function filterContacts() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = allContacts;
+  if (currentCat !== 'all') filtered = filtered.filter(c => c.categorie === currentCat);
+  if (search) filtered = filtered.filter(c =>
+    c.nom.toLowerCase().includes(search) ||
+    (c.ville && c.ville.toLowerCase().includes(search)) ||
+    (c.description && c.description.toLowerCase().includes(search))
+  );
+  renderContacts(filtered);
+}
+
+// ── MODAL ──
+function openModal(contact = null) {
+  document.getElementById('modalId').value = contact?.id || '';
+  document.getElementById('modalTitle').textContent = contact ? 'Modifier le contact' : 'Ajouter un contact';
+  document.getElementById('mNom').value = contact?.nom || '';
+  document.getElementById('mCat').value = contact?.categorie || 'Déménagement';
+  document.getElementById('mType').value = contact?.type || 'verified';
+  document.getElementById('mVille').value = contact?.ville || '';
+  document.getElementById('mTel').value = contact?.telephone || '';
+  document.getElementById('mEmail').value = contact?.email || '';
+  document.getElementById('mSite').value = contact?.site_web || '';
+  document.getElementById('mOrdre').value = contact?.ordre || 0;
+  document.getElementById('mDesc').value = contact?.description || '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+async function saveContact() {
+  const id = document.getElementById('modalId').value;
+  const data = {
+    nom: document.getElementById('mNom').value,
+    categorie: document.getElementById('mCat').value,
+    type: document.getElementById('mType').value,
+    ville: document.getElementById('mVille').value,
+    telephone: document.getElementById('mTel').value,
+    email: document.getElementById('mEmail').value,
+    site_web: document.getElementById('mSite').value,
+    ordre: parseInt(document.getElementById('mOrdre').value) || 0,
+    description: document.getElementById('mDesc').value,
+    actif: true,
+  };
+
+  if (id) {
+    await sb.from('contacts').update(data).eq('id', id);
+  } else {
+    await sb.from('contacts').insert(data);
+  }
+
+  closeModal();
+  await loadContacts();
+}
+
+function editContact(e, id) {
+  e.stopPropagation();
+  const contact = allContacts.find(c => c.id === id);
+  if (contact) openModal(contact);
+}
+
+async function deleteContact(e, id) {
+  e.stopPropagation();
+  if (!confirm('Supprimer ce contact ?')) return;
+  await sb.from('contacts').update({ actif: false }).eq('id', id);
+  await loadContacts();
+}
+
+// ── SUGGEST ──
+async function suggestContact() {
+  const nom = document.getElementById('sNom').value.trim();
+  const cat = document.getElementById('sCat').value;
+  const ville = document.getElementById('sVille').value.trim();
+  const contact = document.getElementById('sContact').value.trim();
+  const desc = document.getElementById('sDesc').value.trim();
+
+  if (!nom) { alert('Entre le nom du contact.'); return; }
+
+  await sb.from('contacts').insert({
+    nom, categorie: cat, ville,
+    telephone: contact.startsWith('0') ? contact : null,
+    site_web: contact.startsWith('http') ? contact : null,
+    description: desc,
+    type: 'community',
+    actif: false, // En attente de validation
+  });
+
+  document.getElementById('suggestMsg').style.display = 'block';
+  setTimeout(() => document.getElementById('suggestMsg').style.display = 'none', 3000);
+  document.getElementById('sNom').value = '';
+  document.getElementById('sVille').value = '';
+  document.getElementById('sContact').value = '';
+  document.getElementById('sDesc').value = '';
+}
+
+// Close modal on overlay click
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+});
+</script>
+</body>
+</html>
