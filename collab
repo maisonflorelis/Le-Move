@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Espace Collaboratif</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+  --espresso: #2C1F14; --warm-black: #1A1410; --sage: #7A8C7E;
+  --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+}
+body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; display: flex; }
+
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--warm-black); padding: 40px 24px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.sidebar-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); margin-bottom: 32px; line-height: 1.2; cursor: pointer; }
+.sidebar-logo span { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); font-style: normal; margin-top: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+.nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+.nav-item.active .nav-dot { background: var(--terracotta); }
+.nav-section { font-size: 8px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.4); padding: 16px 12px 6px; }
+.sidebar-footer { margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+.progress-mini { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-bottom: 8px; font-weight: 300; }
+.progress-bar-mini { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.main { margin-left: 220px; min-height: 100vh; background: var(--warm-white); flex: 1; }
+
+.page-header { background: var(--espresso); padding: 52px 52px 40px; position: relative; overflow: hidden; }
+.page-header::before { content: '🤝'; position: absolute; right: 52px; top: 50%; transform: translateY(-50%); font-size: 120px; opacity: 0.06; pointer-events: none; }
+.breadcrumb { font-size: 9px; font-weight: 200; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.35); margin-bottom: 16px; }
+.breadcrumb span { color: rgba(247,243,238,0.6); }
+.page-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.1; margin-bottom: 8px; }
+.page-line { width: 40px; height: 1px; background: var(--terracotta); margin: 14px 0; }
+.page-quote { font-size: 12px; font-weight: 200; font-style: italic; color: rgba(247,243,238,0.45); }
+
+.content { padding: 44px 52px; max-width: 860px; }
+.section-eyebrow { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.section-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+/* INVITE CARD */
+.invite-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 16px; padding: 32px; margin-bottom: 32px; }
+.invite-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 6px; }
+.invite-sub { font-size: 12px; font-weight: 200; color: var(--text-light); margin-bottom: 24px; line-height: 1.6; }
+.invite-form { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: end; }
+.invite-field { display: flex; flex-direction: column; gap: 6px; }
+.invite-label { font-size: 9px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); }
+.invite-input { padding: 11px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; color: var(--espresso); outline: none; transition: border-color 0.2s; width: 100%; }
+.invite-input:focus { border-color: var(--terracotta); }
+.invite-select { padding: 11px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; color: var(--espresso); outline: none; cursor: pointer; appearance: none; }
+.invite-btn { padding: 11px 24px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+.invite-btn:hover { opacity: 0.85; }
+.invite-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.invite-msg { font-size: 11px; margin-top: 12px; display: none; }
+.invite-msg.success { color: var(--sage); }
+.invite-msg.error { color: var(--terracotta); }
+
+/* COLLABORATOR CARD */
+.collab-empty { text-align: center; padding: 48px; background: var(--cream); border: 1px dashed var(--linen); border-radius: 16px; margin-bottom: 32px; }
+.collab-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.collab-empty-text { font-size: 13px; font-weight: 200; color: var(--text-light); font-style: italic; }
+
+.collab-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 16px; padding: 24px 28px; margin-bottom: 16px; display: flex; align-items: center; gap: 20px; }
+.collab-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; font-weight: 500; flex-shrink: 0; }
+.collab-info { flex: 1; }
+.collab-email { font-size: 13px; font-weight: 300; color: var(--espresso); margin-bottom: 4px; }
+.collab-meta { display: flex; align-items: center; gap: 12px; }
+.collab-status { font-size: 9px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
+.status-pending { background: rgba(184,154,106,0.12); color: var(--gold); }
+.status-active { background: rgba(122,140,126,0.12); color: var(--sage); }
+.collab-access { font-size: 10px; font-weight: 200; color: var(--text-light); }
+.collab-actions { display: flex; gap: 8px; }
+.collab-btn { padding: 7px 14px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid var(--linen); background: transparent; color: var(--text-light); }
+.collab-btn:hover { border-color: var(--sand); color: var(--espresso); }
+.collab-btn.danger:hover { border-color: var(--terracotta); color: var(--terracotta); }
+.collab-btn.resend { background: var(--espresso); color: var(--cream); border-color: var(--espresso); }
+.collab-btn.resend:hover { opacity: 0.85; }
+
+/* INFO SECTION */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+.info-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; padding: 24px; }
+.info-card-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 12px; }
+.info-item { display: flex; gap: 10px; font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; margin-bottom: 6px; }
+.info-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--terracotta); margin-top: 7px; flex-shrink: 0; }
+
+/* ACCESS LEVELS */
+.access-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+.access-card { background: var(--cream); border: 1px solid var(--linen); border-radius: 14px; padding: 24px; }
+.access-title { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 8px; }
+.access-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; color: var(--espresso); margin-bottom: 12px; }
+.access-item { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 200; color: var(--text-light); margin-bottom: 6px; }
+.access-check { color: var(--sage); font-size: 12px; }
+.access-cross { color: var(--sand); font-size: 12px; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.content > * { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+.content > *:nth-child(1) { animation-delay: 0.1s; }
+.content > *:nth-child(2) { animation-delay: 0.15s; }
+.content > *:nth-child(3) { animation-delay: 0.2s; }
+.content > *:nth-child(4) { animation-delay: 0.25s; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .page-header { padding: 32px 20px 24px; }
+  .content { padding: 24px 20px; }
+  .invite-form { grid-template-columns: 1fr; }
+  .info-grid, .access-grid { grid-template-columns: 1fr; }
+  .collab-card { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Espace Collaboratif</span></div>
+    <div class="page-title">Espace Collaboratif</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Invite un proche ou un professionnel à suivre ton projet."</div>
+  </div>
+
+  <div class="content">
+
+    <!-- INVITE -->
+    <div class="section-eyebrow">Inviter un collaborateur</div>
+    <div class="invite-card">
+      <div class="invite-title">Partager mon espace</div>
+      <div class="invite-sub">Invite un parent, partenaire ou professionnel (décorateur, architecte) à accéder à ton espace Le Move. Il recevra un email avec un lien d'accès.</div>
+      <div class="invite-form">
+        <div class="invite-field">
+          <div class="invite-label">Email du collaborateur</div>
+          <input type="email" class="invite-input" id="inviteEmail" placeholder="exemple@email.com">
+        </div>
+        <div class="invite-field">
+          <div class="invite-label">Niveau d'accès</div>
+          <select class="invite-select" id="inviteAccess">
+            <option value="read">Lecture seule</option>
+            <option value="full">Accès complet</option>
+          </select>
+        </div>
+        <button class="invite-btn" onclick="sendInvite()" id="inviteBtn">Envoyer →</button>
+      </div>
+      <div class="invite-msg" id="inviteMsg"></div>
+    </div>
+
+    <!-- COLLABORATOR -->
+    <div class="section-eyebrow">Mon collaborateur</div>
+    <div id="collabSection">
+      <div class="collab-empty">
+        <div class="collab-empty-icon">👥</div>
+        <div class="collab-empty-text">Aucun collaborateur pour l'instant.<br>Invite quelqu'un pour partager ton projet.</div>
+      </div>
+    </div>
+
+    <!-- ACCESS LEVELS -->
+    <div class="section-eyebrow">Niveaux d'accès</div>
+    <div class="access-grid">
+      <div class="access-card">
+        <div class="access-title">Lecture seule</div>
+        <div class="access-name">Observateur</div>
+        <div class="access-item"><span class="access-check">✓</span> Voir tous les modules</div>
+        <div class="access-item"><span class="access-check">✓</span> Consulter le budget</div>
+        <div class="access-item"><span class="access-check">✓</span> Voir le moodboard</div>
+        <div class="access-item"><span class="access-check">✓</span> Suivre l'avancement</div>
+        <div class="access-item"><span class="access-cross">✗</span> Modifier les données</div>
+        <div class="access-item"><span class="access-cross">✗</span> Ajouter des tâches</div>
+      </div>
+      <div class="access-card">
+        <div class="access-title">Accès complet</div>
+        <div class="access-name">Collaborateur actif</div>
+        <div class="access-item"><span class="access-check">✓</span> Voir tous les modules</div>
+        <div class="access-item"><span class="access-check">✓</span> Modifier le budget</div>
+        <div class="access-item"><span class="access-check">✓</span> Éditer le moodboard</div>
+        <div class="access-item"><span class="access-check">✓</span> Ajouter des tâches</div>
+        <div class="access-item"><span class="access-check">✓</span> Modifier les données</div>
+        <div class="access-item"><span class="access-cross">✗</span> Gérer les accès</div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="section-eyebrow">Comment ça marche</div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-title">Pour toi</div>
+        <div class="info-item"><div class="info-dot"></div>Tu peux inviter 1 collaborateur maximum.</div>
+        <div class="info-item"><div class="info-dot"></div>Tu choisis le niveau d'accès : lecture seule ou complet.</div>
+        <div class="info-item"><div class="info-dot"></div>Tu peux révoquer l'accès à tout moment.</div>
+        <div class="info-item"><div class="info-dot"></div>Le collaborateur voit ton espace, pas le sien.</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Pour ton collaborateur</div>
+        <div class="info-item"><div class="info-dot"></div>Il reçoit un email avec un lien d'accès unique.</div>
+        <div class="info-item"><div class="info-dot"></div>Il n'a pas besoin de créer un compte Le Move.</div>
+        <div class="info-item"><div class="info-dot"></div>Son accès expire si tu le révoque.</div>
+        <div class="info-item"><div class="info-dot"></div>Idéal pour : parents, partenaire, décorateur, archi.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
+// ── AUTH ──
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+  currentUser = session.user;
+  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  document.getElementById('sidebarUser').textContent = profile?.prenom || session.user.email.split('@')[0];
+  await loadCollaborator();
+})();
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'app.html';
+}
+
+// ── LOAD COLLABORATOR ──
+async function loadCollaborator() {
+  const { data, error } = await sb.from('collaborators')
+    .select('*')
+    .eq('owner_id', currentUser.id)
+    .single();
+
+  const section = document.getElementById('collabSection');
+
+  if (!data) {
+    section.innerHTML = `
+      <div class="collab-empty">
+        <div class="collab-empty-icon">👥</div>
+        <div class="collab-empty-text">Aucun collaborateur pour l'instant.<br>Invite quelqu'un pour partager ton projet.</div>
+      </div>`;
+    return;
+  }
+
+  const statusLabel = data.status === 'active' ? 'Actif' : 'Invitation envoyée';
+  const statusClass = data.status === 'active' ? 'status-active' : 'status-pending';
+  const accessLabel = data.access_level === 'full' ? 'Accès complet' : 'Lecture seule';
+  const initial = data.collaborator_email[0].toUpperCase();
+
+  section.innerHTML = `
+    <div class="collab-card">
+      <div class="collab-avatar">${initial}</div>
+      <div class="collab-info">
+        <div class="collab-email">${data.collaborator_email}</div>
+        <div class="collab-meta">
+          <span class="collab-status ${statusClass}">${statusLabel}</span>
+          <span class="collab-access">${accessLabel}</span>
+        </div>
+      </div>
+      <div class="collab-actions">
+        ${data.status === 'pending' ? `<button class="collab-btn resend" onclick="resendInvite('${data.id}', '${data.collaborator_email}', '${data.token}', '${data.access_level}')">Renvoyer</button>` : ''}
+        <button class="collab-btn" onclick="changeAccess('${data.id}', '${data.access_level}')">
+          ${data.access_level === 'read' ? 'Passer en complet' : 'Passer en lecture'}
+        </button>
+        <button class="collab-btn danger" onclick="revokeAccess('${data.id}')">Révoquer</button>
+      </div>
+    </div>`;
+}
+
+// ── SEND INVITE ──
+async function sendInvite() {
+  const email = document.getElementById('inviteEmail').value.trim();
+  const access = document.getElementById('inviteAccess').value;
+  const msg = document.getElementById('inviteMsg');
+  const btn = document.getElementById('inviteBtn');
+
+  if (!email) { showMsg('Entre un email valide.', 'error'); return; }
+
+  // Check if already has a collaborator
+  const { data: existing } = await sb.from('collaborators').select('id').eq('owner_id', currentUser.id).single();
+  if (existing) { showMsg('Tu as déjà un collaborateur. Révoque l\'accès actuel pour en inviter un nouveau.', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Envoi...';
+
+  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  const { data, error } = await sb.from('collaborators').insert({
+    owner_id: currentUser.id,
+    collaborator_email: email,
+    access_level: access,
+    status: 'pending',
+    token,
+  }).select().single();
+
+  if (error) { showMsg('Erreur lors de l\'invitation.', 'error'); btn.disabled = false; btn.textContent = 'Envoyer →'; return; }
+
+  // Send invite email via Edge Function
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const ownerName = document.getElementById('sidebarUser').textContent;
+    const inviteUrl = `${window.location.origin}/collab.html?token=${token}`;
+
+    await fetch(`${SUPABASE_URL}/functions/v1/send-collab-invite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ email, access, inviteUrl, ownerName }),
+    });
+  } catch (e) {
+    console.log('Email send failed, but invite created');
+  }
+
+  showMsg(`✓ Invitation envoyée à ${email} !`, 'success');
+  document.getElementById('inviteEmail').value = '';
+  btn.disabled = false;
+  btn.textContent = 'Envoyer →';
+  await loadCollaborator();
+}
+
+async function revokeAccess(id) {
+  if (!confirm('Révoquer l\'accès de ce collaborateur ?')) return;
+  await sb.from('collaborators').delete().eq('id', id);
+  await loadCollaborator();
+}
+
+async function changeAccess(id, current) {
+  const newAccess = current === 'read' ? 'full' : 'read';
+  await sb.from('collaborators').update({ access_level: newAccess }).eq('id', id);
+  await loadCollaborator();
+}
+
+async function resendInvite(id, email, token, access) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const ownerName = document.getElementById('sidebarUser').textContent;
+    const inviteUrl = `${window.location.origin}/collab.html?token=${token}`;
+    await fetch(`${SUPABASE_URL}/functions/v1/send-collab-invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body: JSON.stringify({ email, access, inviteUrl, ownerName }),
+    });
+    showMsg(`✓ Invitation renvoyée à ${email} !`, 'success');
+  } catch (e) {
+    showMsg('Erreur lors du renvoi.', 'error');
+  }
+}
+
+function showMsg(text, type) {
+  const msg = document.getElementById('inviteMsg');
+  msg.textContent = text;
+  msg.className = `invite-msg ${type}`;
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 4000);
+}
+</script>
+</body>
+</html>
