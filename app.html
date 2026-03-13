@@ -356,6 +356,7 @@ const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
 
 const ALL_MODULES = [
   { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Suivi par catégorie avec alertes dépassement.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
@@ -426,6 +427,7 @@ async function loadApp(user) {
 
   const { data: userData } = await sb.from('Users').select('Plan').eq('Email', user.email).single();
   currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
+  if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
 
   const { data: profileData } = await sb.from('Profiles').select('*').eq('id', user.id).single();
   currentProfile = profileData || {};
@@ -433,12 +435,12 @@ async function loadApp(user) {
   const fallbackName = user.email.split('@')[0].split('.')[0];
   const displayName = currentProfile.prenom || (fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1));
 
-  document.getElementById('navPlanBadge').textContent = 'Plan ' + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  document.getElementById('navPlanBadge').textContent = user.email === ADMIN_EMAIL ? 'Admin ✦' : 'Plan ' + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
   refreshAvatarUI(displayName, currentProfile.photo_url);
   document.getElementById('userName').textContent = displayName;
   refreshWelcomeMeta();
   renderModules();
-  if (currentPlan !== 'premium') document.getElementById('upgradeCard').style.display = 'flex';
+  if (currentPlan !== 'premium' && user.email !== ADMIN_EMAIL) document.getElementById('upgradeCard').style.display = 'flex';
 
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('authScreen').style.display = 'none';
@@ -513,8 +515,18 @@ function openModule(id) {
     'moodboard': 'moodboard.html',
     'achats': 'achats.html',
     'avancement': 'avancement.html',
+    'calculateur': 'calculateur.html',
+    'mes-contacts': 'mes-contacts.html',
+    'moodboard-ia': 'moodboard-ia.html',
+    'collab': 'collab.html',
+    'annuaire': 'annuaire.html',
+    'support': 'mailto:bonjour@lemove.fr?subject=Support%20Le%20Move',
   };
-  if (pages[id]) window.location.href = pages[id];
+  if (id === 'support') {
+    window.location.href = pages[id];
+  } else if (pages[id]) {
+    window.location.href = pages[id];
+  }
 }
 
 function updateProgress() {
