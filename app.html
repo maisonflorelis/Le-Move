@@ -520,13 +520,9 @@ function openModule(id) {
     'moodboard-ia': 'moodboard-ia.html',
     'collab': 'collab.html',
     'annuaire': 'annuaire.html',
-    'support': 'mailto:bonjour@lemove.fr?subject=Support%20Le%20Move',
+    'support': 'support.html',
   };
-  if (id === 'support') {
-    window.location.href = pages[id];
-  } else if (pages[id]) {
-    window.location.href = pages[id];
-  }
+  if (pages[id]) window.location.href = pages[id];
 }
 
 function updateProgress() {
