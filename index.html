@@ -456,6 +456,7 @@
     nav { padding: 14px 20px; }
     .nav-links { display: none; }
     .nav-cta { padding: 8px 14px; font-size: 9px; white-space: nowrap; }
+    .nav-link { display: none !important; }
 
     /* ── HERO ── */
     .hero { flex-direction: column !important; min-height: auto !important; }
@@ -532,8 +533,50 @@
     /* ── FOOTER ── */
     footer { padding: 32px 24px !important; flex-direction: column !important; gap: 16px !important; }
     .footer-links { flex-wrap: wrap !important; gap: 12px !important; }
+
+    /* ── PARTNER SECTION ── */
+    .partner-section { padding: 40px 20px !important; }
+    .partner-inner { grid-template-columns: 1fr !important; gap: 28px !important; }
+    .partner-title { font-size: 28px !important; }
+    .partner-form-wrap { padding: 24px 20px !important; }
+    .partner-form-row { grid-template-columns: 1fr !important; gap: 10px !important; }
   }
 
+
+
+  /* PARTNER SECTION */
+  .partner-section { padding: 52px 80px; background: var(--cream); }
+  .partner-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .partner-left { }
+  .partner-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+  .partner-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.2; margin-bottom: 10px; }
+  .partner-sub { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.7; margin-bottom: 20px; }
+  .partner-benefits { display: flex; flex-direction: column; gap: 10px; }
+  .partner-benefit { display: flex; gap: 12px; align-items: flex-start; }
+  .partner-benefit-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .partner-benefit-title { font-size: 12px; font-weight: 400; color: var(--espresso); }
+  .partner-benefit-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .partner-form-wrap { background: var(--espresso); border-radius: 20px; padding: 32px; }
+  .partner-form-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 6px; }
+  .partner-form-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.45); margin-bottom: 24px; line-height: 1.6; }
+  .partner-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .partner-input, .partner-select, .partner-textarea { width: 100%; padding: 11px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
+  .partner-input::placeholder, .partner-textarea::placeholder { color: rgba(247,243,238,0.25); }
+  .partner-input:focus, .partner-select:focus, .partner-textarea:focus { border-color: var(--terracotta); }
+  .partner-select option { background: var(--espresso); color: var(--cream); }
+  .partner-textarea { resize: vertical; min-height: 90px; margin-bottom: 12px; }
+  .partner-submit { width: 100%; padding: 14px; background: var(--terracotta); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .partner-submit:hover { background: #A85A35; transform: translateY(-1px); }
+  .partner-success { text-align: center; display: none; padding: 20px 0; }
+  .partner-success-icon { font-size: 36px; margin-bottom: 10px; }
+  .partner-success-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; color: var(--cream); }
+  .partner-success-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.5); margin-top: 6px; }
+  @media (max-width: 768px) {
+    .partner-section { padding: 40px 20px; }
+    .partner-inner { grid-template-columns: 1fr; gap: 24px; }
+    .partner-form-row { grid-template-columns: 1fr; }
+    .partner-form-wrap { padding: 24px; }
+  }
 
 </style>
 </head>
@@ -553,7 +596,7 @@
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <a class="nav-link" href="app.html" style="font-size:11px;">Me connecter</a>
-    <a class="nav-cta" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank">Créer mon espace →</a>
+    <a class="nav-cta" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank">Créer mon espace →</a>
   </div>
 </nav>
 
@@ -568,11 +611,11 @@
     <div class="hero-desc">Le Move par Maison Florélis, l'espace digital qui pense à tout. Budget, déménagement, moodboard, livraisons. Pour vivre ce moment avec sérénité plutôt qu'avec stress.</div>
     <div class="hero-price-block">
       <div class="hero-price-label">Accès à vie · Paiement unique</div>
-      <div class="hero-price"><sub>€</sub>39</div>
+      <div class="hero-price"><sub>€</sub>69</div>
       <div class="hero-price-note">Accès instantané. Compte personnel sécurisé. Aucun abonnement.</div>
     </div>
     <div class="hero-actions">
-      <a class="btn-primary-hero" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank">Créer mon espace Le Move</a>
+      <a class="btn-primary-hero" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank">Créer mon espace Le Move</a>
       <a class="btn-secondary-hero" href="#preview">Voir l'aperçu complet</a>
     </div>
     <div class="hero-trust">
@@ -869,48 +912,48 @@
   <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pricing-plan">Essentiel</div>
-      <div class="pricing-price"><sup>€</sup>22</div>
+      <div class="pricing-price"><sup>€</sup>39</div>
       <div class="pricing-price-note">Accès à vie</div>
       <div class="pricing-divider"></div>
       <div class="pricing-features-list">
-        <div class="pricing-feat"><span class="feat-check">✓</span>Dashboard central</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mon Budget</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mon Déménagement</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mes Contacts & Agenda</div>
         <div class="pricing-feat"><span class="feat-x">✕</span>Moodboard & Inspirations</div>
         <div class="pricing-feat"><span class="feat-x">✕</span>Suivi achats & livraisons</div>
-        <div class="pricing-feat"><span class="feat-x">✕</span>Avancement Kanban</div>
+        <div class="pricing-feat"><span class="feat-x">✕</span>Calculateur volume</div>
       </div>
-      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01" target="_blank" onclick="window.open('https://buy.stripe.com/8x2aEX1aMgB98pL40r6EU01','_blank');return false;">Choisir Essentiel</a>
+      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/3cIbJ1bPqfx56hD9kL6EU03" target="_blank" onclick="window.open('https://buy.stripe.com/3cIbJ1bPqfx56hD9kL6EU03','_blank');return false;">Choisir Essentiel</a>
     </div>
     <div class="pricing-card featured">
       <div class="pricing-plan">Complet</div>
-      <div class="pricing-price"><sup>€</sup>39</div>
+      <div class="pricing-price"><sup>€</sup>69</div>
       <div class="pricing-price-note">Accès à vie · Recommandé</div>
       <div class="pricing-divider"></div>
       <div class="pricing-features-list">
-        <div class="pricing-feat"><span class="feat-check">✓</span>Les 6 modules complets</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Tout du plan Essentiel</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Moodboard & Inspirations</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Suivi achats & livraisons</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>40+ conseils intégrés</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Compte personnel sécurisé</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mon Avancement Kanban</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Calculateur volume déménagement</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
-      <a class="pricing-btn pricing-btn-dark" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank" onclick="window.open('https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00','_blank');return false;">Créer mon espace, 39€</a>
+      <a class="pricing-btn pricing-btn-dark" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank" onclick="window.open('https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04','_blank');return false;">Créer mon espace, 69€</a>
     </div>
     <div class="pricing-card">
       <div class="pricing-plan">Premium</div>
-      <div class="pricing-price"><sup>€</sup>56</div>
+      <div class="pricing-price"><sup>€</sup>99</div>
       <div class="pricing-price-note">Accès à vie · Notre offre la plus complète</div>
       <div class="pricing-divider"></div>
       <div class="pricing-features-list">
         <div class="pricing-feat"><span class="feat-check">✓</span>Tout du plan Complet</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Guide PDF "Bien s'installer"</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Checklist imprimable A4</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Accès "Le Next Move" en avant-première</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Support prioritaire</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>✨ Moodboard IA (3 générations)</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>🤝 Espace collaboratif</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>⭐ Annuaire Pro vérifié</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>💬 Support prioritaire 24h</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
-      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/aFa00jbPq0Cb8pL54v6EU02" target="_blank" onclick="window.open('https://buy.stripe.com/aFa00jbPq0Cb8pL54v6EU02','_blank');return false;">Créer mon espace, 56€</a>
+      <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/5kQaEXf1CacL7lHcwX6EU05" target="_blank" onclick="window.open('https://buy.stripe.com/5kQaEXf1CacL7lHcwX6EU05','_blank');return false;">Créer mon espace, 99€</a>
     </div>
   </div>
 </section>
@@ -949,6 +992,71 @@
   </div>
 </section>
 
+
+<!-- ── PARTENAIRES PRO ──────────────────────────────────────────── -->
+<section class="partner-section" id="partenaires">
+  <div class="partner-inner">
+    <div class="partner-left">
+      <div class="partner-label">Vous êtes un professionnel ?</div>
+      <div class="partner-title">Rejoignez l'Annuaire Le Move</div>
+      <div class="partner-sub">Déménageur, décorateur, architecte, artisan — apparaissez en recommandation auprès de nos utilisateurs et développez votre clientèle.</div>
+      <div class="partner-benefits">
+        <div class="partner-benefit">
+          <div class="partner-benefit-icon">⭐</div>
+          <div><div class="partner-benefit-title">Visibilité ciblée</div><div class="partner-benefit-desc">Face à des utilisateurs en plein emménagement — le bon moment, la bonne personne.</div></div>
+        </div>
+        <div class="partner-benefit">
+          <div class="partner-benefit-icon">✦</div>
+          <div><div class="partner-benefit-title">Badge Partenaire Le Move</div><div class="partner-benefit-desc">Un badge exclusif qui vous distingue et rassure vos futurs clients.</div></div>
+        </div>
+        <div class="partner-benefit">
+          <div class="partner-benefit-icon">📍</div>
+          <div><div class="partner-benefit-title">Mise en avant locale</div><div class="partner-benefit-desc">Filtrable par ville — trouvez facilement des clients dans votre zone.</div></div>
+        </div>
+        <div class="partner-benefit">
+          <div class="partner-benefit-icon">🤝</div>
+          <div><div class="partner-benefit-title">Partenariat sur mesure</div><div class="partner-benefit-desc">On construit ensemble une relation qui profite aux deux parties.</div></div>
+        </div>
+      </div>
+    </div>
+  <div class="partner-form-wrap">
+    <div id="partnerFormWrap">
+      <div class="partner-form-title">Parlons-en.</div>
+      <div class="partner-form-sub">Remplissez ce formulaire et on vous recontacte sous 48h pour discuter d'un partenariat.</div>
+      <div class="partner-form-row">
+        <input type="text" class="partner-input" id="pNom" placeholder="Votre nom *">
+        <input type="text" class="partner-input" id="pEntreprise" placeholder="Entreprise *">
+      </div>
+      <div class="partner-form-row">
+        <input type="email" class="partner-input" id="pEmail" placeholder="Email *">
+        <input type="text" class="partner-input" id="pVille" placeholder="Ville">
+      </div>
+      <div class="partner-form-row">
+        <select class="partner-select" id="pCategorie">
+          <option value="" disabled selected>Votre activité *</option>
+          <option value="Déménagement">Déménagement</option>
+          <option value="Décoration">Décoration d'intérieur</option>
+          <option value="Architecture">Architecture d'intérieur</option>
+          <option value="Travaux">Travaux & Artisanat</option>
+          <option value="Nettoyage">Nettoyage</option>
+          <option value="Administratif">Services administratifs</option>
+          <option value="Autre">Autre</option>
+        </select>
+        <input type="tel" class="partner-input" id="pTel" placeholder="Téléphone">
+      </div>
+      <textarea class="partner-textarea" id="pMessage" placeholder="Décrivez votre activité et ce que vous proposeriez à nos utilisateurs..."></textarea>
+      <button class="partner-submit" onclick="submitPartner()">Envoyer ma demande →</button>
+    </div>
+    </div>
+    <div class="partner-success" id="partnerSuccess">
+      <div class="partner-success-icon">✉️</div>
+      <div class="partner-success-text">Demande envoyée !</div>
+      <div class="partner-success-sub">On vous recontacte sous 48h à l'adresse indiquée.</div>
+    </div>
+  </div>
+  </div>
+</section>
+
 <!-- ── FINAL CTA ───────────────────────────────────────────────────── -->
 <section class="final-cta">
   <div class="final-cta-inner">
@@ -959,6 +1067,41 @@
 	 y="0px" viewBox="0 0 1200 800" style="enable-background:new 0 0 1200 800;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#FFFFFF;}
+
+  /* PARTNER SECTION */
+  .partner-section { padding: 52px 80px; background: var(--cream); }
+  .partner-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .partner-left { }
+  .partner-label { font-size: 9px; font-weight: 200; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; }
+  .partner-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.2; margin-bottom: 10px; }
+  .partner-sub { font-size: 12px; font-weight: 200; color: var(--text-light); line-height: 1.7; margin-bottom: 20px; }
+  .partner-benefits { display: flex; flex-direction: column; gap: 10px; }
+  .partner-benefit { display: flex; gap: 12px; align-items: flex-start; }
+  .partner-benefit-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .partner-benefit-title { font-size: 12px; font-weight: 400; color: var(--espresso); }
+  .partner-benefit-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .partner-form-wrap { background: var(--espresso); border-radius: 20px; padding: 32px; }
+  .partner-form-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; font-weight: 300; color: var(--cream); margin-bottom: 6px; }
+  .partner-form-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.45); margin-bottom: 24px; line-height: 1.6; }
+  .partner-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .partner-input, .partner-select, .partner-textarea { width: 100%; padding: 11px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 300; color: var(--cream); outline: none; transition: border-color 0.2s; appearance: none; }
+  .partner-input::placeholder, .partner-textarea::placeholder { color: rgba(247,243,238,0.25); }
+  .partner-input:focus, .partner-select:focus, .partner-textarea:focus { border-color: var(--terracotta); }
+  .partner-select option { background: var(--espresso); color: var(--cream); }
+  .partner-textarea { resize: vertical; min-height: 90px; margin-bottom: 12px; }
+  .partner-submit { width: 100%; padding: 14px; background: var(--terracotta); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .partner-submit:hover { background: #A85A35; transform: translateY(-1px); }
+  .partner-success { text-align: center; display: none; padding: 20px 0; }
+  .partner-success-icon { font-size: 36px; margin-bottom: 10px; }
+  .partner-success-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; font-weight: 300; color: var(--cream); }
+  .partner-success-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.5); margin-top: 6px; }
+  @media (max-width: 768px) {
+    .partner-section { padding: 40px 20px; }
+    .partner-inner { grid-template-columns: 1fr; gap: 24px; }
+    .partner-form-row { grid-template-columns: 1fr; }
+    .partner-form-wrap { padding: 24px; }
+  }
+
 </style>
 <path class="st0" d="M715.2,268.8l-59.6,210.7c-27.1,112-103,103-103,103s-59.4,1.1-72.3-75.2C464.7,414.6,608.8,305,608.8,305
 	l27.3-28.5l-4.9,16.6l-32.5,115.9l-22.9,78c-3.3,20.5-20.8,23.5-20.8,23.5l-6.3,0.6l0.3,3.6h66.8l0.6-3.3l-4.2-0.6
@@ -976,7 +1119,7 @@
     <div class="cta-title">Ton premier chez-toi<br>mérite d'être bien organisé.</div>
     <div class="cta-sub">Le Move est prêt. Il n'attend que toi.</div>
     <div class="cta-actions">
-      <a class="cta-btn-main" href="https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00" target="_blank" onclick="window.open('https://buy.stripe.com/bJeaEX6v62Kj0Xj68z6EU00','_blank');return false;">Créer mon espace, 39€</a>
+      <a class="cta-btn-main" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank" onclick="window.open('https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04','_blank');return false;">Créer mon espace, 69€</a>
       <a class="cta-btn-ghost" href="#preview">Voir l'aperçu complet</a>
     </div>
     <div class="cta-note">Accès à vie · Compte personnel sécurisé · Mises à jour incluses · Remboursement 7 jours</div>
@@ -1037,5 +1180,44 @@ function showPreview(index) {
   });
 }
 </script>
+
+<script>
+async function submitPartner() {
+  const nom = document.getElementById('pNom').value.trim();
+  const email = document.getElementById('pEmail').value.trim();
+  const entreprise = document.getElementById('pEntreprise').value.trim();
+  const categorie = document.getElementById('pCategorie').value;
+
+  if (!nom || !email || !entreprise || !categorie) {
+    alert('Merci de remplir les champs obligatoires (*)');
+    return;
+  }
+
+  const ville = document.getElementById('pVille').value;
+  const tel = document.getElementById('pTel').value;
+  const message = document.getElementById('pMessage').value;
+
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer re_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn'
+      },
+      body: JSON.stringify({
+        from: 'Le Move <bonjour@lemove.fr>',
+        to: ['bonjour@lemove.fr'],
+        reply_to: email,
+        subject: `[Partenaire] ${nom} — ${entreprise} (${categorie})`,
+        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville || '—'}</p><p><b>Activité :</b> ${categorie}</p><p><b>Message :</b><br>${message || '—'}</p></div>`
+      })
+    });
+  } catch(e) { console.log('Email fallback'); }
+
+  document.getElementById('partnerFormWrap').style.display = 'none';
+  document.getElementById('partnerSuccess').style.display = 'block';
+}
+</script>
+
 </body>
 </html>
