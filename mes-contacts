@@ -576,7 +576,7 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 
 <script>
 const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhubWxweHRlc2x3bWltbWRxanllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA4NDA3NjMsImV4cCI6MjA1NjQxNjc2M30.gOLrSNSQwiIuPYT43EFU8B2SpEFMZ2xV-vB1rgixaZE';
+const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
