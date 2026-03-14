@@ -311,19 +311,24 @@ function renderInspirations(){
   const g=document.getElementById('inspoGrid');
   const filtered=activePiece==='Toutes'?inspirations:inspirations.filter(i=>i.piece===activePiece);
   if(!filtered.length){g.innerHTML='<div class="empty-state">Aucune inspiration pour cette pièce.</div>';return;}
-  g.innerHTML=filtered.map(i=>`
-    <div class="inspo-card">
+  g.innerHTML=filtered.map(i=>{
+    const domain = i.url ? (() => { try { return new URL(i.url).hostname.replace('www.',''); } catch(e) { return i.url; } })() : null;
+    const isPinterest = domain && domain.includes('pinterest');
+    const isInstagram = domain && domain.includes('instagram');
+    const siteIcon = isPinterest ? '📌' : isInstagram ? '📷' : '🔗';
+    const bgColor = isPinterest ? 'rgba(230,0,35,0.06)' : isInstagram ? 'rgba(131,58,180,0.06)' : 'rgba(44,31,20,0.04)';
+    return `<div class="inspo-card">
       <button class="inspo-delete" onclick="deleteInspo('${i.id}')">Supprimer</button>
-      <div class="inspo-img">
-        ${i.url?`<img src="${i.url}" onerror="this.parentElement.textContent='🖼'" alt="">`:'🖼'}
+      <div class="inspo-img" style="${i.url ? `background:${bgColor};flex-direction:column;gap:8px` : ''}">
+        ${i.url ? `<div style="font-size:36px">${siteIcon}</div><div style="font-size:10px;font-weight:300;color:var(--text-light)">${domain}</div>` : '🖼'}
       </div>
       <div class="inspo-body">
         <div class="inspo-piece-tag">${i.piece||'Général'}</div>
-        ${i.url?`<div style="font-size:10px;color:var(--terracotta);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="${i.url}" target="_blank" style="color:var(--terracotta)">${i.url}</a></div>`:''}
+        ${i.url?`<a href="${i.url}" target="_blank" style="font-size:10px;color:var(--terracotta);display:block;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none">↗ Ouvrir le lien</a>`:''}
         <div class="inspo-note">${i.note||''}</div>
       </div>
-    </div>
-  `).join('')+`<div class="add-inspo-btn" onclick="openInspoModal()"><span style="font-size:24px">🖼</span><span>Ajouter</span></div>`;
+    </div>`;
+  }).join('')+`<div class="add-inspo-btn" onclick="openInspoModal()"><span style="font-size:24px">🖼</span><span>Ajouter</span></div>`;
 }
 
 // PALETTE
