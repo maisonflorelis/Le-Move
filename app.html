@@ -536,16 +536,38 @@ function openModule(id) {
   if (pages[id]) window.location.href = pages[id];
 }
 
-function updateProgress() {
-  // Progress based on profile completion
+async function updateProgress() {
   let pct = 0;
-  if (currentProfile.prenom) pct += 10;
-  if (currentProfile.photo_url) pct += 10;
+
+  // Profil (25%)
+  if (currentProfile.prenom) pct += 5;
+  if (currentProfile.photo_url) pct += 5;
   if (currentProfile.date_emmenagement) pct += 10;
   if (currentProfile.type_logement) pct += 5;
-  // Bonus for plan level
-  if (currentPlan === 'complet') pct += 5;
-  if (currentPlan === 'premium') pct += 10;
+
+  // Tâches déménagement (35%)
+  const { data: taches } = await sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id);
+  if (taches && taches.length > 0) {
+    const done = taches.filter(t => t.fait).length;
+    pct += Math.round((done / taches.length) * 35);
+  }
+
+  // Kanban avancement (25%)
+  const { data: avancement } = await sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id);
+  if (avancement && avancement.length > 0) {
+    const done = avancement.filter(t => t.statut === 'done').length;
+    pct += Math.round((done / avancement.length) * 25);
+  }
+
+  // Budget défini (5%)
+  const { data: budgetP } = await sb.from('Profiles').select('budget_total').eq('id', currentUser.id).single();
+  if (budgetP?.budget_total > 0) pct += 5;
+
+  // Moodboard IA généré (5%)
+  const { data: moodP } = await sb.from('Profiles').select('moodboard_result').eq('id', currentUser.id).single();
+  if (moodP?.moodboard_result) pct += 5;
+
+  pct = Math.min(100, pct);
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('progressPct').textContent = pct + '% complété';
 }
