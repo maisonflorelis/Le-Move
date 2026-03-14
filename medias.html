@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Mes Médias</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:40px 24px;display:flex;flex-direction:column;gap:8px;z-index:100}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);margin-bottom:32px;line-height:1.2;cursor:pointer}
+.sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;font-size:12px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--terracotta)}
+.nav-section{font-size:8px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.4);padding:16px 12px 6px}
+.sidebar-footer{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)}
+.progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
+.progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
+.main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
+.page-header{background:var(--espresso);padding:52px 52px 40px;position:relative;overflow:hidden}
+.page-header::before{content:'📁';position:absolute;right:52px;top:50%;transform:translateY(-50%);font-size:120px;opacity:0.06;pointer-events:none}
+.breadcrumb{font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:16px}
+.breadcrumb span{color:rgba(247,243,238,0.6)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;font-style:italic;color:var(--cream);line-height:1.1;margin-bottom:8px}
+.page-line{width:40px;height:1px;background:var(--terracotta);margin:14px 0}
+.page-quote{font-size:12px;font-weight:200;font-style:italic;color:rgba(247,243,238,0.45)}
+.summary-bar{background:var(--cream);border-bottom:1px solid var(--linen);padding:24px 52px;display:flex}
+.summary-stat{flex:1;padding:0 28px;border-right:1px solid var(--linen)}
+.summary-stat:first-child{padding-left:0}
+.summary-stat:last-child{border-right:none}
+.summary-label{font-size:8px;font-weight:300;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.summary-value{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--espresso);line-height:1}
+.summary-sub{font-size:10px;font-weight:200;color:var(--text-light);margin-top:3px}
+.content{padding:44px 52px}
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--linen);border-radius:16px;padding:48px;text-align:center;margin-bottom:32px;cursor:pointer;transition:all 0.2s;position:relative;background:var(--cream)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--terracotta);background:rgba(196,113,74,0.03)}
+.upload-icon{font-size:48px;margin-bottom:12px}
+.upload-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;font-weight:300;color:var(--espresso);margin-bottom:6px}
+.upload-sub{font-size:12px;font-weight:200;color:var(--text-light);margin-bottom:20px}
+.upload-types{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.upload-type{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:var(--linen);color:var(--text-light)}
+.upload-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.upload-field{display:flex;flex-direction:column;gap:5px}
+.upload-label{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)}
+.upload-select,.upload-input-text{padding:9px 14px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;transition:border-color 0.2s;appearance:none}
+.upload-select:focus,.upload-input-text:focus{border-color:var(--terracotta)}
+.upload-btn{width:100%;padding:12px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.upload-btn:hover{opacity:0.85}
+.upload-btn:disabled{opacity:0.4;cursor:not-allowed}
+.upload-progress{height:3px;background:var(--linen);border-radius:3px;overflow:hidden;margin-top:10px;display:none}
+.upload-progress-fill{height:100%;background:var(--terracotta);border-radius:3px;transition:width 0.3s;width:0%}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.filter-tab{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:300;cursor:pointer;transition:all 0.2s;border:1px solid var(--linen);color:var(--text-light);background:var(--warm-white)}
+.filter-tab:hover{border-color:var(--sand);color:var(--espresso)}
+.filter-tab.active{background:var(--espresso);color:var(--cream);border-color:var(--espresso)}
+
+/* MEDIA GRID */
+.media-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px}
+.media-card{background:var(--cream);border:1px solid var(--linen);border-radius:12px;overflow:hidden;transition:all 0.2s;position:relative;cursor:pointer}
+.media-card:hover{border-color:var(--sand);transform:translateY(-2px);box-shadow:0 8px 24px rgba(44,31,20,0.08)}
+.media-thumb{width:100%;height:140px;object-fit:cover;background:var(--linen);display:flex;align-items:center;justify-content:center;font-size:40px}
+.media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover}
+.media-body{padding:12px}
+.media-name{font-size:11px;font-weight:300;color:var(--espresso);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.media-cat{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:10px;background:var(--linen);color:var(--text-light);display:inline-block}
+.media-delete{position:absolute;top:8px;right:8px;background:rgba(44,31,20,0.6);color:white;border:none;border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer;opacity:0;transition:opacity 0.2s}
+.media-card:hover .media-delete{opacity:1}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(20,14,8,0.92);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.lightbox.open{display:flex}
+.lightbox-inner{max-width:90vw;max-height:90vh;position:relative}
+.lightbox-img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px}
+.lightbox-video{max-width:90vw;max-height:85vh;border-radius:8px}
+.lightbox-close{position:absolute;top:-40px;right:0;background:none;border:none;color:rgba(255,255,255,0.6);font-size:24px;cursor:pointer}
+.lightbox-name{text-align:center;font-size:12px;font-weight:200;color:rgba(255,255,255,0.4);margin-top:12px}
+
+.empty-state{text-align:center;padding:48px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic;grid-column:1/-1}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}
+  .page-header,.content{padding:24px 20px}
+  .summary-bar{padding:16px 20px;flex-wrap:wrap}
+  .summary-stat{min-width:45%;padding:8px 12px}
+  .media-grid{grid-template-columns:1fr 1fr}
+  .upload-meta{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Mes Médias</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
+  <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mes Médias</span></div>
+    <div class="page-title">Mes Médias</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Photos, vidéos, documents — tout ton projet en un endroit."</div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-stat"><div class="summary-label">Fichiers</div><div class="summary-value" id="statTotal">0</div><div class="summary-sub">Total</div></div>
+    <div class="summary-stat"><div class="summary-label">Photos</div><div class="summary-value" id="statPhotos">0</div><div class="summary-sub">Images</div></div>
+    <div class="summary-stat"><div class="summary-label">Vidéos</div><div class="summary-value" id="statVideos">0</div><div class="summary-sub">Enregistrements</div></div>
+    <div class="summary-stat"><div class="summary-label">Documents</div><div class="summary-value" id="statDocs">0</div><div class="summary-sub">Fichiers</div></div>
+  </div>
+
+  <div class="content">
+
+    <div class="section-eyebrow">Ajouter un fichier</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" class="upload-input" id="fileInput" accept="image/*,video/*,.pdf,.doc,.docx" multiple>
+      <div class="upload-icon">📎</div>
+      <div class="upload-title">Glisse tes fichiers ici</div>
+      <div class="upload-sub">ou clique pour sélectionner</div>
+      <div class="upload-types">
+        <span class="upload-type">📸 Photos</span>
+        <span class="upload-type">🎥 Vidéos</span>
+        <span class="upload-type">📄 PDF</span>
+        <span class="upload-type">📝 Documents</span>
+      </div>
+    </div>
+
+    <div id="uploadForm" style="display:none;background:var(--cream);border:1px solid var(--linen);border-radius:14px;padding:24px;margin-bottom:32px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;margin-bottom:16px" id="uploadFileName">—</div>
+      <div class="upload-meta">
+        <div class="upload-field">
+          <div class="upload-label">Nom</div>
+          <input type="text" class="upload-input-text" id="uploadName" placeholder="Ex : Visite appartement rue de la Paix">
+        </div>
+        <div class="upload-field">
+          <div class="upload-label">Catégorie</div>
+          <select class="upload-select" id="uploadCat">
+            <option value="Général">Général</option>
+            <option value="Visite">Visite appartement</option>
+            <option value="Déco">Inspiration déco</option>
+            <option value="État des lieux">État des lieux</option>
+            <option value="Documents">Documents officiels</option>
+            <option value="Avant/Après">Avant / Après</option>
+            <option value="Chantier">Travaux / Chantier</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-progress" id="uploadProgress"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+      <button class="upload-btn" id="uploadBtn" onclick="uploadFile()">Uploader →</button>
+    </div>
+
+    <div class="section-eyebrow">Ma médiathèque</div>
+    <div class="filter-tabs" id="filterTabs"></div>
+    <div class="media-grid" id="mediaGrid">
+      <div class="empty-state">Aucun média. Glisse tes premiers fichiers !</div>
+    </div>
+
+  </div>
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div id="lightboxContent"></div>
+    <div class="lightbox-name" id="lightboxName"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+const CATS=['Tous','Visite','Déco','État des lieux','Documents','Avant/Après','Chantier','Général'];
+let currentUser=null,medias=[],activeFilter='Tous',pendingFile=null;
+
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='app.html';return;}
+  currentUser=session.user;
+  const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
+  document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  await loadData();
+  setupDragDrop();
+})();
+
+async function logout(){await sb.auth.signOut();window.location.href='app.html';}
+
+async function loadData(){
+  const{data}=await sb.from('medias').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  medias=data||[];
+  renderAll();
+}
+
+function renderAll(){updateSummary();renderFilterTabs();renderGrid();}
+
+function updateSummary(){
+  document.getElementById('statTotal').textContent=medias.length;
+  document.getElementById('statPhotos').textContent=medias.filter(m=>m.type==='photo').length;
+  document.getElementById('statVideos').textContent=medias.filter(m=>m.type==='video').length;
+  document.getElementById('statDocs').textContent=medias.filter(m=>m.type==='document').length;
+}
+
+function renderFilterTabs(){
+  document.getElementById('filterTabs').innerHTML=CATS.map(c=>{
+    const count=c==='Tous'?medias.length:medias.filter(m=>m.categorie===c).length;
+    return`<div class="filter-tab ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${c}${count>0?` (${count})`:''}</div>`;
+  }).join('');
+}
+
+function setFilter(f){activeFilter=f;renderFilterTabs();renderGrid();}
+
+function renderGrid(){
+  const g=document.getElementById('mediaGrid');
+  const filtered=activeFilter==='Tous'?medias:medias.filter(m=>m.categorie===activeFilter);
+  if(!filtered.length){g.innerHTML='<div class="empty-state">Aucun média dans cette catégorie.</div>';return;}
+  g.innerHTML=filtered.map(m=>{
+    const isPhoto=m.type==='photo';
+    const isVideo=m.type==='video';
+    const thumb=isPhoto?`<img src="${m.url}" alt="" loading="lazy" onerror="this.parentElement.textContent='📸'">`:
+                isVideo?`<video src="${m.url}" preload="metadata"></video>`:
+                `<div style="font-size:40px">${m.type==='document'?'📄':'📎'}</div>`;
+    return`<div class="media-card" onclick="openLightbox('${m.id}')">
+      <button class="media-delete" onclick="deleteMedia('${m.id}',event)">🗑</button>
+      <div class="media-thumb">${thumb}</div>
+      <div class="media-body">
+        <div class="media-name">${m.nom||'Sans nom'}</div>
+        <span class="media-cat">${m.categorie||'Général'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openLightbox(id){
+  const m=medias.find(m=>m.id===id);
+  if(!m)return;
+  const c=document.getElementById('lightboxContent');
+  if(m.type==='photo') c.innerHTML=`<img class="lightbox-img" src="${m.url}" alt="">`;
+  else if(m.type==='video') c.innerHTML=`<video class="lightbox-video" src="${m.url}" controls autoplay></video>`;
+  else { window.open(m.url,'_blank'); return; }
+  document.getElementById('lightboxName').textContent=m.nom||'';
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxContent').innerHTML='';
+}
+
+// FILE INPUT
+document.getElementById('fileInput').addEventListener('change',e=>{
+  if(e.target.files[0])prepareUpload(e.target.files[0]);
+});
+
+function setupDragDrop(){
+  const zone=document.getElementById('uploadZone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault();zone.classList.remove('drag');
+    if(e.dataTransfer.files[0])prepareUpload(e.dataTransfer.files[0]);
+  });
+}
+
+function prepareUpload(file){
+  pendingFile=file;
+  document.getElementById('uploadFileName').textContent=file.name;
+  document.getElementById('uploadName').value=file.name.replace(/\.[^/.]+$/,'');
+  document.getElementById('uploadForm').style.display='block';
+  document.getElementById('uploadZone').style.display='none';
+}
+
+async function uploadFile(){
+  if(!pendingFile)return;
+  const btn=document.getElementById('uploadBtn');
+  const prog=document.getElementById('uploadProgress');
+  const fill=document.getElementById('uploadProgressFill');
+  btn.disabled=true;btn.textContent='Upload en cours...';
+  prog.style.display='block';fill.style.width='30%';
+
+  const ext=pendingFile.name.split('.').pop();
+  const type=pendingFile.type.startsWith('image/')?'photo':pendingFile.type.startsWith('video/')?'video':'document';
+  const path=`${currentUser.id}/${Date.now()}.${ext}`;
+
+  fill.style.width='60%';
+  const{error:storageErr}=await sb.storage.from('medias').upload(path,pendingFile,{upsert:false});
+  if(storageErr){alert('Erreur upload : '+storageErr.message);btn.disabled=false;btn.textContent='Uploader →';return;}
+
+  fill.style.width='85%';
+  const{data:urlData}=sb.storage.from('medias').getPublicUrl(path);
+
+  const{data}=await sb.from('medias').insert({
+    user_id:currentUser.id,
+    nom:document.getElementById('uploadName').value||pendingFile.name,
+    type,
+    categorie:document.getElementById('uploadCat').value,
+    url:urlData.publicUrl,
+    storage_path:path
+  }).select().single();
+
+  fill.style.width='100%';
+  if(data){medias.unshift(data);renderAll();}
+  setTimeout(()=>{
+    document.getElementById('uploadForm').style.display='none';
+    document.getElementById('uploadZone').style.display='block';
+    document.getElementById('fileInput').value='';
+    btn.disabled=false;btn.textContent='Uploader →';
+    prog.style.display='none';fill.style.width='0%';
+    pendingFile=null;
+  },500);
+}
+
+async function deleteMedia(id,e){
+  e.stopPropagation();
+  if(!confirm('Supprimer ce fichier ?'))return;
+  const m=medias.find(m=>m.id===id);
+  if(m?.storage_path)await sb.storage.from('medias').remove([m.storage_path]);
+  await sb.from('medias').delete().eq('id',id);
+  medias=medias.filter(m=>m.id!==id);renderAll();
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+</script>
+</body>
+</html>
