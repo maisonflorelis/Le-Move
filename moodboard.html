@@ -121,6 +121,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
   <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
   <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
   <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
   <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
   <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
@@ -237,7 +238,14 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
           <option value="Entrée">Entrée</option>
         </select>
       </div>
-      <div class="modal-field"><div class="modal-label">Lien (Pinterest, Instagram...)</div><input type="url" class="modal-input" id="inspoUrl" placeholder="https://..."></div>
+      <div class="modal-field">
+        <div class="modal-label">Ajouter une photo</div>
+        <div style="border:2px dashed var(--linen);border-radius:8px;padding:16px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.2s" id="inspoDropZone">
+          <input type="file" id="inspoFileInput" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+          <div id="inspoFilePreview" style="font-size:11px;color:var(--text-light)">📸 Clique ou glisse une photo</div>
+        </div>
+      </div>
+      <div class="modal-field"><div class="modal-label">Ou un lien (Pinterest, Instagram...)</div><input type="url" class="modal-input" id="inspoUrl" placeholder="https://pinterest.com/..."></div>
       <div class="modal-field"><div class="modal-label">Note</div><textarea class="modal-textarea" id="inspoNote" placeholder="Ce qui m'a inspiré, ce que j'aime dans cette image..."></textarea></div>
     </div>
     <button class="modal-save" onclick="saveInspo()">Ajouter l'inspiration</button>
@@ -312,19 +320,21 @@ function renderInspirations(){
   const filtered=activePiece==='Toutes'?inspirations:inspirations.filter(i=>i.piece===activePiece);
   if(!filtered.length){g.innerHTML='<div class="empty-state">Aucune inspiration pour cette pièce.</div>';return;}
   g.innerHTML=filtered.map(i=>{
-    const domain = i.url ? (() => { try { return new URL(i.url).hostname.replace('www.',''); } catch(e) { return i.url; } })() : null;
+    const isUploaded = i.url && i.url.includes('supabase');
+    const domain = i.url && !isUploaded ? (() => { try { return new URL(i.url).hostname.replace('www.',''); } catch(e) { return i.url; } })() : null;
     const isPinterest = domain && domain.includes('pinterest');
     const isInstagram = domain && domain.includes('instagram');
     const siteIcon = isPinterest ? '📌' : isInstagram ? '📷' : '🔗';
     const bgColor = isPinterest ? 'rgba(230,0,35,0.06)' : isInstagram ? 'rgba(131,58,180,0.06)' : 'rgba(44,31,20,0.04)';
     return `<div class="inspo-card">
       <button class="inspo-delete" onclick="deleteInspo('${i.id}')">Supprimer</button>
-      <div class="inspo-img" style="${i.url ? `background:${bgColor};flex-direction:column;gap:8px` : ''}">
-        ${i.url ? `<div style="font-size:36px">${siteIcon}</div><div style="font-size:10px;font-weight:300;color:var(--text-light)">${domain}</div>` : '🖼'}
+      <div class="inspo-img" style="${i.url && !isUploaded ? `background:${bgColor};flex-direction:column;gap:8px` : ''}">
+        ${isUploaded ? `<img src="${i.url}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='📸'">` :
+          i.url ? `<div style="font-size:36px">${siteIcon}</div><div style="font-size:10px;font-weight:300;color:var(--text-light)">${domain}</div>` : '🖼'}
       </div>
       <div class="inspo-body">
         <div class="inspo-piece-tag">${i.piece||'Général'}</div>
-        ${i.url?`<a href="${i.url}" target="_blank" style="font-size:10px;color:var(--terracotta);display:block;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none">↗ Ouvrir le lien</a>`:''}
+        ${i.url && !isUploaded ?`<a href="${i.url}" target="_blank" style="font-size:10px;color:var(--terracotta);display:block;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none">↗ Ouvrir le lien</a>`:''}
         <div class="inspo-note">${i.note||''}</div>
       </div>
     </div>`;
@@ -362,10 +372,45 @@ async function savePaletteNote(){
 
 // INSPIRATIONS
 function openInspoModal(){document.getElementById('inspoModal').classList.add('open');}
-function closeInspoModal(){document.getElementById('inspoModal').classList.remove('open');document.getElementById('inspoUrl').value='';document.getElementById('inspoNote').value='';}
+function closeInspoModal(){
+  document.getElementById('inspoModal').classList.remove('open');
+  document.getElementById('inspoUrl').value='';
+  document.getElementById('inspoNote').value='';
+  document.getElementById('inspoFileInput').value='';
+  document.getElementById('inspoFilePreview').textContent='📸 Clique ou glisse une photo';
+}
+
+// Preview selected image
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inspoFileInput')?.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if(f) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('inspoFilePreview').innerHTML = `<img src="${ev.target.result}" style="max-height:80px;border-radius:6px;object-fit:cover">`;
+      };
+      reader.readAsDataURL(f);
+    }
+  });
+});
 
 async function saveInspo(){
-  const{data}=await sb.from('moodboard_items').insert({user_id:currentUser.id,piece:document.getElementById('inspoPiece').value,url:document.getElementById('inspoUrl').value,note:document.getElementById('inspoNote').value,type:'inspiration'}).select().single();
+  let url = document.getElementById('inspoUrl').value;
+  
+  // Handle file upload if a file was selected
+  const fileInput = document.getElementById('inspoFileInput');
+  if(fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/moodboard_${Date.now()}.${ext}`;
+    const{error} = await sb.storage.from('medias').upload(path, file, {upsert:false});
+    if(!error) {
+      const{data:urlData} = sb.storage.from('medias').getPublicUrl(path);
+      url = urlData.publicUrl;
+    }
+  }
+  
+  const{data}=await sb.from('moodboard_items').insert({user_id:currentUser.id,piece:document.getElementById('inspoPiece').value,url,note:document.getElementById('inspoNote').value,type:'inspiration'}).select().single();
   if(data){inspirations.unshift(data);renderPieceTabs();renderInspirations();}
   closeInspoModal();
 }
