@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -345,7 +345,12 @@
 
     <div style="margin-top:32px;">
       <div class="profile-section-title">Mon compte</div>
-      <div style="font-size:12px;color:var(--text-light);margin-bottom:16px;line-height:1.7;">Pour changer ton mot de passe, utilise le lien "Mot de passe oublié" sur la page de connexion.</div>
+      <div class="profile-field">
+        <label class="profile-label">Nouveau mot de passe</label>
+        <input type="password" class="profile-input" id="profileNewPwd" placeholder="Nouveau mot de passe (6 min.)">
+      </div>
+      <button class="profile-save" onclick="changePassword()" style="background:var(--sage);margin-bottom:8px;">Changer mon mot de passe</button>
+      <div class="profile-saved-msg" id="pwdSavedMsg" style="display:none;">✓ Mot de passe mis à jour !</div>
       <button class="profile-logout" onclick="logout()">Se déconnecter</button>
     </div>
   </div>
@@ -369,10 +374,12 @@ const ALL_MODULES = [
 ];
 
 const TUTORIAL_STEPS = [
-  { icon: '🎉', title: 'Bienvenue dans ton espace !', text: 'Le Move est ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, livraisons — tout est centralisé ici.' },
-  { icon: '📦', title: 'Tes modules t\'attendent.', text: 'Chaque module correspond à une partie de ton emménagement. Commence par le budget ou le planning déménagement — c\'est là que tout commence.' },
-  { icon: '✅', title: 'Suis ta progression.', text: 'La barre en haut suit ton avancement. Plus tu coches de tâches dans chaque module, plus elle avance. Objectif : 100% avant le jour J !' },
-  { icon: '✨', title: 'Personnalisons ton espace !', text: 'On va te demander ton prénom et ta date d\'emménagement pour que Le Move soit vraiment toi.' },
+  { icon: '🎉', title: 'Bienvenue dans ton espace !', text: "Le Move est ton espace digital pour organiser ton premier emménagement de A à Z. Budget, contacts, déco, livraisons — tout est centralisé ici." },
+  { icon: '📦', title: '11 modules t\'attendent.', text: "Du budget au moodboard IA, chaque module couvre une partie clé de ton emménagement. Commence par les essentiels : Budget, Déménagement, Mes Contacts." },
+  { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style déco et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires." },
+  { icon: '🤝', title: 'Partage ton espace (Premium)', text: "Invite un proche, un décorateur ou un architecte à accéder à ton espace Le Move. Lecture seule ou accès complet, c'est toi qui décides." },
+  { icon: '✅', title: 'Suis ta progression.', text: "La barre en haut de ton dashboard suit ton avancement. Complète ton profil pour commencer !" },
+  { icon: '📸', title: 'Personnalisons ton espace !', text: "On va te demander ton prénom, ta photo et ta date d'emménagement pour que Le Move soit vraiment toi." },
 ];
 
 let tutStep = 0;
@@ -526,8 +533,15 @@ function openModule(id) {
 }
 
 function updateProgress() {
-  const accessible = ALL_MODULES.filter(m => m.plans.includes(currentPlan)).length;
-  const pct = Math.round((accessible / ALL_MODULES.length) * 40);
+  // Progress based on profile completion
+  let pct = 0;
+  if (currentProfile.prenom) pct += 10;
+  if (currentProfile.photo_url) pct += 10;
+  if (currentProfile.date_emmenagement) pct += 10;
+  if (currentProfile.type_logement) pct += 5;
+  // Bonus for plan level
+  if (currentPlan === 'complet') pct += 5;
+  if (currentPlan === 'premium') pct += 10;
   document.getElementById('progressBar').style.width = pct + '%';
   document.getElementById('progressPct').textContent = pct + '% complété';
 }
@@ -641,6 +655,20 @@ async function uploadPhoto(file) {
   if (error) { console.error('Upload error:', error); return null; }
   const { data } = sb.storage.from('profiles').getPublicUrl(path);
   return data.publicUrl + '?t=' + Date.now();
+}
+
+async function changePassword() {
+  const pwd = document.getElementById('profileNewPwd').value;
+  if (!pwd || pwd.length < 6) {
+    alert('Le mot de passe doit faire au moins 6 caractères.');
+    return;
+  }
+  const { error } = await sb.auth.updateUser({ password: pwd });
+  if (error) { alert('Erreur : ' + error.message); return; }
+  document.getElementById('profileNewPwd').value = '';
+  const msg = document.getElementById('pwdSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
