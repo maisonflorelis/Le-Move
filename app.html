@@ -375,6 +375,7 @@ const ALL_MODULES = [
   { id: 'collab', icon: '🤝', title: 'Espace Collaboratif', desc: "Invite un proche ou un professionnel à accéder à ton espace Le Move.", tags: ['Partage', 'Premium'], plans: ['premium'] },
   { id: 'annuaire', icon: '⭐', title: 'Annuaire Pro', desc: 'Prestataires vérifiés et partenaires Le Move — déménageurs, décorateurs, artisans.', tags: ['Contacts', 'Premium'], plans: ['premium'] },
   { id: 'support', icon: '💬', title: 'Support Prioritaire', desc: "Accès direct à l'équipe Le Move. Réponse garantie sous 24h.", tags: ['Support', 'Premium'], plans: ['premium'] },
+  { id: 'medias', icon: '📁', title: 'Mes Médias', desc: 'Photos, vidéos, documents — ta visite d'appart, tes inspirations, ton état des lieux.', tags: ['Photos', 'Vidéos'], plans: ['essentiel', 'complet', 'premium'] },
 ];
 
 const TUTORIAL_STEPS = [
@@ -532,6 +533,7 @@ function openModule(id) {
     'collab': 'collab.html',
     'annuaire': 'annuaire.html',
     'support': 'support.html',
+    'medias': 'medias.html',
   };
   if (pages[id]) window.location.href = pages[id];
 }
@@ -681,27 +683,3 @@ async function uploadPhoto(file) {
   if (error) { console.error('Upload error:', error); return null; }
   const { data } = sb.storage.from('profiles').getPublicUrl(path);
   return data.publicUrl + '?t=' + Date.now();
-}
-
-async function changePassword() {
-  const pwd = document.getElementById('profileNewPwd').value;
-  if (!pwd || pwd.length < 6) {
-    alert('Le mot de passe doit faire au moins 6 caractères.');
-    return;
-  }
-  const { error } = await sb.auth.updateUser({ password: pwd });
-  if (error) { alert('Erreur : ' + error.message); return; }
-  document.getElementById('profileNewPwd').value = '';
-  const msg = document.getElementById('pwdSavedMsg');
-  msg.style.display = 'block';
-  setTimeout(() => msg.style.display = 'none', 3000);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-});
-
-init();
-</script>
-</body>
-</html>
