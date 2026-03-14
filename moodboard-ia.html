@@ -532,8 +532,24 @@ let answers_detailed = { budget_deco: '2000 €' };
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'app.html'; return; }
   currentUser = session.user;
-  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  const { data: profile } = await sb.from('Profiles').select('prenom, moodboard_result').eq('id', session.user.id).single();
   document.getElementById('sidebarUser').textContent = profile?.prenom || session.user.email.split('@')[0];
+
+  // If saved result exists, show it directly
+  if (profile?.moodboard_result) {
+    try {
+      const saved = JSON.parse(profile.moodboard_result);
+      displayResult(saved);
+      // Show a "regenerate" button
+      const regen = document.createElement('button');
+      regen.textContent = '↺ Regénérer un moodboard';
+      regen.style.cssText = 'margin:24px auto;display:block;padding:10px 24px;background:transparent;border:1px solid var(--linen);border-radius:8px;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-light);transition:all 0.2s';
+      regen.onmouseenter = () => { regen.style.borderColor = 'var(--terracotta)'; regen.style.color = 'var(--terracotta)'; };
+      regen.onmouseleave = () => { regen.style.borderColor = 'var(--linen)'; regen.style.color = 'var(--text-light)'; };
+      regen.onclick = () => { document.getElementById('resultSection').classList.remove('active'); regen.remove(); };
+      document.getElementById('resultSection').appendChild(regen);
+    } catch(e) {}
+  }
 
   // Load usage
   const { data: usage } = await sb.from('moodboard_usage').select('count').eq('user_id', session.user.id).single();
