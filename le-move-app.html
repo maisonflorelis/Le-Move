@@ -441,7 +441,8 @@ async function logout() {
 async function loadApp(user) {
   currentUser = user;
 
-  const { data: userData } = await sb.from('Users').select('Plan').eq('Email', user.email).single();
+  const { data: userData, error: userError } = await sb.from('Users').select('Plan').eq('Email', user.email).maybeSingle();
+  if (userError) console.warn('Users query:', userError.message);
   currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
 
@@ -719,3 +720,4 @@ init();
 </script>
 </body>
 </html>
+
