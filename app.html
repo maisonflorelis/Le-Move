@@ -441,7 +441,7 @@ async function loadApp(user) {
   currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
 
-  const { data: profileData } = await sb.from('Profiles').select('*').eq('id', user.id).single();
+  const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).single();
   currentProfile = profileData || {};
 
   const fallbackName = user.email.split('@')[0].split('.')[0];
@@ -539,39 +539,43 @@ function openModule(id) {
 }
 
 async function updateProgress() {
-  let pct = 0;
+  try {
+    let pct = 0;
 
-  // Profil (25%)
-  if (currentProfile.prenom) pct += 5;
-  if (currentProfile.photo_url) pct += 5;
-  if (currentProfile.date_emmenagement) pct += 10;
-  if (currentProfile.type_logement) pct += 5;
+    // Profil (25%)
+    if (currentProfile.prenom) pct += 5;
+    if (currentProfile.photo_url) pct += 5;
+    if (currentProfile.date_emmenagement) pct += 10;
+    if (currentProfile.type_logement) pct += 5;
 
-  // Tâches déménagement (35%)
-  const { data: taches } = await sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id);
-  if (taches && taches.length > 0) {
-    const done = taches.filter(t => t.fait).length;
-    pct += Math.round((done / taches.length) * 35);
+    // Tâches déménagement + kanban en parallèle (60%)
+    const [tachesRes, avancementRes] = await Promise.all([
+      sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id),
+      sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id)
+    ]);
+
+    const taches = tachesRes.data || [];
+    if (taches.length > 0) {
+      const done = taches.filter(t => t.fait).length;
+      pct += Math.round((done / taches.length) * 35);
+    }
+
+    const avancement = avancementRes.data || [];
+    if (avancement.length > 0) {
+      const done = avancement.filter(t => t.statut === 'done').length;
+      pct += Math.round((done / avancement.length) * 25);
+    }
+
+    // Budget + moodboard depuis currentProfile déjà chargé
+    if (currentProfile.budget_total > 0) pct += 5;
+    if (currentProfile.moodboard_result) pct += 5;
+
+    pct = Math.min(100, pct);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '% complété';
+  } catch(e) {
+    console.error('Progress error:', e);
   }
-
-  // Kanban avancement (25%)
-  const { data: avancement } = await sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id);
-  if (avancement && avancement.length > 0) {
-    const done = avancement.filter(t => t.statut === 'done').length;
-    pct += Math.round((done / avancement.length) * 25);
-  }
-
-  // Budget défini (5%)
-  const { data: budgetP } = await sb.from('Profiles').select('budget_total').eq('id', currentUser.id).single();
-  if (budgetP?.budget_total > 0) pct += 5;
-
-  // Moodboard IA généré (5%)
-  const { data: moodP } = await sb.from('Profiles').select('moodboard_result').eq('id', currentUser.id).single();
-  if (moodP?.moodboard_result) pct += 5;
-
-  pct = Math.min(100, pct);
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressPct').textContent = pct + '% complété';
 }
 
 // ── TUTORIAL ──
@@ -683,3 +687,27 @@ async function uploadPhoto(file) {
   if (error) { console.error('Upload error:', error); return null; }
   const { data } = sb.storage.from('profiles').getPublicUrl(path);
   return data.publicUrl + '?t=' + Date.now();
+}
+
+async function changePassword() {
+  const pwd = document.getElementById('profileNewPwd').value;
+  if (!pwd || pwd.length < 6) {
+    alert('Le mot de passe doit faire au moins 6 caractères.');
+    return;
+  }
+  const { error } = await sb.auth.updateUser({ password: pwd });
+  if (error) { alert('Erreur : ' + error.message); return; }
+  document.getElementById('profileNewPwd').value = '';
+  const msg = document.getElementById('pwdSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+});
+
+init();
+</script>
+</body>
+</html>
