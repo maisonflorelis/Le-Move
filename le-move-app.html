@@ -376,6 +376,10 @@ const ALL_MODULES = [
   { id: 'annuaire', icon: '⭐', title: 'Annuaire Pro', desc: 'Prestataires vérifiés et partenaires Le Move — déménageurs, décorateurs, artisans.', tags: ['Contacts', 'Premium'], plans: ['premium'] },
   { id: 'support', icon: '💬', title: 'Support Prioritaire', desc: "Accès direct à l'équipe Le Move. Réponse garantie sous 24h.", tags: ['Support', 'Premium'], plans: ['premium'] },
   { id: 'medias', icon: '📁', title: 'Mes Médias', desc: 'Photos, vidéos, documents — visite appart, inspirations, état des lieux.', tags: ['Photos', 'Vidéos'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'admin', icon: '📋', title: 'Checklist Administrative', desc: 'Changements d'adresse, résiliations, démarches officielles — tout ce qu'il ne faut pas oublier.', tags: ['Admin', 'Démarches'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'aides', icon: '💶', title: 'Guide des Aides', desc: 'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags: ['Aides', 'Budget'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'carnet', icon: '📓', title: 'Carnet de Bord', desc: 'Codes, mesures, contacts immeuble, notes — tout ce dont tu as besoin au quotidien.', tags: ['Notes', 'Pratique'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'cremaillere', icon: '🎉', title: 'Ma Crémaillère', desc: 'Crée ta liste de cadeaux et partage-la avec tes proches.', tags: ['Cadeaux', 'Partage'], plans: ['essentiel', 'complet', 'premium'] },
 ];
 
 const TUTORIAL_STEPS = [
@@ -534,6 +538,10 @@ function openModule(id) {
     'annuaire': 'annuaire.html',
     'support': 'support.html',
     'medias': 'medias.html',
+    'admin': 'admin.html',
+    'aides': 'aides.html',
+    'carnet': 'carnet.html',
+    'cremaillere': 'cremaillere.html',
   };
   if (pages[id]) window.location.href = pages[id];
 }

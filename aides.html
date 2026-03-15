@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Guide des Aides</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:40px 24px;display:flex;flex-direction:column;gap:8px;z-index:100;overflow-y:auto}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);margin-bottom:32px;line-height:1.2;cursor:pointer}
+.sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;font-size:12px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--terracotta)}
+.nav-section{font-size:8px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.4);padding:16px 12px 6px}
+.sidebar-footer{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)}
+.progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
+.progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
+.main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
+.page-header{background:var(--espresso);padding:52px 52px 40px;position:relative;overflow:hidden}
+.page-header::before{content:'💶';position:absolute;right:52px;top:50%;transform:translateY(-50%);font-size:120px;opacity:0.06;pointer-events:none}
+.breadcrumb{font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:16px}
+.breadcrumb span{color:rgba(247,243,238,0.6)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;font-style:italic;color:var(--cream);line-height:1.1;margin-bottom:8px}
+.page-line{width:40px;height:1px;background:var(--terracotta);margin:14px 0}
+.page-quote{font-size:12px;font-weight:200;font-style:italic;color:rgba(247,243,238,0.45)}
+.content{padding:44px 52px}
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen)}
+.alert-banner{background:rgba(184,154,106,0.1);border:1px solid rgba(184,154,106,0.3);border-radius:12px;padding:16px 20px;margin-bottom:32px;font-size:12px;font-weight:200;color:var(--espresso);line-height:1.6}
+.alert-banner strong{font-weight:400}
+.aides-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.aide-card{background:var(--cream);border:1px solid var(--linen);border-radius:14px;padding:28px;transition:all 0.2s;position:relative}
+.aide-card:hover{border-color:var(--sand);transform:translateY(-2px);box-shadow:0 8px 24px rgba(44,31,20,0.07)}
+.aide-card.featured{background:var(--espresso);border-color:var(--espresso)}
+.aide-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.aide-icon{font-size:28px}
+.aide-amount{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--terracotta)}
+.aide-card.featured .aide-amount{color:var(--gold)}
+.aide-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;font-style:italic;color:var(--espresso);margin-bottom:8px}
+.aide-card.featured .aide-name{color:var(--cream)}
+.aide-desc{font-size:11px;font-weight:200;color:var(--text-light);line-height:1.7;margin-bottom:16px}
+.aide-card.featured .aide-desc{color:rgba(247,243,238,0.5)}
+.aide-conditions{margin-bottom:16px}
+.aide-conditions-title{font-size:8px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px}
+.aide-card.featured .aide-conditions-title{color:rgba(247,243,238,0.35)}
+.aide-condition{display:flex;align-items:flex-start;gap:8px;font-size:11px;font-weight:200;color:var(--text-light);margin-bottom:4px;line-height:1.5}
+.aide-card.featured .aide-condition{color:rgba(247,243,238,0.45)}
+.aide-condition::before{content:'•';color:var(--terracotta);flex-shrink:0;margin-top:1px}
+.aide-card.featured .aide-condition::before{color:var(--gold)}
+.aide-link{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--terracotta);text-decoration:none;transition:opacity 0.2s}
+.aide-card.featured .aide-link{color:var(--gold)}
+.aide-link:hover{opacity:0.7}
+.aide-tag{display:inline-block;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:10px;margin-bottom:12px}
+.tag-green{background:rgba(122,140,126,0.1);color:var(--sage)}
+.tag-gold{background:rgba(184,154,106,0.12);color:var(--gold)}
+.tag-tc{background:rgba(196,113,74,0.1);color:var(--terracotta)}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.content{padding:24px 20px}.aides-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
+  <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
+  <div class="nav-item" onclick="window.location.href='admin.html'"><div class="nav-dot"></div>Checklist Admin</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Guide des Aides</div>
+  <div class="nav-item" onclick="window.location.href='carnet.html'"><div class="nav-dot"></div>Carnet de Bord</div>
+  <div class="nav-item" onclick="window.location.href='cremaillere.html'"><div class="nav-dot"></div>Crémaillère</div>
+  <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Guide des Aides</span></div>
+    <div class="page-title">Guide des Aides</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Les aides auxquelles tu as peut-être droit — et que peu de gens connaissent."</div>
+  </div>
+  <div class="content">
+    <div class="alert-banner">⚠️ <strong>Information importante :</strong> Les montants et conditions des aides sont donnés à titre indicatif et peuvent évoluer. Vérifie toujours les informations directement auprès des organismes officiels avant de faire une demande.</div>
+
+    <div class="section-eyebrow">Aides au logement</div>
+    <div class="aides-grid">
+      <div class="aide-card featured">
+        <div class="aide-header"><div class="aide-icon">🏠</div><div class="aide-amount">Jusqu'à 500€/mois</div></div>
+        <div class="aide-tag tag-green">CAF · Très fréquent</div>
+        <div class="aide-name">APL — Aide Personnalisée au Logement</div>
+        <div class="aide-desc">La principale aide au logement en France. Elle réduit directement ton loyer selon tes revenus, ta situation et ton logement.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Locataire ou colocataire</div>
+          <div class="aide-condition">Logement conventionné APL</div>
+          <div class="aide-condition">Revenus sous plafond</div>
+          <div class="aide-condition">Résidence principale</div>
+        </div>
+        <a href="https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/logement/l-aide-personnalisee-au-logement-apl" target="_blank" class="aide-link">Faire ma simulation →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">🔒</div><div class="aide-amount">Caution gratuite</div></div>
+        <div class="aide-tag tag-gold">Visale · Pour les moins de 30 ans</div>
+        <div class="aide-name">Garantie Visale</div>
+        <div class="aide-desc">Action Logement se porte garant à ta place auprès du propriétaire. Plus besoin de trouver une caution physique !</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Moins de 30 ans OU salarié en mobilité</div>
+          <div class="aide-condition">Entrée dans le logement depuis moins de 6 mois</div>
+          <div class="aide-condition">Loyer max 1500€ IDF / 1300€ province</div>
+          <div class="aide-condition">À demander avant la signature du bail</div>
+        </div>
+        <a href="https://www.visale.fr" target="_blank" class="aide-link">Vérifier mon éligibilité →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">💼</div><div class="aide-amount">Jusqu'à 1000€</div></div>
+        <div class="aide-tag tag-gold">Action Logement · Salariés</div>
+        <div class="aide-name">Mobili-Pass</div>
+        <div class="aide-desc">Aide pour les salariés qui déménagent pour raison professionnelle. Couvre une partie des frais de déménagement ou de caution.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Salarié du secteur privé non agricole</div>
+          <div class="aide-condition">Déménagement lié à une mobilité pro</div>
+          <div class="aide-condition">Entreprise cotisant à Action Logement</div>
+        </div>
+        <a href="https://www.actionlogement.fr" target="_blank" class="aide-link">En savoir plus →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">🎓</div><div class="aide-amount">Variable</div></div>
+        <div class="aide-tag tag-tc">CROUS · Étudiants</div>
+        <div class="aide-name">Bourse sur critères sociaux</div>
+        <div class="aide-desc">Si tu es étudiant, les bourses CROUS peuvent aider à financer ton logement et tes études selon les revenus de tes parents.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Étudiant inscrit dans l'enseignement supérieur</div>
+          <div class="aide-condition">Revenus parentaux sous plafond</div>
+          <div class="aide-condition">Nationalité française ou UE</div>
+        </div>
+        <a href="https://www.messervices.etudiant.gouv.fr" target="_blank" class="aide-link">Faire une demande →</a>
+      </div>
+    </div>
+
+    <div class="section-eyebrow">Aides à l'installation</div>
+    <div class="aides-grid">
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">⚡</div><div class="aide-amount">Chèque énergie</div></div>
+        <div class="aide-tag tag-green">ANAH · Automatique</div>
+        <div class="aide-name">Chèque Énergie</div>
+        <div class="aide-desc">Aide automatique envoyée par courrier aux ménages à faibles revenus. Utilisable pour payer les factures d'énergie ou des travaux.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Revenus fiscaux de référence sous plafond</div>
+          <div class="aide-condition">Envoyé automatiquement, pas de demande</div>
+          <div class="aide-condition">Valable 1 an</div>
+        </div>
+        <a href="https://chequeenergie.gouv.fr" target="_blank" class="aide-link">Vérifier mon éligibilité →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">🛋</div><div class="aide-amount">Variable</div></div>
+        <div class="aide-tag tag-gold">CCAS · Local</div>
+        <div class="aide-name">Aide à l'équipement CCAS</div>
+        <div class="aide-desc">Les Centres Communaux d'Action Sociale proposent des aides locales pour l'équipement du logement selon ta commune et ta situation.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Résider dans la commune</div>
+          <div class="aide-condition">Ressources sous plafond</div>
+          <div class="aide-condition">Variable selon les communes</div>
+        </div>
+        <a href="https://www.service-public.fr/particuliers/vosdroits/F1088" target="_blank" class="aide-link">En savoir plus →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">📦</div><div class="aide-amount">200€ à 1000€</div></div>
+        <div class="aide-tag tag-tc">Pôle Emploi · Demandeurs</div>
+        <div class="aide-name">Aide à la mobilité Pôle Emploi</div>
+        <div class="aide-desc">Si tu déménages pour prendre un emploi ou passer un entretien, France Travail peut financer une partie de tes frais de déménagement.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Demandeur d'emploi inscrit</div>
+          <div class="aide-condition">Déménagement pour raison professionnelle</div>
+          <div class="aide-condition">Distance min. 60km ou 1h30 de trajet</div>
+        </div>
+        <a href="https://www.francetravail.fr/candidat/vos-recherches/aides-aux-projets-professionnels/les-aides-a-la-mobilite.html" target="_blank" class="aide-link">En savoir plus →</a>
+      </div>
+      <div class="aide-card">
+        <div class="aide-header"><div class="aide-icon">🏦</div><div class="aide-amount">Variable</div></div>
+        <div class="aide-tag tag-green">Banque · Premier logement</div>
+        <div class="aide-name">Prêt Avance Loca-Pass</div>
+        <div class="aide-desc">Action Logement peut t'avancer le dépôt de garantie (caution) sans intérêts. Tu le rembourses sur 25 mois maximum.</div>
+        <div class="aide-conditions"><div class="aide-conditions-title">Conditions</div>
+          <div class="aide-condition">Salarié ou jeune de moins de 30 ans</div>
+          <div class="aide-condition">Location dans le secteur privé ou social</div>
+          <div class="aide-condition">Résidence principale</div>
+        </div>
+        <a href="https://www.actionlogement.fr/l-avance-loca-pass" target="_blank" class="aide-link">En savoir plus →</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='app.html';return;}
+  const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
+  document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+})();
+async function logout(){await sb.auth.signOut();window.location.href='app.html';}
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<title>Le Move — Checklist Administrative</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:40px 24px;display:flex;flex-direction:column;gap:8px;z-index:100;overflow-y:auto}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);margin-bottom:32px;line-height:1.2;cursor:pointer}
+.sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;font-size:12px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--terracotta)}
+.nav-section{font-size:8px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.4);padding:16px 12px 6px}
+.sidebar-footer{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)}
+.progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
+.progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
+.main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
+.page-header{background:var(--espresso);padding:52px 52px 40px;position:relative;overflow:hidden}
+.page-header::before{content:'📋';position:absolute;right:52px;top:50%;transform:translateY(-50%);font-size:120px;opacity:0.06;pointer-events:none}
+.breadcrumb{font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:16px}
+.breadcrumb span{color:rgba(247,243,238,0.6)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;font-style:italic;color:var(--cream);line-height:1.1;margin-bottom:8px}
+.page-line{width:40px;height:1px;background:var(--terracotta);margin:14px 0}
+.page-quote{font-size:12px;font-weight:200;font-style:italic;color:rgba(247,243,238,0.45)}
+.summary-bar{background:var(--cream);border-bottom:1px solid var(--linen);padding:24px 52px;display:flex}
+.summary-stat{flex:1;padding:0 28px;border-right:1px solid var(--linen)}
+.summary-stat:first-child{padding-left:0}
+.summary-stat:last-child{border-right:none}
+.summary-label{font-size:8px;font-weight:300;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.summary-value{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--espresso);line-height:1}
+.summary-value.green{color:var(--sage)}
+.summary-value.orange{color:var(--terracotta)}
+.summary-sub{font-size:10px;font-weight:200;color:var(--text-light);margin-top:3px}
+.content{padding:44px 52px}
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen)}
+.cat-block{background:var(--cream);border:1px solid var(--linen);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.cat-header{padding:18px 24px;border-bottom:1px solid var(--linen);display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background 0.15s}
+.cat-header:hover{background:rgba(232,224,213,0.3)}
+.cat-header-left{display:flex;align-items:center;gap:12px}
+.cat-icon{font-size:20px}
+.cat-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;font-weight:300;color:var(--espresso)}
+.cat-progress{font-size:10px;font-weight:200;color:var(--text-light)}
+.cat-bar{height:2px;background:var(--linen)}
+.cat-bar-fill{height:100%;background:var(--terracotta);transition:width 0.4s}
+.cat-body{padding:8px 0}
+.task-row{display:flex;align-items:center;gap:14px;padding:12px 24px;cursor:pointer;transition:background 0.15s}
+.task-row:hover{background:rgba(232,224,213,0.2)}
+.task-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--linen);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+.task-check.done{background:var(--sage);border-color:var(--sage)}
+.task-check.done::after{content:'✓';font-size:10px;color:white}
+.task-text{flex:1;font-size:12px;font-weight:300;color:var(--espresso)}
+.task-text.done{text-decoration:line-through;color:var(--text-light)}
+.task-priority{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.priority-urgent{background:rgba(196,113,74,0.12);color:var(--terracotta)}
+.priority-normal{background:rgba(201,186,168,0.15);color:var(--sand)}
+.task-delete{background:none;border:none;cursor:pointer;font-size:11px;color:var(--text-light);opacity:0;transition:opacity 0.2s}
+.task-row:hover .task-delete{opacity:1}
+.add-task-row{display:flex;gap:10px;padding:10px 24px;border-top:1px solid var(--linen)}
+.add-task-input{flex:1;padding:8px 12px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;transition:border-color 0.2s}
+.add-task-input:focus{border-color:var(--terracotta)}
+.add-task-btn{padding:8px 14px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.empty-state{text-align:center;padding:32px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.page-header,.content{padding:24px 20px}.summary-bar{padding:16px 20px;flex-wrap:wrap}.summary-stat{min-width:45%;padding:8px 12px}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+  <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
+  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+  <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur Volume</div>
+  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collaboratif</div>
+  <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
+  <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
+  <div class="nav-item active"><div class="nav-dot"></div>Checklist Admin</div>
+  <div class="nav-item" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
+  <div class="nav-item" onclick="window.location.href='carnet.html'"><div class="nav-dot"></div>Carnet de Bord</div>
+  <div class="nav-item" onclick="window.location.href='cremaillere.html'"><div class="nav-dot"></div>Crémaillère</div>
+  <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Checklist Administrative</span></div>
+    <div class="page-title">Checklist Administrative</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"Le truc que tout le monde oublie — et qui stresse au dernier moment."</div>
+  </div>
+  <div class="summary-bar">
+    <div class="summary-stat"><div class="summary-label">Total</div><div class="summary-value" id="statTotal">0</div><div class="summary-sub">Démarches</div></div>
+    <div class="summary-stat"><div class="summary-label">Complétées</div><div class="summary-value green" id="statDone">0</div><div class="summary-sub" id="statPct">0%</div></div>
+    <div class="summary-stat"><div class="summary-label">Restantes</div><div class="summary-value orange" id="statLeft">0</div><div class="summary-sub">À faire</div></div>
+    <div class="summary-stat"><div class="summary-label">Urgentes</div><div class="summary-value orange" id="statUrgent">0</div><div class="summary-sub">Priorité haute</div></div>
+  </div>
+  <div class="content">
+    <div class="section-eyebrow">Mes démarches</div>
+    <div id="catsContainer"></div>
+  </div>
+</main>
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+const CATS=[
+  {id:'adresse',icon:'📮',nom:'Changement d\'adresse',tasks:['La Poste — réexpédition du courrier','Carte d\'identité / Passeport','Carte grise du véhicule','Permis de conduire','Carte vitale / CPAM','Médecin traitant','Mutuelle santé','Banque principale','Autres comptes bancaires']},
+  {id:'contrats',icon:'📄',nom:'Résiliations & Nouveaux contrats',tasks:['Résilier contrat électricité ancien logement','Ouvrir contrat électricité nouveau logement','Résilier contrat gaz ancien logement','Ouvrir contrat gaz nouveau logement','Résilier contrat internet ancien logement','Souscrire internet nouveau logement','Assurance habitation — résilier ancien','Assurance habitation — souscrire nouveau']},
+  {id:'admin',icon:'🏛️',nom:'Organismes officiels',tasks:['Impôts — mise à jour adresse','CAF — mise à jour adresse','Pôle Emploi (si concerné)','Caisse de retraite (si concerné)','Sécurité sociale','Mairie — liste électorale']},
+  {id:'abonnements',icon:'📱',nom:'Abonnements & Services',tasks:['Opérateur téléphonique','Netflix / streaming','Amazon Prime','Abonnements presse','Abonnements sport / fitness','Livraisons récurrentes (Picard, etc.)']},
+  {id:'pro',icon:'💼',nom:'Professionnel',tasks:['Informer l\'employeur','Mise à jour bulletin de salaire','Note de frais / remboursements','Carte de transport domicile-travail']},
+];
+
+let currentUser=null,taches=[];
+
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='app.html';return;}
+  currentUser=session.user;
+  const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
+  document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  await loadData();
+})();
+
+async function logout(){await sb.auth.signOut();window.location.href='app.html';}
+
+async function loadData(){
+  const{data}=await sb.from('admin_taches').select('*').eq('user_id',currentUser.id).order('ordre');
+  taches=data||[];
+  if(!taches.length)await seedDefaults();
+  else renderAll();
+}
+
+async function seedDefaults(){
+  const toInsert=[];
+  CATS.forEach((cat,ci)=>{
+    cat.tasks.forEach((titre,ti)=>{
+      const isUrgent=['Assurance habitation — souscrire nouveau','Ouvrir contrat électricité nouveau logement','La Poste — réexpédition du courrier'].includes(titre);
+      toInsert.push({user_id:currentUser.id,categorie:cat.id,titre,fait:false,priorite:isUrgent?'urgent':'normal',ordre:ci*100+ti});
+    });
+  });
+  const{data}=await sb.from('admin_taches').insert(toInsert).select();
+  taches=data||[];
+  renderAll();
+}
+
+function renderAll(){updateSummary();renderCats();}
+
+function updateSummary(){
+  const total=taches.length;
+  const done=taches.filter(t=>t.fait).length;
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statDone').textContent=done;
+  document.getElementById('statPct').textContent=pct+'%';
+  document.getElementById('statLeft').textContent=total-done;
+  document.getElementById('statUrgent').textContent=taches.filter(t=>!t.fait&&t.priorite==='urgent').length;
+}
+
+function renderCats(){
+  const container=document.getElementById('catsContainer');
+  container.innerHTML=CATS.map(cat=>{
+    const catTaches=taches.filter(t=>t.categorie===cat.id);
+    const done=catTaches.filter(t=>t.fait).length;
+    const pct=catTaches.length>0?Math.round((done/catTaches.length)*100):0;
+    return`<div class="cat-block">
+      <div class="cat-header" onclick="toggleCat('body-${cat.id}')">
+        <div class="cat-header-left">
+          <div class="cat-icon">${cat.icon}</div>
+          <div class="cat-name">${cat.nom}</div>
+        </div>
+        <div class="cat-progress">${done}/${catTaches.length} · ${pct}%</div>
+      </div>
+      <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%"></div></div>
+      <div class="cat-body" id="body-${cat.id}">
+        ${catTaches.map(t=>`<div class="task-row" onclick="toggleTask('${t.id}')">
+          <div class="task-check ${t.fait?'done':''}"></div>
+          <div class="task-text ${t.fait?'done':''}">${t.titre}</div>
+          ${t.priorite==='urgent'?'<div class="task-priority priority-urgent">Urgent</div>':''}
+          <button class="task-delete" onclick="deleteTask('${t.id}',event)">🗑</button>
+        </div>`).join('')}
+        <div class="add-task-row">
+          <input type="text" class="add-task-input" id="input-${cat.id}" placeholder="Ajouter une démarche..." onkeydown="if(event.key==='Enter')addTask('${cat.id}')">
+          <button class="add-task-btn" onclick="addTask('${cat.id}')">+ Ajouter</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCat(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'';}
+
+async function toggleTask(id){
+  const t=taches.find(t=>t.id===id);if(!t)return;
+  await sb.from('admin_taches').update({fait:!t.fait}).eq('id',id);
+  t.fait=!t.fait;renderAll();
+}
+
+async function addTask(catId){
+  const input=document.getElementById('input-'+catId);
+  const titre=input?.value.trim();if(!titre)return;
+  const{data}=await sb.from('admin_taches').insert({user_id:currentUser.id,categorie:catId,titre,fait:false,priorite:'normal',ordre:999}).select().single();
+  if(data){taches.push(data);renderAll();}
+  if(input)input.value='';
+}
+
+async function deleteTask(id,e){
+  e.stopPropagation();
+  await sb.from('admin_taches').delete().eq('id',id);
+  taches=taches.filter(t=>t.id!==id);renderAll();
+}
+</script>
+</body>
+</html>
