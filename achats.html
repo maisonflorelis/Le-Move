@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
 <title>Le Move — Mes Achats & Livraisons</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">async function getModuleProgress() {
@@ -345,6 +345,7 @@ const STATUT_NEXT={commandé:'préparé',préparé:'en-route','en-route':'livré
 
 let currentUser=null,commandes=[],activeFilter='Tous';
 
+
 (async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
@@ -513,6 +514,7 @@ async function renderModuleProgress() {
   } catch(e) { console.warn('Progress error:', e); }
 }
 
+</script>
 </script>
 
 // ── NOTIFICATIONS (module) ──

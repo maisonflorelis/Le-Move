@@ -394,6 +394,7 @@ const DEFAULT_TASKS={
 
 let currentUser=null,taches=[],contacts=[],activePhase='Signature',dateDemo=null;
 
+
 (async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
@@ -626,6 +627,7 @@ async function renderModuleProgress() {
   } catch(e) { console.warn('Progress error:', e); }
 }
 
+</script>
 </script>
 
 // ── NOTIFICATIONS (module) ──

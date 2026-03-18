@@ -420,6 +420,7 @@ const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let currentUser=null,categories=[],achats=[],budgetTotal=0;
 
+
 (async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
@@ -613,6 +614,7 @@ async function renderModuleProgress() {
   } catch(e) { console.warn('Progress error:', e); }
 }
 
+</script>
 </script>
 
 // ── NOTIFICATIONS (module) ──
