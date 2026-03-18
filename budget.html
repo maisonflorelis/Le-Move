@@ -464,5 +464,35 @@ async function deleteAchat(id){
 
 ['catModal','achatModal'].forEach(id=>{document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)document.getElementById(id).classList.remove('open');});});
 </script>
+<script>
+function toggleMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(!drawer || !overlay || !ham) return;
+  drawer.classList.toggle('open');
+  overlay.classList.toggle('open');
+  ham.classList.toggle('open');
+}
+function closeMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(drawer) drawer.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+  if(ham) ham.classList.remove('open');
+}
+// Set active item
+const currentPage = window.location.pathname.split('/').pop() || 'app.html';
+document.querySelectorAll('.mobile-drawer .nav-item').forEach(el => {
+  if(el.getAttribute('href') === currentPage) el.classList.add('active');
+});
+// Set username after load
+setTimeout(() => {
+  const user = document.getElementById('sidebarUser');
+  const mobileUser = document.getElementById('mobileUser');
+  if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
+}, 2000);
+</script>
 </body>
 </html>

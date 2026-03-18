@@ -457,11 +457,11 @@ const ALL_MODULES = [
 ];
 
 const TUTORIAL_STEPS = [
-  { icon: '🎉', title: 'Bienvenue dans ton espace !', text: "Le Move est ton espace digital pour organiser ton premier emménagement de A à Z. Budget, contacts, déco, livraisons — tout est centralisé ici." },
-  { icon: '📦', title: '11 modules t\'attendent.', text: "Du budget au moodboard IA, chaque module couvre une partie clé de ton emménagement. Commence par les essentiels : Budget, Déménagement, Mes Contacts." },
-  { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style déco et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires." },
-  { icon: '🤝', title: 'Partage ton espace (Premium)', text: "Invite un proche, un décorateur ou un architecte à accéder à ton espace Le Move. Lecture seule ou accès complet, c'est toi qui décides." },
-  { icon: '✅', title: 'Suis ta progression.', text: "La barre en haut de ton dashboard suit ton avancement. Complète ton profil pour commencer !" },
+  { icon: '🎉', title: 'Bienvenue dans Le Move !', text: "Ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, démarches, livraisons — 16 modules centralisés en un seul endroit." },
+  { icon: '📦', title: '16 modules t\'attendent.', text: "4 grandes familles : Emménagement (budget, déménagement, achats, aides), Déco & Style (moodboard, IA), Pratique (carnet, contacts, avancement) et Social & Pro (crémaillère, annuaire, collab)." },
+  { icon: '💶', title: 'Tes aides financières.', text: "Le module Guide des Aides te présente toutes les aides auxquelles tu as peut-être droit — APL, Visale, Mobili-Pass, Loca-Pass. À consulter en priorité !" },
+  { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires sur-mesure." },
+  { icon: '🎉', title: 'Ta liste de crémaillère (Premium)', text: "Crée ta liste de cadeaux et partage-la avec tes proches via un lien. Ils peuvent réserver sans créer de compte !" },
   { icon: '📸', title: 'Personnalisons ton espace !', text: "On va te demander ton prénom, ta photo et ta date d'emménagement pour que Le Move soit vraiment toi." },
 ];
 
@@ -791,6 +791,36 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 init();
+</script>
+<script>
+function toggleMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(!drawer || !overlay || !ham) return;
+  drawer.classList.toggle('open');
+  overlay.classList.toggle('open');
+  ham.classList.toggle('open');
+}
+function closeMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(drawer) drawer.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+  if(ham) ham.classList.remove('open');
+}
+// Set active item
+const currentPage = window.location.pathname.split('/').pop() || 'app.html';
+document.querySelectorAll('.mobile-drawer .nav-item').forEach(el => {
+  if(el.getAttribute('href') === currentPage) el.classList.add('active');
+});
+// Set username after load
+setTimeout(() => {
+  const user = document.getElementById('sidebarUser');
+  const mobileUser = document.getElementById('mobileUser');
+  if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
+}, 2000);
 </script>
 </body>
 </html>
