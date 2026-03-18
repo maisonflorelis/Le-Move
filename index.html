@@ -457,6 +457,7 @@
     nav { padding: 14px 20px; }
     .nav-links { display: none; }
     .nav-cta { padding: 8px 14px; font-size: 9px; white-space: nowrap; }
+    .nav-login-mobile { display: inline-flex !important; }
     .nav-link { display: none !important; }
 
     /* ── HERO ── */
@@ -640,6 +641,7 @@
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <a class="nav-link" href="app.html" style="font-size:11px;">Me connecter</a>
+    <a class="nav-login-mobile" href="app.html" style="display:none;font-size:10px;font-weight:300;letter-spacing:0.08em;color:var(--text-light);text-decoration:none;padding:6px 10px;border:1px solid var(--linen);border-radius:6px;">Connexion</a>
     <a class="nav-cta" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank">Créer mon espace →</a>
   </div>
 </nav>
@@ -797,29 +799,36 @@
       <div class="persona-card">
         <div class="persona-emoji">🎓</div>
         <div>
-          <div class="persona-title">L'étudiante qui prend son premier appart</div>
-          <div class="persona-desc">"J'avais 3 500 € de budget, zéro idée par où commencer et une mère qui m'envoyait des liens IKEA toutes les heures."</div>
+          <div class="persona-title">Le premier appart solo</div>
+          <div class="persona-desc">"3 500 € de budget, zéro idée par où commencer — et une mère qui m'envoyait des liens IKEA toutes les heures."</div>
         </div>
       </div>
       <div class="persona-card">
         <div class="persona-emoji">💼</div>
         <div>
-          <div class="persona-title">Le jeune actif qui s'installe enfin seul</div>
-          <div class="persona-desc">"J'ai un CDI, j'ai trouvé l'appart. Il me fallait juste un système pour ne rien oublier sans y passer mes soirées."</div>
+          <div class="persona-title">La mobilité professionnelle</div>
+          <div class="persona-desc">"Nouvelle ville, nouveau boulot. Il me fallait un système pour tout organiser sans y passer mes week-ends."</div>
+        </div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-emoji">💑</div>
+        <div>
+          <div class="persona-title">Le premier chez-soi à deux</div>
+          <div class="persona-desc">"On s'installait ensemble pour la première fois. Avoir un espace partagé pour tout coordonner, c'était exactement ce qu'il nous fallait."</div>
         </div>
       </div>
       <div class="persona-card">
         <div class="persona-emoji">🌱</div>
         <div>
-          <div class="persona-title">Celui ou celle qui traverse un changement</div>
-          <div class="persona-desc">"Nouveau départ, nouvelle ville, nouvelle étape... et besoin d'un peu d'ordre dans tout ça."</div>
+          <div class="persona-title">Le nouveau départ</div>
+          <div class="persona-desc">"Séparation, retour en France, changement de vie. Le Move m'a aidée à reprendre le contrôle, une tâche à la fois."</div>
         </div>
       </div>
     </div>
   </div>
   <div class="fw-right">
     <div class="fw-stat-row">
-      <div class="fw-stat-num">6<span>+</span></div>
+      <div class="fw-stat-num">16<span>+</span></div>
       <div class="fw-stat-text">modules pensés ensemble pour couvrir chaque aspect de ton emménagement, du premier carton à la première soirée.</div>
     </div>
     <div class="fw-stat-row">
@@ -837,50 +846,36 @@
 <section class="features" id="features">
   <div class="features-header">
     <div class="features-label">Ce que tu obtiens</div>
-    <div class="features-title">Tout ce dont tu as besoin,<br>au même endroit.</div>
+    <div class="features-title">Quatre grandes familles.<br>Un seul espace.</div>
   </div>
   <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-num">01</div>
-      <div class="feature-icon">🏠</div>
-      <div class="feature-title">Dashboard central</div>
-      <div class="feature-desc">Vue d'ensemble de ton projet en un coup d'œil. Progression globale, livraisons du jour, tâches urgentes, compte à rebours.</div>
-      <div class="feature-tags"><span class="ftag">Vue globale</span><span class="ftag">Temps réel</span></div>
-    </div>
     <div class="feature-card featured">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">📦</div>
+      <div class="feature-title">Organiser ton déménagement</div>
+      <div class="feature-desc">Budget, checklist par phase, calculateur de volume, suivi des achats et livraisons, checklist administrative — tout pour ne rien oublier du bail au carton.</div>
+      <div class="feature-tags"><span class="ftag">Budget</span><span class="ftag">Déménagement</span><span class="ftag">Livraisons</span><span class="ftag">Admin</span></div>
+    </div>
+    <div class="feature-card">
       <div class="feature-num">02</div>
-      <div class="feature-icon">💰</div>
-      <div class="feature-title">Budget mobilier & déco</div>
-      <div class="feature-desc">Catégories pré-remplies, jauges visuelles, alertes de dépassement. Ton budget au centime près, sans effort.</div>
-      <div class="feature-tags"><span class="ftag">6 catégories</span><span class="ftag">Alertes</span><span class="ftag">Par pièce</span></div>
+      <div class="feature-icon">🎨</div>
+      <div class="feature-title">Créer ton intérieur</div>
+      <div class="feature-desc">Moodboard par pièce, palette de couleurs, inspiration Pinterest, et Moodboard IA qui génère ton style sur-mesure en quelques minutes.</div>
+      <div class="feature-tags"><span class="ftag">Moodboard</span><span class="ftag">IA déco</span><span class="ftag">Style</span></div>
     </div>
     <div class="feature-card">
       <div class="feature-num">03</div>
-      <div class="feature-icon">🎨</div>
-      <div class="feature-title">Moodboard & inspirations</div>
-      <div class="feature-desc">Galerie par pièce, palette de couleurs, notes de style, inspirations sauvegardées. Ton intérieur commence ici.</div>
-      <div class="feature-tags"><span class="ftag">Par pièce</span><span class="ftag">Palette</span><span class="ftag">Notes</span></div>
+      <div class="feature-icon">🗂️</div>
+      <div class="feature-title">Gérer ton quotidien</div>
+      <div class="feature-desc">Carnet de bord (codes, mesures, contacts), agenda rendez-vous, médias (photos/vidéos/docs), avancement Kanban et journal de projet.</div>
+      <div class="feature-tags"><span class="ftag">Carnet</span><span class="ftag">Contacts</span><span class="ftag">Médias</span><span class="ftag">Avancement</span></div>
     </div>
     <div class="feature-card">
       <div class="feature-num">04</div>
-      <div class="feature-icon">📦</div>
-      <div class="feature-title">Suivi achats & livraisons</div>
-      <div class="feature-desc">Timeline de livraisons, alertes du jour, suivi par boutique, mini-tracker de statut pour chaque colis.</div>
-      <div class="feature-tags"><span class="ftag">Tracking</span><span class="ftag">Par boutique</span><span class="ftag">Alertes</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-num">05</div>
-      <div class="feature-icon">🚚</div>
-      <div class="feature-title">Organisation déménagement</div>
-      <div class="feature-desc">Checklist chronologique J-30 à J+7, contacts utiles, compte à rebours jusqu'au Jour J, journal du projet.</div>
-      <div class="feature-tags"><span class="ftag">5 phases</span><span class="ftag">Contacts</span><span class="ftag">Journal</span></div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-num">06</div>
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">Avancement global</div>
-      <div class="feature-desc">Kanban visuel, score de progression, avancement par module, milestones et journal personnel du projet.</div>
-      <div class="feature-tags"><span class="ftag">Kanban</span><span class="ftag">Score</span><span class="ftag">Milestones</span></div>
+      <div class="feature-icon">🤝</div>
+      <div class="feature-title">Partager & découvrir</div>
+      <div class="feature-desc">Liste de crémaillère partageable, espace collaboratif pour inviter un proche ou un pro, annuaire de prestataires vérifiés et guide des aides financières.</div>
+      <div class="feature-tags"><span class="ftag">Crémaillère</span><span class="ftag">Collaboratif</span><span class="ftag">Aides</span><span class="ftag">Annuaire</span></div>
     </div>
   </div>
 </section>
@@ -972,15 +967,8 @@
       <div class="pricing-features-list">
         <div class="pricing-feat"><span class="feat-check">✓</span>Mon Budget</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mon Déménagement</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Calculateur Volume</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Guide des Aides</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Checklist Administrative</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Carnet de Bord</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mes Achats & Livraisons</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Mon Avancement</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Mes Contacts & Agenda</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Mes Médias</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>Ma Crémaillère</div>
       </div>
       <a class="pricing-btn pricing-btn-outline" href="https://buy.stripe.com/3cIbJ1bPqfx56hD9kL6EU03" target="_blank" onclick="window.open('https://buy.stripe.com/3cIbJ1bPqfx56hD9kL6EU03','_blank');return false;">Choisir Essentiel</a>
     </div>
@@ -991,7 +979,13 @@
       <div class="pricing-divider"></div>
       <div class="pricing-features-list">
         <div class="pricing-feat"><span class="feat-check">✓</span>Tout du plan Essentiel</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Calculateur Volume</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Checklist Administrative</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Carnet de Bord</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mon Avancement Kanban</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mes Contacts & Agenda</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Moodboard & Inspirations</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>Mes Médias</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
       <a class="pricing-btn pricing-btn-dark" href="https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04" target="_blank" onclick="window.open('https://buy.stripe.com/aFa7sLcTu98HbBX40r6EU04','_blank');return false;">Créer mon espace, 69€</a>
@@ -1004,8 +998,9 @@
       <div class="pricing-features-list">
         <div class="pricing-feat"><span class="feat-check">✓</span>Tout du plan Complet</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>✨ Moodboard IA (3 générations)</div>
-        <div class="pricing-feat"><span class="feat-check">✓</span>🤝 Espace collaboratif</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>🤝 Espace Collaboratif</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>⭐ Annuaire Pro vérifié</div>
+        <div class="pricing-feat"><span class="feat-check">✓</span>🎉 Ma Crémaillère</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>💬 Support prioritaire 24h</div>
         <div class="pricing-feat"><span class="feat-check">✓</span>Mises à jour à vie</div>
       </div>
