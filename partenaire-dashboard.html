@@ -124,12 +124,34 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="auth-card">
     <div class="auth-logo">Le Move</div>
     <div class="auth-sub">Espace Partenaire</div>
-    <div class="auth-title">Connectez-vous.</div>
-    <input type="email" class="auth-input" id="authEmail" placeholder="votre@email.pro">
-    <input type="password" class="auth-input" id="authPwd" placeholder="Mot de passe">
-    <button class="auth-btn" onclick="login()">Accéder à mon espace →</button>
-    <div class="auth-error" id="authError">Email ou mot de passe incorrect.</div>
-    <div class="auth-forgot" onclick="resetPwd()">Mot de passe oublié ?</div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:0;border:1px solid var(--linen);border-radius:10px;overflow:hidden;margin-bottom:24px">
+      <button id="tabLogin" onclick="switchTab('login')" style="flex:1;padding:10px;background:var(--espresso);color:var(--cream);border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s">Connexion</button>
+      <button id="tabRegister" onclick="switchTab('register')" style="flex:1;padding:10px;background:none;color:var(--text-light);border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s">Créer un compte</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm">
+      <div class="auth-title">Connectez-vous.</div>
+      <input type="email" class="auth-input" id="authEmail" placeholder="votre@email.pro">
+      <input type="password" class="auth-input" id="authPwd" placeholder="Mot de passe">
+      <button class="auth-btn" onclick="login()">Accéder à mon espace →</button>
+      <div class="auth-error" id="authError">Email ou mot de passe incorrect.</div>
+      <div class="auth-forgot" onclick="resetPwd()">Mot de passe oublié ?</div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" style="display:none">
+      <div class="auth-title">Créez votre compte.</div>
+      <div style="font-size:12px;font-weight:200;color:var(--text-light);margin-bottom:16px;line-height:1.6;background:rgba(196,113,74,0.06);border-radius:8px;padding:12px">Créez votre compte après avoir reçu votre email de validation.</div>
+      <input type="email" class="auth-input" id="regEmail" placeholder="votre@email.pro">
+      <input type="password" class="auth-input" id="regPwd" placeholder="Choisir un mot de passe (min. 8 car.)">
+      <input type="password" class="auth-input" id="regPwd2" placeholder="Confirmer le mot de passe">
+      <button class="auth-btn" onclick="register()">Créer mon compte →</button>
+      <div class="auth-error" id="regError"></div>
+      <div class="auth-forgot" onclick="switchTab('login')">Déjà un compte ? Se connecter</div>
+    </div>
   </div>
 </div>
 
@@ -288,6 +310,34 @@ let isEditing = false;
   if (session) { currentUser = session.user; await loadPartenaire(); }
   else { document.getElementById('authScreen').style.display = 'flex'; }
 })();
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLogin').style.background = isLogin ? 'var(--espresso)' : 'none';
+  document.getElementById('tabLogin').style.color = isLogin ? 'var(--cream)' : 'var(--text-light)';
+  document.getElementById('tabRegister').style.background = isLogin ? 'none' : 'var(--espresso)';
+  document.getElementById('tabRegister').style.color = isLogin ? 'var(--text-light)' : 'var(--cream)';
+}
+
+async function register() {
+  const email = document.getElementById('regEmail').value.trim();
+  const pwd = document.getElementById('regPwd').value;
+  const pwd2 = document.getElementById('regPwd2').value;
+  const errEl = document.getElementById('regError');
+  errEl.style.display = 'none';
+  if (!email || !pwd) { errEl.textContent = 'Remplis tous les champs.'; errEl.style.display = 'block'; return; }
+  if (pwd.length < 8) { errEl.textContent = 'Le mot de passe doit faire au moins 8 caractères.'; errEl.style.display = 'block'; return; }
+  if (pwd !== pwd2) { errEl.textContent = 'Les mots de passe ne correspondent pas.'; errEl.style.display = 'block'; return; }
+  const { data, error } = await sb.auth.signUp({ email, password: pwd });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+  if (data.user) {
+    currentUser = data.user;
+    document.getElementById('authScreen').style.display = 'none';
+    await loadPartenaire();
+  }
+}
 
 async function login() {
   const email = document.getElementById('authEmail').value;
