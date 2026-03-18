@@ -427,7 +427,6 @@ let currentUser=null,categories=[],achats=[],budgetTotal=0;
   currentUser=session.user;
   const{data:p}=await sb.from('Profiles').select('prenom,budget_total').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
-  setTimeout(()=>loadNotifications(session.user.id), 800);
   if(p?.budget_total){budgetTotal=parseFloat(p.budget_total)||0;if(budgetTotal>0)document.getElementById('budgetTotalInput').value=budgetTotal;}
   await loadData();
 })();
@@ -673,5 +672,14 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
+      loadNotifications(currentUser.id);
+    }
+  }, 1500);
+});
+</script>
 </body>
 </html>

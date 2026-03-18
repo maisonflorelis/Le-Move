@@ -325,7 +325,6 @@ let currentUser=null,notes=[],activecat='Toutes',infos={},editingNoteId=null;
   currentUser=session.user;
   const{data:p}=await sb.from('Profiles').select('prenom,carnet_infos').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
-  setTimeout(()=>loadNotifications(session.user.id), 800);
   if(p?.carnet_infos){try{infos=JSON.parse(p.carnet_infos)||{};}catch(e){}}
   fillInfos();
   await loadNotes();
@@ -497,5 +496,14 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
+      loadNotifications(currentUser.id);
+    }
+  }, 1500);
+});
+</script>
 </body>
 </html>

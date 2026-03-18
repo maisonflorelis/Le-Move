@@ -390,7 +390,6 @@ let currentUser=null,palette=[],inspirations=[],activePiece='Toutes',styleNotes=
   currentUser=session.user;
   const{data:p}=await sb.from('Profiles').select('prenom,moodboard_notes').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
-  setTimeout(()=>loadNotifications(session.user.id), 800);
   if(p?.moodboard_notes){
     try{
       styleNotes=JSON.parse(p.moodboard_notes)||{};
@@ -645,5 +644,14 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
+      loadNotifications(currentUser.id);
+    }
+  }, 1500);
+});
+</script>
 </body>
 </html>
