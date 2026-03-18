@@ -4,10 +4,28 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
+<meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
 <title>Le Move — Mon Déménagement</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">async function getModuleProgress() {
+  const { data } = await sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id);
+  if (!data || !data.length) return 0;
+  return Math.round((data.filter(t=>t.fait).length / data.length) * 100);
+}
+
+async function renderModuleProgress() {
+  try {
+    const pct = await getModuleProgress();
+    const strip = document.getElementById('moduleProgressStrip');
+    const fill = document.getElementById('moduleProgressFill');
+    const pctEl = document.getElementById('moduleProgressPct');
+    if (strip) strip.style.display = 'flex';
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  } catch(e) { console.warn('Progress error:', e); }
+}
+
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
@@ -199,6 +217,54 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     .mobile-nav { display: flex; }
   }
 
+
+  /* ── NOTIFICATIONS ── */
+  .notif-bell { position: relative; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; }
+  .notif-bell-icon { font-size: 18px; transition: transform 0.2s; }
+  .notif-bell:hover .notif-bell-icon { transform: rotate(15deg); }
+  .notif-badge { position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: var(--terracotta); border-radius: 50%; font-size: 9px; font-weight: 500; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid var(--warm-black); animation: pulse-badge 2s infinite; }
+  @keyframes pulse-badge { 0%,100%{transform:scale(1)}50%{transform:scale(1.15)} }
+  .notif-panel { position: fixed; top: 56px; right: 12px; width: 320px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 16px; box-shadow: 0 16px 48px rgba(44,31,20,0.15); z-index: 1000; display: none; overflow: hidden; animation: popIn 0.2s ease; }
+  .notif-panel.open { display: block; }
+  .notif-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--linen); display: flex; align-items: center; justify-content: space-between; }
+  .notif-panel-title { font-family: "Cormorant Garamond", serif; font-size: 16px; font-style: italic; font-weight: 300; color: var(--espresso); }
+  .notif-mark-all { font-size: 10px; font-weight: 300; color: var(--text-light); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: "DM Sans", sans-serif; }
+  .notif-mark-all:hover { color: var(--terracotta); }
+  .notif-list { max-height: 380px; overflow-y: auto; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid var(--linen); display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.15s; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item:hover { background: rgba(232,224,213,0.3); }
+  .notif-item.unread { background: rgba(196,113,74,0.04); }
+  .notif-item.unread::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--terracotta); border-radius: 0 2px 2px 0; }
+  .notif-item { position: relative; }
+  .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .notif-icon-livraison { background: rgba(184,154,106,0.12); }
+  .notif-icon-urgente { background: rgba(196,113,74,0.12); }
+  .notif-icon-jourj { background: rgba(44,31,20,0.06); }
+  .notif-icon-module { background: rgba(122,140,126,0.12); }
+  .notif-icon-collab { background: rgba(184,154,106,0.12); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-title { font-size: 12px; font-weight: 400; color: var(--espresso); margin-bottom: 2px; }
+  .notif-msg { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .notif-time { font-size: 9px; font-weight: 200; color: var(--sand); margin-top: 4px; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--text-light); font-size: 13px; font-weight: 200; font-style: italic; }
+  .notif-footer { padding: 12px 20px; border-top: 1px solid var(--linen); text-align: center; }
+  .notif-footer a { font-size: 10px; font-weight: 300; color: var(--text-light); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
+  .notif-footer a:hover { color: var(--terracotta); }
+
+
+  /* ── MODULE PROGRESS BAR ── */
+  .module-progress-strip { background: var(--cream); border-bottom: 1px solid var(--linen); padding: 12px 52px; display: flex; align-items: center; gap: 20px; }
+  .module-progress-label { font-size: 9px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); white-space: nowrap; }
+  .module-progress-bar { flex: 1; height: 3px; background: var(--linen); border-radius: 3px; overflow: hidden; }
+  .module-progress-fill { height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 3px; transition: width 0.8s ease; width: 0%; }
+  .module-progress-pct { font-size: 11px; font-weight: 300; color: var(--text-light); white-space: nowrap; font-family: "Cormorant Garamond", serif; }
+  .module-progress-modules { display: flex; gap: 6px; }
+  .module-pip { width: 20px; height: 3px; border-radius: 3px; background: var(--linen); transition: background 0.3s; cursor: pointer; }
+  .module-pip.done { background: var(--sage); }
+  .module-pip.active { background: var(--terracotta); }
+  @media (max-width: 768px) { .module-progress-strip { padding: 10px 16px; } .module-progress-modules { display: none; } }
+
 </style>
 </head>
 <body>
@@ -257,6 +323,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <div class="summary-stat"><div class="summary-label">Contacts</div><div class="summary-value" id="statContacts">0</div><div class="summary-sub">Enregistrés</div></div>
   </div>
 
+  <div class="module-progress-strip" id="moduleProgressStrip" style="display:none">
+  <div class="module-progress-label" id="moduleProgressLabel">Déménagement organisé</div>
+  <div class="module-progress-bar"><div class="module-progress-fill" id="moduleProgressFill"></div></div>
+  <div class="module-progress-pct" id="moduleProgressPct">0%</div>
+</div>
   <div class="content">
 
     <!-- DATE -->
@@ -329,6 +400,7 @@ let currentUser=null,taches=[],contacts=[],activePhase='Signature',dateDemo=null
   currentUser=session.user;
   const{data:p}=await sb.from('Profiles').select('prenom,date_emmenagement').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  setTimeout(()=>loadNotifications(session.user.id), 800);
   if(p?.date_emmenagement){
     document.getElementById('dateInput').value=p.date_emmenagement;
     updateCountdown(p.date_emmenagement);
@@ -488,6 +560,24 @@ async function deleteContact(id){
 }
 
 document.getElementById('contactModal').addEventListener('click',e=>{if(e.target.id==='contactModal')closeContactModal();});
+async function getModuleProgress() {
+  const { data } = await sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id);
+  if (!data || !data.length) return 0;
+  return Math.round((data.filter(t=>t.fait).length / data.length) * 100);
+}
+
+async function renderModuleProgress() {
+  try {
+    const pct = await getModuleProgress();
+    const strip = document.getElementById('moduleProgressStrip');
+    const fill = document.getElementById('moduleProgressFill');
+    const pctEl = document.getElementById('moduleProgressPct');
+    if (strip) strip.style.display = 'flex';
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  } catch(e) { console.warn('Progress error:', e); }
+}
+
 </script>
 <script>
 function toggleMenu() {
@@ -518,6 +608,81 @@ setTimeout(() => {
   const mobileUser = document.getElementById('mobileUser');
   if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
 }, 2000);
+async function getModuleProgress() {
+  const { data } = await sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id);
+  if (!data || !data.length) return 0;
+  return Math.round((data.filter(t=>t.fait).length / data.length) * 100);
+}
+
+async function renderModuleProgress() {
+  try {
+    const pct = await getModuleProgress();
+    const strip = document.getElementById('moduleProgressStrip');
+    const fill = document.getElementById('moduleProgressFill');
+    const pctEl = document.getElementById('moduleProgressPct');
+    if (strip) strip.style.display = 'flex';
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  } catch(e) { console.warn('Progress error:', e); }
+}
+
 </script>
+
+// ── NOTIFICATIONS (module) ──
+let notifications = [];
+let notifOpen = false;
+const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
+const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
+
+async function loadNotifications(userId) {
+  const { data } = await sb.from('notifications').select('*').eq('user_id', userId).eq('lue', false).order('created_at', { ascending: false }).limit(10);
+  notifications = data || [];
+  renderNotifBadge();
+  renderNotifPanel();
+}
+function renderNotifBadge() {
+  const unread = notifications.filter(n => !n.lue).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) { badge.style.display = unread > 0 ? 'flex' : 'none'; badge.textContent = unread > 9 ? '9+' : unread; }
+}
+function renderNotifPanel() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) { list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>'; return; }
+  list.innerHTML = notifications.map(n => {
+    const diff = Math.floor((new Date() - new Date(n.created_at)) / 60000);
+    const ago = diff < 60 ? diff + ' min' : diff < 1440 ? Math.floor(diff/60) + 'h' : Math.floor(diff/1440) + 'j';
+    return \`<div class="notif-item \${n.lue?'':'unread'}" onclick="clickNotif('\${n.id}','\${n.lien||''}')">
+      <div class="notif-icon \${NOTIF_ICON_CLASS[n.type]||''}">\${NOTIF_ICONS[n.type]||'🔔'}</div>
+      <div class="notif-content"><div class="notif-title">\${n.titre}</div><div class="notif-msg">\${n.message||''}</div><div class="notif-time">\${ago}</div></div>
+    </div>\`;
+  }).join('');
+}
+async function clickNotif(id, lien) {
+  await sb.from('notifications').update({lue:true}).eq('id',id);
+  notifications = notifications.filter(n=>n.id!==id);
+  renderNotifBadge(); renderNotifPanel();
+  if(lien) window.location.href = lien;
+  closeNotifPanel();
+}
+async function markAllRead() {
+  const ids = notifications.map(n=>n.id);
+  if(ids.length) await sb.from('notifications').update({lue:true}).in('id',ids);
+  notifications=[]; renderNotifBadge(); renderNotifPanel();
+}
+function toggleNotifPanel() {
+  notifOpen=!notifOpen;
+  const p=document.getElementById('notifPanel');
+  if(p) p.classList.toggle('open',notifOpen);
+}
+function closeNotifPanel() {
+  notifOpen=false;
+  const p=document.getElementById('notifPanel');
+  if(p) p.classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
+});
+
 </body>
 </html>
