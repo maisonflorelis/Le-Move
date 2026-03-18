@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Le Move — Mon Espace Partenaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--sand);border-radius:4px}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:32px 20px;display:flex;flex-direction:column;gap:6px;z-index:100}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:4px;line-height:1.2}
+.sidebar-badge{font-size:7px;letter-spacing:0.2em;text-transform:uppercase;background:rgba(196,113,74,0.2);color:var(--terracotta);padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:24px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:6px;font-size:12px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--terracotta)}
+.sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;min-height:100vh}
+
+/* HEADER */
+.page-header{background:var(--espresso);padding:40px 48px;position:relative;overflow:hidden}
+.page-header::before{content:'✦';position:absolute;right:48px;top:50%;transform:translateY(-50%);font-size:120px;opacity:0.04;pointer-events:none}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between}
+.header-badge{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;background:rgba(196,113,74,0.15);color:var(--terracotta);padding:4px 12px;border-radius:20px;margin-bottom:12px;display:inline-block}
+.header-name{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;font-style:italic;color:var(--cream);line-height:1.2}
+.header-meta{font-size:11px;font-weight:200;color:rgba(247,243,238,0.4);margin-top:4px}
+.header-status{text-align:right}
+.status-pill{font-size:10px;font-weight:300;padding:6px 16px;border-radius:20px;display:inline-block}
+.status-actif{background:rgba(122,140,126,0.15);color:var(--sage)}
+.status-inactif{background:rgba(196,113,74,0.15);color:var(--terracotta)}
+
+/* STATS */
+.stats-bar{background:var(--warm-white);border-bottom:1px solid var(--linen);padding:20px 48px;display:flex;gap:0}
+.stat{flex:1;padding:0 28px;border-right:1px solid var(--linen);text-align:center}
+.stat:first-child{padding-left:0;text-align:left}
+.stat:last-child{border-right:none;text-align:right}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--espresso);line-height:1}
+.stat-lbl{font-size:8px;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-top:4px}
+
+/* CONTENT */
+.content{padding:40px 48px}
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen)}
+
+/* FICHE */
+.fiche-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:16px;padding:32px;margin-bottom:32px}
+.fiche-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.fiche-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;font-weight:300;color:var(--espresso)}
+.edit-btn{padding:8px 18px;background:none;border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;color:var(--text-light);transition:all 0.2s}
+.edit-btn:hover{border-color:var(--terracotta);color:var(--terracotta)}
+.save-btn{padding:8px 18px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;display:none}
+.save-btn:hover{opacity:0.85}
+.fiche-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fiche-field{display:flex;flex-direction:column;gap:5px}
+.fiche-label{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)}
+.fiche-value{font-size:13px;font-weight:300;color:var(--espresso);padding:10px 14px;background:var(--cream);border-radius:8px;border:1px solid transparent;transition:border-color 0.2s}
+.fiche-value.editable{border-color:var(--linen);cursor:text}
+.fiche-value.editable:focus{outline:none;border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(196,113,74,0.1)}
+.fiche-textarea{font-size:13px;font-weight:300;color:var(--espresso);padding:10px 14px;background:var(--cream);border-radius:8px;border:1px solid var(--linen);width:100%;resize:vertical;min-height:80px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.fiche-textarea:focus{border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(196,113,74,0.1)}
+.saved-flash{font-size:11px;color:var(--sage);display:none;margin-top:8px}
+
+/* MESSAGES */
+.messages-list{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.message-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px;transition:all 0.2s}
+.message-card.unread{border-color:rgba(196,113,74,0.2);background:rgba(196,113,74,0.02)}
+.message-card:hover{border-color:var(--sand)}
+.message-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.message-from{font-size:12px;font-weight:400;color:var(--espresso)}
+.message-time{font-size:10px;font-weight:200;color:var(--text-light)}
+.message-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--terracotta);flex-shrink:0}
+.message-text{font-size:12px;font-weight:200;color:var(--text-light);line-height:1.6}
+.message-reply-btn{margin-top:10px;padding:6px 14px;background:none;border:1px solid var(--linen);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:10px;cursor:pointer;color:var(--text-light);transition:all 0.2s}
+.message-reply-btn:hover{border-color:var(--espresso);color:var(--espresso)}
+.no-messages{text-align:center;padding:40px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic}
+
+/* DONNEES ZONE */
+.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
+.data-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px}
+.data-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--espresso);line-height:1;margin-bottom:4px}
+.data-lbl{font-size:10px;font-weight:300;color:var(--text-light)}
+.data-trend{font-size:10px;color:var(--sage);margin-top:6px}
+
+/* AUTH */
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--espresso);width:100%}
+.auth-card{background:var(--cream);border-radius:20px;padding:48px;max-width:420px;width:90%}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:28px;color:var(--espresso);margin-bottom:4px}
+.auth-sub{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:32px}
+.auth-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;font-style:italic;margin-bottom:20px}
+.auth-input{width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.auth-input:focus{border-color:var(--terracotta)}
+.auth-btn{width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.auth-btn:hover{opacity:0.85}
+.auth-error{background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 14px;font-size:12px;color:#DC2626;margin-top:8px;display:none}
+.auth-forgot{text-align:center;margin-top:14px;font-size:11px;color:var(--text-light);cursor:pointer;text-decoration:underline}
+.loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--espresso);width:100%}
+.loading-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;color:var(--cream);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}
+  .page-header,.content{padding:24px 20px}
+  .stats-bar{padding:16px 20px;flex-wrap:wrap}
+  .stat{min-width:45%;padding:8px 12px}
+  .fiche-grid,.data-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen"><div class="loading-logo">Le Move</div></div>
+
+<div class="auth-screen" id="authScreen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">Le Move</div>
+    <div class="auth-sub">Espace Partenaire</div>
+    <div class="auth-title">Connectez-vous.</div>
+    <input type="email" class="auth-input" id="authEmail" placeholder="votre@email.pro">
+    <input type="password" class="auth-input" id="authPwd" placeholder="Mot de passe">
+    <button class="auth-btn" onclick="login()">Accéder à mon espace →</button>
+    <div class="auth-error" id="authError">Email ou mot de passe incorrect.</div>
+    <div class="auth-forgot" onclick="resetPwd()">Mot de passe oublié ?</div>
+  </div>
+</div>
+
+<aside class="sidebar" id="appSidebar" style="display:none">
+  <div class="sidebar-logo">Le Move</div>
+  <div class="sidebar-badge">✦ Partenaire</div>
+  <div class="nav-item active" onclick="showSection('dashboard')"><div class="nav-dot"></div>Tableau de bord</div>
+  <div class="nav-item" onclick="showSection('fiche')"><div class="nav-dot"></div>Ma fiche</div>
+  <div class="nav-item" onclick="showSection('messages')"><div class="nav-dot"></div>Messages <span id="msgBadge" style="display:none;background:var(--terracotta);color:white;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
+  <div class="nav-item" onclick="showSection('donnees')"><div class="nav-dot"></div>Données zone</div>
+  <div class="sidebar-footer">
+    <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);margin-bottom:8px" id="sidebarEmail"></div>
+    <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Se déconnecter</div>
+  </div>
+</aside>
+
+<main class="main" id="appMain" style="display:none">
+  <div class="page-header">
+    <div class="header-top">
+      <div>
+        <div class="header-badge">✦ Partenaire Le Move</div>
+        <div class="header-name" id="headerName">Mon Espace</div>
+        <div class="header-meta" id="headerMeta"></div>
+      </div>
+      <div class="header-status">
+        <div class="status-pill status-actif" id="statusPill">● Actif</div>
+        <div style="font-size:10px;font-weight:200;color:rgba(247,243,238,0.3);margin-top:6px" id="memberSince"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num" id="statVues">—</div><div class="stat-lbl">Vues de votre fiche</div></div>
+    <div class="stat" style="text-align:center"><div class="stat-num" id="statClics">—</div><div class="stat-lbl">Clics contact</div></div>
+    <div class="stat" style="text-align:center"><div class="stat-num" id="statMessages">—</div><div class="stat-lbl">Messages reçus</div></div>
+    <div class="stat"><div class="stat-num" id="statAbonnement" style="color:var(--sage)">39€</div><div class="stat-lbl">Abonnement / mois</div></div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="sectionDashboard">
+      <div class="section-eyebrow">Vue d'ensemble</div>
+      <div class="data-grid" style="margin-bottom:32px">
+        <div class="data-card">
+          <div class="data-num" id="dashVues">0</div>
+          <div class="data-lbl">Vues ce mois</div>
+          <div class="data-trend">↑ En augmentation</div>
+        </div>
+        <div class="data-card">
+          <div class="data-num" id="dashClics">0</div>
+          <div class="data-lbl">Clics sur vos coordonnées</div>
+          <div class="data-trend">Tél + email + site</div>
+        </div>
+        <div class="data-card">
+          <div class="data-num" id="dashMsg">0</div>
+          <div class="data-lbl">Messages reçus</div>
+          <div class="data-trend" id="dashMsgUnread"></div>
+        </div>
+      </div>
+
+      <div class="section-eyebrow">Conseils pour booster votre visibilité</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:32px">
+        <div style="background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px">
+          <div style="font-size:16px;margin-bottom:8px">📸</div>
+          <div style="font-size:13px;font-weight:400;color:var(--espresso);margin-bottom:6px">Ajoutez une description détaillée</div>
+          <div style="font-size:11px;font-weight:200;color:var(--text-light);line-height:1.6">Les fiches avec une description complète reçoivent 3x plus de contacts.</div>
+          <button class="edit-btn" style="margin-top:12px" onclick="showSection('fiche')">Modifier ma fiche →</button>
+        </div>
+        <div style="background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px">
+          <div style="font-size:16px;margin-bottom:8px">💬</div>
+          <div style="font-size:13px;font-weight:400;color:var(--espresso);margin-bottom:6px">Répondez vite aux messages</div>
+          <div style="font-size:11px;font-weight:200;color:var(--text-light);line-height:1.6">Un temps de réponse rapide améliore votre classement dans l'annuaire.</div>
+          <button class="edit-btn" style="margin-top:12px" onclick="showSection('messages')">Voir mes messages →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FICHE -->
+    <div id="sectionFiche" style="display:none">
+      <div class="section-eyebrow">Ma fiche partenaire</div>
+      <div class="fiche-card">
+        <div class="fiche-header">
+          <div class="fiche-title">Informations visibles dans l'annuaire</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="saved-flash" id="savedFlash">✓ Sauvegardé !</div>
+            <button class="edit-btn" id="editBtn" onclick="toggleEdit()">Modifier</button>
+            <button class="save-btn" id="saveBtn" onclick="saveFiche()">Sauvegarder →</button>
+          </div>
+        </div>
+        <div class="fiche-grid">
+          <div class="fiche-field"><div class="fiche-label">Entreprise</div><div class="fiche-value" id="fEntreprise" data-field="entreprise">—</div></div>
+          <div class="fiche-field"><div class="fiche-label">Activité</div><div class="fiche-value" id="fActivite" data-field="activite">—</div></div>
+          <div class="fiche-field"><div class="fiche-label">Zone géographique</div><div class="fiche-value" id="fZone" data-field="zone">—</div></div>
+          <div class="fiche-field"><div class="fiche-label">Téléphone</div><div class="fiche-value" id="fTel" data-field="telephone">—</div></div>
+          <div class="fiche-field"><div class="fiche-label">Email professionnel</div><div class="fiche-value" id="fEmail" data-field="email">—</div></div>
+          <div class="fiche-field"><div class="fiche-label">Site web</div><div class="fiche-value" id="fSite" data-field="site">—</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="fiche-label" style="margin-bottom:6px">Description</div>
+          <textarea class="fiche-textarea" id="fDescription" disabled placeholder="Décrivez votre activité, vos spécialités, ce qui vous différencie..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="sectionMessages" style="display:none">
+      <div class="section-eyebrow">Messages des utilisateurs</div>
+      <div class="messages-list" id="messagesList">
+        <div class="no-messages">Aucun message pour le moment.<br>Votre fiche est visible — les utilisateurs peuvent vous contacter !</div>
+      </div>
+    </div>
+
+    <!-- DONNEES ZONE -->
+    <div id="sectionDonnees" style="display:none">
+      <div class="section-eyebrow">Données de votre zone</div>
+      <div class="data-grid">
+        <div class="data-card">
+          <div class="data-num" id="zoneUsers">—</div>
+          <div class="data-lbl">Utilisateurs actifs dans votre zone</div>
+          <div class="data-trend">Personnes en projet d'emménagement</div>
+        </div>
+        <div class="data-card">
+          <div class="data-num" id="zoneDem">—</div>
+          <div class="data-lbl">Déménagements prévus ce mois</div>
+          <div class="data-trend">Dans votre secteur</div>
+        </div>
+        <div class="data-card">
+          <div class="data-num" id="zoneBudget">—</div>
+          <div class="data-lbl">Budget moyen déco/mobilier</div>
+          <div class="data-trend">Par utilisateur dans votre zone</div>
+        </div>
+      </div>
+      <div style="background:var(--warm-white);border:1px solid var(--linen);border-radius:14px;padding:28px;margin-top:20px">
+        <div style="font-size:14px;font-weight:400;color:var(--espresso);margin-bottom:8px">📊 Rapport mensuel</div>
+        <div style="font-size:12px;font-weight:200;color:var(--text-light);line-height:1.7">Les données de zone sont mises à jour chaque mois. Elles incluent le nombre d'utilisateurs actifs dans votre secteur géographique, les types de logements recherchés et les budgets moyens. Ces données vous permettent d'adapter votre offre à la demande locale.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let partenaire = null;
+let isEditing = false;
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('loadingScreen').style.display = 'none';
+  if (session) { currentUser = session.user; await loadPartenaire(); }
+  else { document.getElementById('authScreen').style.display = 'flex'; }
+})();
+
+async function login() {
+  const email = document.getElementById('authEmail').value;
+  const pwd = document.getElementById('authPwd').value;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if (error) { document.getElementById('authError').style.display = 'block'; return; }
+  currentUser = data.user;
+  document.getElementById('authScreen').style.display = 'none';
+  await loadPartenaire();
+}
+
+async function resetPwd() {
+  const email = document.getElementById('authEmail').value;
+  if (!email) { alert('Entre ton email d\'abord.'); return; }
+  await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://lemove.fr/reset-password.html' });
+  alert('Email de réinitialisation envoyé !');
+}
+
+async function logout() { await sb.auth.signOut(); location.reload(); }
+
+async function loadPartenaire() {
+  const { data } = await sb.from('partenaires').select('*').eq('user_id', currentUser.id).single();
+
+  if (!data) {
+    // Partenaire pas encore créé — cherche dans candidatures validées
+    const { data: candidature } = await sb.from('candidatures_partenaires')
+      .select('*').eq('email', currentUser.email).eq('statut', 'valide').single();
+
+    if (candidature) {
+      // Créer la fiche partenaire
+      const { data: newP } = await sb.from('partenaires').insert({
+        user_id: currentUser.id,
+        entreprise: candidature.entreprise,
+        activite: candidature.activite,
+        zone: candidature.zone,
+        site: candidature.site,
+        telephone: candidature.telephone,
+        email: candidature.email,
+        statut: 'actif'
+      }).select().single();
+      partenaire = newP;
+    } else {
+      // Pas encore validé
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('authScreen').style.display = 'none';
+      document.body.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--espresso);font-family:'DM Sans',sans-serif">
+        <div style="background:var(--cream);border-radius:20px;padding:48px;max-width:480px;text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">⏳</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;color:var(--espresso);margin-bottom:12px">Candidature en cours d'examen</div>
+          <div style="font-size:13px;font-weight:200;color:var(--text-light);line-height:1.7">Votre dossier est entre nos mains. Nous revenons vers vous sous 48h.<br><br>Questions : <a href="mailto:bonjour@lemove.fr" style="color:var(--terracotta)">bonjour@lemove.fr</a></div>
+        </div>
+      </div>`;
+      return;
+    }
+  } else {
+    partenaire = data;
+  }
+
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('appSidebar').style.display = 'flex';
+  document.getElementById('appMain').style.display = 'block';
+
+  document.getElementById('headerName').textContent = partenaire.entreprise || 'Mon Espace';
+  document.getElementById('headerMeta').textContent = (partenaire.activite || '') + (partenaire.zone ? ' · ' + partenaire.zone : '');
+  document.getElementById('sidebarEmail').textContent = currentUser.email;
+  document.getElementById('memberSince').textContent = 'Membre depuis ' + new Date(partenaire.created_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+
+  document.getElementById('statVues').textContent = partenaire.vues || 0;
+  document.getElementById('statClics').textContent = partenaire.clics || 0;
+  document.getElementById('statMessages').textContent = partenaire.contacts || 0;
+  document.getElementById('dashVues').textContent = partenaire.vues || 0;
+  document.getElementById('dashClics').textContent = partenaire.clics || 0;
+
+  // Fill fiche fields
+  ['entreprise','activite','zone','telephone','email','site'].forEach(f => {
+    const el = document.getElementById('f' + f.charAt(0).toUpperCase() + f.slice(1));
+    if (el) el.textContent = partenaire[f] || '—';
+  });
+  document.getElementById('fDescription').value = partenaire.description || '';
+
+  loadMessages();
+  loadZoneData();
+}
+
+async function loadMessages() {
+  const { data } = await sb.from('partenaires_messages')
+    .select('*').eq('partenaire_id', partenaire.id)
+    .order('created_at', { ascending: false });
+
+  const msgs = data || [];
+  const unread = msgs.filter(m => !m.lu).length;
+
+  document.getElementById('dashMsg').textContent = msgs.length;
+  document.getElementById('statMessages').textContent = msgs.length;
+
+  if (unread > 0) {
+    document.getElementById('msgBadge').textContent = unread;
+    document.getElementById('msgBadge').style.display = 'inline';
+    document.getElementById('dashMsgUnread').textContent = unread + ' non lu' + (unread > 1 ? 's' : '');
+    document.getElementById('dashMsgUnread').style.color = 'var(--terracotta)';
+  }
+
+  const list = document.getElementById('messagesList');
+  if (!msgs.length) { list.innerHTML = '<div class="no-messages">Aucun message pour le moment.<br>Votre fiche est visible — les utilisateurs peuvent vous contacter !</div>'; return; }
+
+  list.innerHTML = msgs.map(m => {
+    const date = new Date(m.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+    return `<div class="message-card ${m.lu ? '' : 'unread'}" onclick="markRead('${m.id}',this)">
+      <div class="message-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          ${!m.lu ? '<div class="message-unread-dot"></div>' : ''}
+          <div class="message-from">Utilisateur Le Move</div>
+        </div>
+        <div class="message-time">${date}</div>
+      </div>
+      <div class="message-text">${m.message}</div>
+      <button class="message-reply-btn" onclick="event.stopPropagation();replyMessage('${m.id}')">Répondre par email →</button>
+    </div>`;
+  }).join('');
+}
+
+async function markRead(id, el) {
+  await sb.from('partenaires_messages').update({ lu: true }).eq('id', id);
+  el.classList.remove('unread');
+}
+
+function replyMessage(id) {
+  window.location.href = 'mailto:bonjour@lemove.fr?subject=Réponse via Le Move&body=Bonjour,';
+}
+
+async function loadZoneData() {
+  // Approximate zone data based on active users
+  const { count: usersCount } = await sb.from('Profiles')
+    .select('*', { count: 'exact', head: true })
+    .not('date_emmenagement', 'is', null);
+
+  document.getElementById('zoneUsers').textContent = usersCount || '—';
+  document.getElementById('zoneDem').textContent = Math.round((usersCount || 0) * 0.3) || '—';
+  document.getElementById('zoneBudget').textContent = '2 400€';
+}
+
+function showSection(name) {
+  ['Dashboard','Fiche','Messages','Donnees'].forEach(s => {
+    document.getElementById('section' + s).style.display = s.toLowerCase() === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['dashboard','fiche','messages','donnees'][i] === name);
+  });
+}
+
+function toggleEdit() {
+  isEditing = !isEditing;
+  document.getElementById('editBtn').style.display = isEditing ? 'none' : 'block';
+  document.getElementById('saveBtn').style.display = isEditing ? 'block' : 'none';
+  document.getElementById('fDescription').disabled = !isEditing;
+
+  ['fEntreprise','fActivite','fZone','fTel','fEmail','fSite'].forEach(id => {
+    const el = document.getElementById(id);
+    if (isEditing) {
+      el.contentEditable = 'true';
+      el.classList.add('editable');
+    } else {
+      el.contentEditable = 'false';
+      el.classList.remove('editable');
+    }
+  });
+}
+
+async function saveFiche() {
+  const updates = {
+    entreprise: document.getElementById('fEntreprise').textContent,
+    activite: document.getElementById('fActivite').textContent,
+    zone: document.getElementById('fZone').textContent,
+    telephone: document.getElementById('fTel').textContent,
+    email: document.getElementById('fEmail').textContent,
+    site: document.getElementById('fSite').textContent,
+    description: document.getElementById('fDescription').value,
+  };
+
+  await sb.from('partenaires').update(updates).eq('id', partenaire.id);
+  partenaire = { ...partenaire, ...updates };
+
+  toggleEdit();
+  const flash = document.getElementById('savedFlash');
+  flash.style.display = 'block';
+  setTimeout(() => flash.style.display = 'none', 2500);
+}
+
+document.getElementById('authPwd')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>
