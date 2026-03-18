@@ -692,7 +692,7 @@ async function renderModuleProgress() {
 
 </script>
 </script>
-
+<script>
 // ── NOTIFICATIONS (module) ──
 let notifications = [];
 let notifOpen = false;
@@ -745,6 +745,7 @@ function closeNotifPanel() {
   const p=document.getElementById('notifPanel');
   if(p) p.classList.remove('open');
 }
+</script>
 document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
