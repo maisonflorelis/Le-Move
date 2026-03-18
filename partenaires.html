@@ -30,7 +30,7 @@ nav{background:var(--espresso);padding:0 80px;height:64px;display:flex;align-ite
 .offer-price-block{text-align:center}
 .offer-price{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;color:var(--cream);line-height:1;display:flex;align-items:baseline;gap:4px}
 .offer-price sup{font-size:24px;vertical-align:top;margin-top:12px}
-.offer-period{font-size:10px;font-weight:200;color:rgba(247,243,238,0.4);letter-spacing:0.15em;text-transform:uppercase;margin-top:4px}
+.offer-period{font-size:10px;font-weight:200;color:rgba(247,243,238,0.4);letter-spacing:0.15em;text-transform:uppercase;margin-top:12px;display:block}
 .offer-divider{width:1px;height:60px;background:rgba(255,255,255,0.1)}
 .offer-details{display:flex;flex-direction:column;gap:8px}
 .offer-feat{font-size:12px;font-weight:200;color:rgba(247,243,238,0.65);display:flex;align-items:center;gap:8px}
@@ -116,6 +116,7 @@ footer{background:var(--espresso);padding:32px 80px;display:flex;align-items:cen
   <a href="index.html" class="nav-logo">Le Move</a>
   <div class="nav-right">
     <a href="index.html" class="nav-link">Retour au site</a>
+    <a href="partenaire-dashboard.html" class="nav-link">Me connecter</a>
     <a href="#candidature" class="nav-cta" onclick="document.getElementById('candidature').scrollIntoView({behavior:'smooth'});return false;">Candidater →</a>
   </div>
 </nav>
@@ -127,7 +128,7 @@ footer{background:var(--espresso);padding:32px 80px;display:flex;align-items:cen
   <div class="hero-sub">Le Move accompagne des personnes en plein emménagement — votre cible idéale, au moment précis où elle cherche vos services. Rejoignez notre réseau de professionnels vérifiés.</div>
 
   <div class="hero-offer">
-    <div class="offer-price-block">
+    <div class="offer-price-block" style="display:flex;flex-direction:column;align-items:center">
       <div class="offer-price">39<span style="font-size:24px;font-family:'DM Sans',sans-serif;font-weight:200">€</span></div>
       <div class="offer-period">par mois · sans engagement</div>
     </div>
@@ -141,7 +142,7 @@ footer{background:var(--espresso);padding:32px 80px;display:flex;align-items:cen
       <div class="offer-feat">Données de votre zone géographique</div>
     </div>
   </div>
-  <div class="hero-note">🎯 Tarif Fondateurs · Augmentation à 79€/mois après 6 mois</div>
+  <div class="hero-note" style="font-size:14px;font-style:normal;font-weight:300;color:var(--terracotta);letter-spacing:0.02em">🎯 Tarif Fondateurs · Augmentation à 79€/mois après 6 mois</div>
 </section>
 
 <!-- POURQUOI -->
