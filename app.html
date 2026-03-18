@@ -495,20 +495,20 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
 
 const ALL_MODULES = [
-  { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Suivi par catégorie avec alertes dépassement.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Catégories personnalisées avec alertes.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
   { id: 'demenagement', icon: '📦', title: 'Mon Déménagement', desc: 'Checklist par phase : Signature, Préparation, Démarches, Jour J, Installation.', tags: ['Organisation', 'Checklist'], plans: ['essentiel', 'complet', 'premium'] },
   { id: 'aides', icon: '💶', title: 'Guide des Aides', desc: 'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags: ['Aides', 'Budget'], plans: ['essentiel', 'complet', 'premium'] },
   { id: 'achats', icon: '🚚', title: 'Mes Achats & Livraisons', desc: 'Suivi de toutes tes commandes — Commandé, Préparé, En route, Livré.', tags: ['Achats', 'Suivi'], plans: ['essentiel', 'complet', 'premium'] },
-  { id: 'calculateur', icon: '📐', title: 'Calculateur Volume', desc: 'Calcule le volume de tes meubles et trouve le bon camion de déménagement.', tags: ['Déménagement', 'Outil'], plans: ['complet', 'premium'] },
+  { id: 'calculateur', icon: '📐', title: 'Calculateur Volume', desc: 'Calcule le volume de tes meubles et trouve le bon camion.', tags: ['Déménagement', 'Outil'], plans: ['complet', 'premium'] },
   { id: 'admin', icon: '📋', title: 'Checklist Administrative', desc: 'Changements adresse, résiliations, démarches officielles — rien oublier.', tags: ['Admin', 'Démarches'], plans: ['complet', 'premium'] },
-  { id: 'carnet', icon: '📓', title: 'Carnet de Bord', desc: 'Codes, mesures, contacts immeuble, notes — tout ce dont tu as besoin au quotidien.', tags: ['Notes', 'Pratique'], plans: ['complet', 'premium'] },
-  { id: 'avancement', icon: '✅', title: 'Mon Avancement', desc: 'Vue Kanban de toutes tes tâches — faites, en cours, en retard, countdown jour J.', tags: ['Gestion', 'Tâches'], plans: ['complet', 'premium'] },
-  { id: 'mes-contacts', icon: '📒', title: 'Mes Contacts & Agenda', desc: 'Carnet de contacts clés avec agenda rendez-vous présentiel et visio.', tags: ['Contacts', 'Agenda'], plans: ['complet', 'premium'] },
+  { id: 'carnet', icon: '📓', title: 'Carnet de Bord', desc: 'Codes, mesures, contacts immeuble, notes pratiques au quotidien.', tags: ['Notes', 'Pratique'], plans: ['complet', 'premium'] },
+  { id: 'avancement', icon: '✅', title: 'Mon Avancement', desc: 'Vue Kanban de toutes tes tâches — faites, en cours, countdown jour J.', tags: ['Gestion', 'Tâches'], plans: ['complet', 'premium'] },
+  { id: 'mes-contacts', icon: '📒', title: 'Mes Contacts & Agenda', desc: 'Carnet de contacts clés avec agenda rendez-vous.', tags: ['Contacts', 'Agenda'], plans: ['complet', 'premium'] },
   { id: 'moodboard', icon: '🎨', title: 'Moodboard & Inspirations', desc: 'Palette de couleurs, inspirations sauvegardées, notes de style.', tags: ['Déco', 'Inspiration'], plans: ['complet', 'premium'] },
   { id: 'medias', icon: '📁', title: 'Mes Médias', desc: 'Photos, vidéos, documents — visite appart, inspirations, état des lieux.', tags: ['Photos', 'Vidéos'], plans: ['complet', 'premium'] },
   { id: 'moodboard-ia', icon: '✨', title: 'Moodboard IA', desc: "Questionnaire déco — l'IA génère ta palette, ton style et tes achats prioritaires.", tags: ['IA', 'Déco'], plans: ['premium'] },
-  { id: 'collab', icon: '🤝', title: 'Espace Collaboratif', desc: "Invite un proche ou un professionnel à accéder à ton espace Le Move.", tags: ['Partage', 'Premium'], plans: ['premium'] },
-  { id: 'annuaire', icon: '⭐', title: 'Annuaire Pro', desc: 'Prestataires vérifiés et partenaires Le Move — déménageurs, décorateurs, artisans.', tags: ['Contacts', 'Premium'], plans: ['premium'] },
+  { id: 'collab', icon: '🤝', title: 'Espace Collaboratif', desc: "Invite un proche ou un pro à accéder à ton espace Le Move.", tags: ['Partage', 'Premium'], plans: ['premium'] },
+  { id: 'annuaire', icon: '⭐', title: 'Annuaire Pro', desc: 'Prestataires vérifiés et partenaires Le Move près de chez toi.', tags: ['Contacts', 'Premium'], plans: ['premium'] },
   { id: 'cremaillere', icon: '🎉', title: 'Ma Crémaillère', desc: 'Crée ta liste de cadeaux et partage-la avec tes proches.', tags: ['Cadeaux', 'Partage'], plans: ['premium'] },
   { id: 'support', icon: '💬', title: 'Support Prioritaire', desc: "Accès direct à l'équipe Le Move. Réponse garantie sous 24h.", tags: ['Support', 'Premium'], plans: ['premium'] },
 ];
@@ -931,7 +931,7 @@ async function generateSmartNotifs() {
   for (const l of (livraisons || [])) {
     const exists = await checkNotifExists('livraison_' + l.nom + '_' + today);
     if (!exists) {
-      toInsert.push({ user_id: currentUser.id, type: 'livraison', titre: 'Livraison prévue aujourd'hui', message: l.nom + ' devrait arriver aujourd'hui !', lien: 'achats.html', created_at: new Date().toISOString() });
+      toInsert.push({ user_id: currentUser.id, type: 'livraison', titre: "Livraison prévue aujourd'hui", message: l.nom + " devrait arriver aujourd'hui !", lien: 'achats.html', created_at: new Date().toISOString() });
     }
   }
   
@@ -945,7 +945,7 @@ async function generateSmartNotifs() {
   if ((taches || []).length > 0) {
     const exists = await checkNotifExists('urgentes_' + today);
     if (!exists) {
-      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: 'Tu as ' + taches.length + ' démarche(s) administrative(s) urgente(s) à faire.', lien: 'admin.html', created_at: new Date().toISOString() });
+      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) administrative(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
     }
   }
   
@@ -956,7 +956,7 @@ async function generateSmartNotifs() {
     if (diff === 7 || diff === 3 || diff === 1) {
       const exists = await checkNotifExists('jourj_' + diff + '_' + today);
       if (!exists) {
-        toInsert.push({ user_id: currentUser.id, type: 'jourj', titre: 'Jour J dans ' + diff + ' jour' + (diff > 1 ? 's' : '') + ' !', message: 'Ton déménagement approche. Vérifie ta checklist !', lien: 'demenagement.html', created_at: new Date().toISOString() });
+        toInsert.push({ user_id: currentUser.id, type: 'jourj', titre: `Jour J dans ${diff} jour${diff > 1 ? 's' : ''} !`, message: "Ton déménagement approche. Vérifie ta checklist !", lien: 'demenagement.html', created_at: new Date().toISOString() });
       }
     }
   }
@@ -965,7 +965,7 @@ async function generateSmartNotifs() {
   if (profile && !profile.prenom) {
     const exists = await checkNotifExists('profil_incomplet_' + today);
     if (!exists) {
-      toInsert.push({ user_id: currentUser.id, type: 'module', titre: 'Complète ton profil', message: 'Ajoute ton prénom et ta date d'emménagement pour personnaliser ton espace.', lien: 'app.html', created_at: new Date().toISOString() });
+      toInsert.push({ user_id: currentUser.id, type: 'module', titre: 'Complète ton profil', message: "Ajoute ton prénom et ta date d'emménagement pour personnaliser ton espace.", lien: 'app.html', created_at: new Date().toISOString() });
     }
   }
   
@@ -1003,25 +1003,6 @@ function renderNotifBadge() {
 const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
 const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
 
-function renderNotifPanel() {
-  const list = document.getElementById('notifList');
-  if (!list) return;
-  if (!notifications.length) {
-    list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>';
-    return;
-  }
-  list.innerHTML = notifications.map(n => {
-    const ago = timeAgo(n.created_at);
-    return \`<div class="notif-item \${n.lue ? '' : 'unread'}" onclick="clickNotif('\${n.id}', '\${n.lien || ''}')">
-      <div class="notif-icon \${NOTIF_ICON_CLASS[n.type] || ''}">\${NOTIF_ICONS[n.type] || '🔔'}</div>
-      <div class="notif-content">
-        <div class="notif-title">\${n.titre}</div>
-        <div class="notif-msg">\${n.message || ''}</div>
-        <div class="notif-time">\${ago}</div>
-      </div>
-    </div>\`;
-  }).join('');
-}
 
 function timeAgo(dateStr) {
   const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
