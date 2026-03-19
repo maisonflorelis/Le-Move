@@ -140,7 +140,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="nav-section">Revenus</div>
   <div class="nav-item" onclick="showSection('revenus',this)"><div class="nav-dot"></div>MRR & Revenus</div>
   <div class="sidebar-footer">
-    <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);margin-bottom:8px">sheryl.mercier@gmail.com</div>
+    <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);margin-bottom:8px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6b18030e19120745060e1908020e192b0c060a020745080406">[email&#160;protected]</a></div>
     <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="adminLogout()">Déconnexion</div>
   </div>
 </aside>
@@ -177,6 +177,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
             </table>
           </div>
         </div>
+      </div>
+
+      <div class="section-eyebrow">Utilisateurs par zone géographique</div>
+      <div class="section-block" style="padding:20px">
+        <div id="zoneStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
       </div>
 
       <div class="section-eyebrow">Candidatures en attente</div>
@@ -336,7 +341,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
@@ -452,6 +457,27 @@ function renderDashboard() {
       <td><span class="plan-badge plan-${u.Plan || 'essentiel'}">${u.Plan || 'essentiel'}</span></td>
       <td>${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
     </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-light);font-style:italic">Aucun utilisateur</td></tr>';
+
+  // Zone stats
+  const zoneCounts = {};
+  allUsers.forEach(u => {
+    const ville = (u.ville || 'Non renseignée').trim();
+    const key = ville.split(' ')[0]; // First word of city
+    zoneCounts[key] = (zoneCounts[key] || 0) + 1;
+  });
+  const sortedZones = Object.entries(zoneCounts).sort((a,b) => b[1]-a[1]).slice(0, 9);
+  const maxZone = sortedZones[0]?.[1] || 1;
+  document.getElementById('zoneStats').innerHTML = sortedZones.length ? sortedZones.map(([zone, count]) => `
+    <div style="background:var(--cream);border-radius:10px;padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:300;color:var(--espresso)">${zone}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--espresso)">${count}</div>
+      </div>
+      <div style="height:3px;background:var(--linen);border-radius:2px;overflow:hidden">
+        <div style="height:100%;background:var(--terracotta);width:${Math.round((count/maxZone)*100)}%;border-radius:2px;transition:width 0.6s ease"></div>
+      </div>
+      <div style="font-size:9px;color:var(--text-light);margin-top:4px">${Math.round((count/total)*100)}% des utilisateurs</div>
+    </div>`).join('') : '<div style="color:var(--text-light);font-size:12px;font-style:italic;text-align:center;padding:20px;grid-column:1/-1">Aucune donnée de zone — les utilisateurs doivent renseigner leur ville dans leur profil.</div>';
 
   // Pending candidatures
   const pendingList = allCandidatures.filter(c => c.statut === 'en_attente').slice(0, 5);
@@ -804,10 +830,4 @@ function showToast(msg) {
   setTimeout(() => t.style.display = 'none', 3000);
 }
 
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
-document.getElementById('adminPwd')?.addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
-</script>
-</body>
-</html>
+document.querySelectorAll('.modal-overlay').forEach(m =>
