@@ -341,7 +341,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false">
 const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
@@ -611,7 +611,7 @@ async function sendEmail() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
     body: JSON.stringify({
-      from: 'Le Move <bonjour@lemove.fr>', to,
+      from: 'Le Move <' + ['bonjour','lemove.fr'].join('@') + '>', to,
       subject,
       html: '<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px">' + body.replace(/\n/g,'<br>') + '<br><br><hr><p style="font-size:11px;color:#9C8B7E">L\'équipe Le Move · lemove.fr</p></div>'
     })
@@ -676,7 +676,7 @@ async function validerCandidature(id, email, prenom, nom) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
     body: JSON.stringify({
-      from: 'Le Move <bonjour@lemove.fr>', to: email,
+      from: 'Le Move <' + ['bonjour','lemove.fr'].join('@') + '>', to: email,
       subject: '✦ Votre candidature Partenaire Le Move est validée !',
       html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto">
         <div style="background:#2C1F14;padding:32px;text-align:center;border-radius:16px 16px 0 0">
@@ -710,7 +710,7 @@ async function refuserCandidature(id, email, prenom) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
     body: JSON.stringify({
-      from: 'Le Move <bonjour@lemove.fr>', to: email,
+      from: 'Le Move <' + ['bonjour','lemove.fr'].join('@') + '>', to: email,
       subject: 'Votre candidature Partenaire Le Move',
       html: `<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px">
         <p>Bonjour ${prenom},</p>
