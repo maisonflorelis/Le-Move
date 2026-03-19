@@ -5,202 +5,637 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
-<title>Le Move — Admin Partenaires</title>
+<title>Le Move — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
-body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh}
-.admin-nav{background:var(--espresso);padding:0 40px;height:56px;display:flex;align-items:center;justify-content:space-between}
-.admin-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream)}
-.admin-badge{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;background:var(--terracotta);color:white;padding:3px 10px;border-radius:10px}
-.admin-content{max-width:1100px;margin:0 auto;padding:40px}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-style:italic;font-weight:300;color:var(--espresso);margin-bottom:6px}
-.page-sub{font-size:12px;font-weight:200;color:var(--text-light);margin-bottom:32px}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
-.stat-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px}
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--espresso);line-height:1}
-.stat-lbl{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-top:4px}
-.filters{display:flex;gap:8px;margin-bottom:20px}
-.filter-btn{padding:7px 16px;border-radius:20px;font-size:11px;font-weight:300;cursor:pointer;border:1px solid var(--linen);background:var(--warm-white);color:var(--text-light);transition:all 0.2s}
-.filter-btn:hover{border-color:var(--sand);color:var(--espresso)}
-.filter-btn.active{background:var(--espresso);color:var(--cream);border-color:var(--espresso)}
-.candidature-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:14px;padding:24px;margin-bottom:14px;transition:all 0.2s}
-.candidature-card:hover{border-color:var(--sand)}
-.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
-.card-name{font-size:16px;font-weight:400;color:var(--espresso)}
-.card-meta{font-size:11px;font-weight:200;color:var(--text-light);margin-top:2px}
-.card-status{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 12px;border-radius:20px}
-.status-en_attente{background:rgba(184,154,106,0.12);color:var(--gold)}
-.status-valide{background:rgba(122,140,126,0.12);color:var(--sage)}
-.status-refuse{background:rgba(196,113,74,0.1);color:var(--terracotta)}
-.card-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
-.card-field{display:flex;flex-direction:column;gap:2px}
-.card-field-label{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)}
-.card-field-value{font-size:12px;font-weight:300;color:var(--espresso)}
-.card-message{background:var(--cream);border-radius:8px;padding:12px 16px;font-size:12px;font-weight:200;color:var(--text-light);line-height:1.6;margin-bottom:16px;font-style:italic}
-.card-docs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.doc-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:10px;font-weight:300;cursor:pointer;border:1px solid var(--linen);background:var(--warm-white);color:var(--text-light);text-decoration:none;transition:all 0.2s}
-.doc-btn:hover{border-color:var(--terracotta);color:var(--terracotta)}
-.card-actions{display:flex;gap:10px}
-.btn-valider{padding:9px 20px;background:var(--sage);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
-.btn-valider:hover{opacity:0.85}
-.btn-refuser{padding:9px 20px;background:none;color:var(--terracotta);border:1px solid var(--terracotta);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
-.btn-refuser:hover{background:var(--terracotta);color:white}
-.btn-contact{padding:9px 20px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:opacity 0.2s}
-.btn-contact:hover{opacity:0.85}
-.empty-state{text-align:center;padding:60px;color:var(--text-light);font-size:14px;font-weight:200;font-style:italic}
-.loading{text-align:center;padding:40px;color:var(--text-light)}
-.auth-block{min-height:100vh;display:flex;align-items:center;justify-content:center}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--sand);border-radius:4px}
+
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:32px 20px;display:flex;flex-direction:column;gap:4px;z-index:100;overflow-y:auto;scrollbar-width:none}
+.sidebar::-webkit-scrollbar{display:none}
+.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:4px}
+.sidebar-badge{font-size:7px;letter-spacing:0.2em;text-transform:uppercase;background:rgba(196,113,74,0.2);color:var(--terracotta);padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:20px}
+.nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.35);padding:10px 10px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:11px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+.nav-item.active .nav-dot{background:var(--terracotta)}
+.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)}
+
+.main{margin-left:220px;flex:1;min-height:100vh}
+.page-header{background:var(--espresso);padding:32px 48px;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;font-weight:300;color:var(--cream)}
+.page-sub{font-size:11px;font-weight:200;color:rgba(247,243,238,0.4);margin-top:2px}
+.content{padding:32px 48px}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.stat-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px;transition:all 0.2s}
+.stat-card:hover{border-color:var(--sand)}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--espresso);line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:8px;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light)}
+.stat-trend{font-size:10px;font-weight:200;color:var(--sage);margin-top:6px}
+
+/* SECTION */
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen);margin-left:16px}
+.section-block{background:var(--warm-white);border:1px solid var(--linen);border-radius:14px;overflow:hidden;margin-bottom:24px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{padding:12px 16px;font-size:8px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);text-align:left;border-bottom:1px solid var(--linen);background:var(--cream)}
+.data-table td{padding:12px 16px;font-size:12px;font-weight:300;color:var(--espresso);border-bottom:1px solid rgba(232,224,213,0.5)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(232,224,213,0.2)}
+.plan-badge{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:10px}
+.plan-essentiel{background:rgba(201,186,168,0.2);color:var(--text-light)}
+.plan-complet{background:rgba(184,154,106,0.15);color:var(--gold)}
+.plan-premium{background:rgba(44,31,20,0.08);color:var(--espresso)}
+.plan-admin{background:rgba(196,113,74,0.12);color:var(--terracotta)}
+.status-actif{color:var(--sage)}
+.status-suspendu{color:var(--terracotta)}
+
+/* ACTION BUTTONS */
+.action-btn{padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap}
+.btn-edit{background:var(--linen);color:var(--espresso)}
+.btn-edit:hover{background:var(--sand)}
+.btn-email{background:rgba(122,140,126,0.12);color:var(--sage)}
+.btn-email:hover{background:rgba(122,140,126,0.2)}
+.btn-suspend{background:rgba(196,113,74,0.1);color:var(--terracotta)}
+.btn-suspend:hover{background:rgba(196,113,74,0.2)}
+.btn-delete{background:rgba(220,38,38,0.08);color:#DC2626}
+.btn-delete:hover{background:rgba(220,38,38,0.15)}
+.btn-validate{background:rgba(122,140,126,0.12);color:var(--sage)}
+.btn-validate:hover{background:var(--sage);color:white}
+.btn-refuse{background:rgba(196,113,74,0.1);color:var(--terracotta)}
+.btn-refuse:hover{background:var(--terracotta);color:white}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;padding:10px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;transition:border-color 0.2s}
+.search-input:focus{border-color:var(--terracotta)}
+.filter-select{padding:10px 14px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;appearance:none;cursor:pointer}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(44,31,20,0.6);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-card{background:var(--cream);border-radius:20px;padding:36px;max-width:520px;width:90%;position:relative;animation:popIn 0.2s ease;max-height:90vh;overflow-y:auto}
+@keyframes popIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-light)}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;font-weight:300;margin-bottom:20px}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.modal-label{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)}
+.modal-input,.modal-select,.modal-textarea{width:100%;padding:10px 14px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;transition:border-color 0.2s;appearance:none}
+.modal-input:focus,.modal-select:focus,.modal-textarea:focus{border-color:var(--terracotta)}
+.modal-textarea{resize:vertical;min-height:100px}
+.modal-save{width:100%;padding:12px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;margin-top:4px}
+.modal-save:hover{opacity:0.85}
+.modal-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.info-item{background:var(--warm-white);border-radius:8px;padding:12px}
+.info-label{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px}
+.info-value{font-size:12px;font-weight:300;color:var(--espresso)}
+
+/* MRR CHART */
+.mrr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.mrr-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px}
+.mrr-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--espresso);line-height:1;margin-bottom:4px}
+.mrr-lbl{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)}
+
+/* AUTH */
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--espresso);width:100%}
 .auth-card{background:var(--cream);border-radius:20px;padding:48px;max-width:400px;width:90%;text-align:center}
-.auth-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;font-weight:300;margin-bottom:20px}
-.auth-input{width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
-.auth-input:focus{border-color:var(--terracotta)}
-.auth-btn{width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer}
+
+.empty{text-align:center;padding:40px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--espresso);color:var(--cream);padding:12px 20px;border-radius:10px;font-size:12px;z-index:300;display:none;animation:slideUp 0.2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
-<div id="authBlock" class="auth-block">
+<div class="auth-screen" id="authScreen">
   <div class="auth-card">
-    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;margin-bottom:4px">Le Move</div>
-    <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:28px">Admin Partenaires</div>
-    <div class="auth-title">Accès réservé</div>
-    <input type="email" class="auth-input" id="adminEmail" placeholder="Email admin" value="sheryl.mercier@gmail.com">
-    <input type="password" class="auth-input" id="adminPwd" placeholder="Mot de passe">
-    <button class="auth-btn" onclick="adminLogin()">Accéder →</button>
-    <div id="authError" style="color:#DC2626;font-size:11px;margin-top:10px;display:none">Email ou mot de passe incorrect.</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:28px;color:var(--espresso);margin-bottom:4px">Le Move</div>
+    <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:28px">Administration</div>
+    <input type="email" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminEmail" placeholder="Email admin" value="sheryl.mercier@gmail.com">
+    <input type="password" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminPwd" placeholder="Mot de passe">
+    <button onclick="adminLogin()" style="width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer">Accéder →</button>
+    <div id="authErr" style="color:#DC2626;font-size:11px;margin-top:10px;display:none">Accès refusé.</div>
   </div>
 </div>
 
-<div id="adminBlock" style="display:none">
-  <div class="admin-nav">
-    <div class="admin-logo">Le Move</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="admin-badge">Admin Partenaires</div>
-      <div style="font-size:10px;color:rgba(247,243,238,0.4);cursor:pointer" onclick="adminLogout()">Déconnexion</div>
+<aside class="sidebar" id="appSidebar" style="display:none">
+  <div class="sidebar-logo">Le Move</div>
+  <div class="sidebar-badge">Administration</div>
+  <div class="nav-item active" onclick="showSection('dashboard',this)"><div class="nav-dot"></div>Dashboard</div>
+  <div class="nav-section">Utilisateurs</div>
+  <div class="nav-item" onclick="showSection('users',this)"><div class="nav-dot"></div>Tous les utilisateurs</div>
+  <div class="nav-item" onclick="showSection('plans',this)"><div class="nav-dot"></div>Gestion des plans</div>
+  <div class="nav-section">Partenaires</div>
+  <div class="nav-item" onclick="showSection('candidatures',this)"><div class="nav-dot"></div>Candidatures <span id="navBadge" style="display:none;background:var(--terracotta);color:white;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px">0</span></div>
+  <div class="nav-item" onclick="showSection('partenaires',this)"><div class="nav-dot"></div>Partenaires actifs</div>
+  <div class="nav-section">Revenus</div>
+  <div class="nav-item" onclick="showSection('revenus',this)"><div class="nav-dot"></div>MRR & Revenus</div>
+  <div class="sidebar-footer">
+    <div style="font-size:9px;font-weight:200;color:rgba(201,186,168,0.4);margin-bottom:8px">sheryl.mercier@gmail.com</div>
+    <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="adminLogout()">Déconnexion</div>
+  </div>
+</aside>
+
+<main class="main" id="appMain" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div id="sectionDashboard">
+    <div class="page-header">
+      <div><div class="page-title">Dashboard</div><div class="page-sub">Vue d'ensemble de Le Move</div></div>
+      <div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.4)" id="lastUpdate"></div>
+    </div>
+    <div class="content">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="dTotalUsers">—</div><div class="stat-lbl">Utilisateurs total</div><div class="stat-trend" id="dNewUsers"></div></div>
+        <div class="stat-card"><div class="stat-num" id="dMRR" style="color:var(--sage)">—</div><div class="stat-lbl">MRR estimé</div><div class="stat-trend">Revenus mensuels</div></div>
+        <div class="stat-card"><div class="stat-num" id="dPartenaires" style="color:var(--gold)">—</div><div class="stat-lbl">Partenaires actifs</div><div class="stat-trend" id="dCandidatures"></div></div>
+        <div class="stat-card"><div class="stat-num" id="dConversion" style="color:var(--terracotta)">—</div><div class="stat-lbl">Taux conversion</div><div class="stat-trend">Visiteurs → clients</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+        <div>
+          <div class="section-eyebrow">Répartition des plans</div>
+          <div class="section-block" style="padding:20px">
+            <div id="planBreakdown" style="display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-eyebrow">Dernières inscriptions</div>
+          <div class="section-block">
+            <table class="data-table" id="recentUsers">
+              <thead><tr><th>Utilisateur</th><th>Plan</th><th>Date</th></tr></thead>
+              <tbody id="recentUsersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-eyebrow">Candidatures en attente</div>
+      <div class="section-block">
+        <table class="data-table">
+          <thead><tr><th>Candidat</th><th>Activité</th><th>Zone</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="dashCandidatures"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="admin-content">
-    <div class="page-title">Candidatures Partenaires</div>
-    <div class="page-sub">Validez ou refusez les candidatures. Un email est envoyé automatiquement au candidat.</div>
-
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-lbl">Total candidatures</div></div>
-      <div class="stat-card"><div class="stat-num" id="statAttente" style="color:var(--gold)">—</div><div class="stat-lbl">En attente</div></div>
-      <div class="stat-card"><div class="stat-num" id="statValide" style="color:var(--sage)">—</div><div class="stat-lbl">Validées</div></div>
-      <div class="stat-card"><div class="stat-num" id="statRefuse" style="color:var(--terracotta)">—</div><div class="stat-lbl">Refusées</div></div>
+  <!-- USERS -->
+  <div id="sectionUsers" style="display:none">
+    <div class="page-header">
+      <div><div class="page-title">Utilisateurs</div><div class="page-sub" id="usersCount"></div></div>
     </div>
-
-    <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('all',this)">Toutes</button>
-      <button class="filter-btn" onclick="setFilter('en_attente',this)">En attente</button>
-      <button class="filter-btn" onclick="setFilter('valide',this)">Validées</button>
-      <button class="filter-btn" onclick="setFilter('refuse',this)">Refusées</button>
+    <div class="content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="userSearch" placeholder="Rechercher par email ou prénom..." oninput="filterUsers()">
+        <select class="filter-select" id="userPlanFilter" onchange="filterUsers()">
+          <option value="">Tous les plans</option>
+          <option value="essentiel">Essentiel</option>
+          <option value="complet">Complet</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
+      <div class="section-block">
+        <table class="data-table">
+          <thead><tr><th>Utilisateur</th><th>Email</th><th>Plan</th><th>Inscription</th><th>Déménagement</th><th>Actions</th></tr></thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
     </div>
+  </div>
 
-    <div id="candidaturesList"><div class="loading">Chargement...</div></div>
+  <!-- PLANS -->
+  <div id="sectionPlans" style="display:none">
+    <div class="page-header">
+      <div><div class="page-title">Gestion des plans</div><div class="page-sub">Modifier le plan d'un utilisateur</div></div>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="planSearch" placeholder="Rechercher un utilisateur..." oninput="filterPlans()">
+      </div>
+      <div class="section-block">
+        <table class="data-table">
+          <thead><tr><th>Utilisateur</th><th>Email</th><th>Plan actuel</th><th>Modifier</th></tr></thead>
+          <tbody id="plansTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANDIDATURES -->
+  <div id="sectionCandidatures" style="display:none">
+    <div class="page-header">
+      <div><div class="page-title">Candidatures Partenaires</div><div class="page-sub" id="candidaturesCount"></div></div>
+    </div>
+    <div class="content">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="candidatureSearch" placeholder="Rechercher..." oninput="filterCandidatures()">
+        <select class="filter-select" id="candidatureStatusFilter" onchange="filterCandidatures()">
+          <option value="">Tous les statuts</option>
+          <option value="en_attente">En attente</option>
+          <option value="valide">Validées</option>
+          <option value="refuse">Refusées</option>
+        </select>
+      </div>
+      <div id="candidaturesList"></div>
+    </div>
+  </div>
+
+  <!-- PARTENAIRES -->
+  <div id="sectionPartenaires" style="display:none">
+    <div class="page-header">
+      <div><div class="page-title">Partenaires actifs</div><div class="page-sub" id="partenairesCount"></div></div>
+    </div>
+    <div class="content">
+      <div class="section-block">
+        <table class="data-table">
+          <thead><tr><th>Entreprise</th><th>Activité</th><th>Zone</th><th>Vues</th><th>Contacts</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="partenairesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUS -->
+  <div id="sectionRevenus" style="display:none">
+    <div class="page-header">
+      <div><div class="page-title">MRR & Revenus</div><div class="page-sub">Revenus mensuels récurrents</div></div>
+    </div>
+    <div class="content">
+      <div class="mrr-grid">
+        <div class="mrr-card"><div class="mrr-num" id="mrrTotal" style="color:var(--sage)">—</div><div class="mrr-lbl">MRR total estimé</div></div>
+        <div class="mrr-card"><div class="mrr-num" id="mrrUsers">—</div><div class="mrr-lbl">Revenus utilisateurs</div></div>
+        <div class="mrr-card"><div class="mrr-num" id="mrrPartenaires">—</div><div class="mrr-lbl">Revenus partenaires</div></div>
+      </div>
+      <div class="section-eyebrow">Répartition par plan</div>
+      <div class="section-block" style="padding:24px">
+        <div id="revenusBreakdown" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL USER -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+    <div class="modal-title" id="userModalTitle">Détails utilisateur</div>
+    <div class="modal-info" id="userModalInfo"></div>
+    <div class="modal-field">
+      <div class="modal-label">Plan</div>
+      <select class="modal-select" id="userModalPlan">
+        <option value="essentiel">Essentiel</option>
+        <option value="complet">Complet</option>
+        <option value="premium">Premium</option>
+      </select>
+    </div>
+    <button class="modal-save" onclick="saveUserPlan()">Sauvegarder le plan →</button>
   </div>
 </div>
+
+<!-- MODAL EMAIL -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('emailModal')">✕</button>
+    <div class="modal-title">Envoyer un email</div>
+    <div class="modal-field"><div class="modal-label">À</div><input type="text" class="modal-input" id="emailTo" readonly></div>
+    <div class="modal-field"><div class="modal-label">Sujet</div><input type="text" class="modal-input" id="emailSubject" placeholder="Sujet de l'email"></div>
+    <div class="modal-field"><div class="modal-label">Message</div><textarea class="modal-textarea" id="emailBody" placeholder="Votre message..."></textarea></div>
+    <button class="modal-save" onclick="sendEmail()">Envoyer →</button>
+  </div>
+</div>
+
+<!-- MODAL PARTENAIRE -->
+<div class="modal-overlay" id="partenaireModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('partenaireModal')">✕</button>
+    <div class="modal-title">Modifier le partenaire</div>
+    <input type="hidden" id="partenaireModalId">
+    <div class="modal-field"><div class="modal-label">Entreprise</div><input type="text" class="modal-input" id="pmEntreprise"></div>
+    <div class="modal-field"><div class="modal-label">Activité</div><input type="text" class="modal-input" id="pmActivite"></div>
+    <div class="modal-field"><div class="modal-label">Zone</div><input type="text" class="modal-input" id="pmZone"></div>
+    <div class="modal-field"><div class="modal-label">Statut</div>
+      <select class="modal-select" id="pmStatut">
+        <option value="actif">Actif</option>
+        <option value="suspendu">Suspendu</option>
+      </select>
+    </div>
+    <button class="modal-save" onclick="savePartenaire()">Sauvegarder →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
+const RESEND_KEY = 're_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn';
+const STRIPE_LINK = 'https://buy.stripe.com/9B63cv9HickT8pLeF56EU06';
+const PLANS_PRICE = { essentiel: 39, complet: 69, premium: 99 };
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let candidatures = [];
-let activeFilter = 'all';
+let allUsers = [], allCandidatures = [], allPartenaires = [];
+let editingUser = null;
 
-async function adminLogin() {
-  const email = document.getElementById('adminEmail').value;
-  const pwd = document.getElementById('adminPwd').value;
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
-  if (error || data.user.email !== ADMIN_EMAIL) {
-    document.getElementById('authError').style.display = 'block';
-    return;
-  }
-  document.getElementById('authBlock').style.display = 'none';
-  document.getElementById('adminBlock').style.display = 'block';
-  await loadCandidatures();
-}
-
-async function adminLogout() {
-  await sb.auth.signOut();
-  location.reload();
-}
-
-// Check existing session
+// ── AUTH ──
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session && session.user.email === ADMIN_EMAIL) {
-    document.getElementById('authBlock').style.display = 'none';
-    document.getElementById('adminBlock').style.display = 'block';
-    await loadCandidatures();
-  }
+  if (session && session.user.email === ADMIN_EMAIL) showAdmin();
 })();
 
-async function loadCandidatures() {
-  const { data } = await sb.from('candidatures_partenaires').select('*').order('created_at', { ascending: false });
-  candidatures = data || [];
-  updateStats();
-  renderList();
+async function adminLogin() {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: document.getElementById('adminEmail').value,
+    password: document.getElementById('adminPwd').value
+  });
+  if (error || data.user.email !== ADMIN_EMAIL) {
+    document.getElementById('authErr').style.display = 'block'; return;
+  }
+  showAdmin();
+}
+async function adminLogout() { await sb.auth.signOut(); location.reload(); }
+
+function showAdmin() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appSidebar').style.display = 'flex';
+  document.getElementById('appMain').style.display = 'block';
+  document.getElementById('lastUpdate').textContent = 'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  loadAll();
 }
 
-function updateStats() {
-  document.getElementById('statTotal').textContent = candidatures.length;
-  document.getElementById('statAttente').textContent = candidatures.filter(c => c.statut === 'en_attente').length;
-  document.getElementById('statValide').textContent = candidatures.filter(c => c.statut === 'valide').length;
-  document.getElementById('statRefuse').textContent = candidatures.filter(c => c.statut === 'refuse').length;
+// ── LOAD DATA ──
+async function loadAll() {
+  const [usersRes, profilesRes, candidaturesRes, partenairesRes] = await Promise.all([
+    sb.from('Users').select('*').order('created_at', { ascending: false }),
+    sb.from('Profiles').select('*').order('created_at', { ascending: false }),
+    sb.from('candidatures_partenaires').select('*').order('created_at', { ascending: false }),
+    sb.from('partenaires').select('*').order('created_at', { ascending: false }),
+  ]);
+
+  allUsers = (usersRes.data || []).map(u => {
+    const profile = (profilesRes.data || []).find(p => p.id === u.id) || {};
+    return { ...u, ...profile };
+  });
+  allCandidatures = candidaturesRes.data || [];
+  allPartenaires = partenairesRes.data || [];
+
+  renderDashboard();
+  renderUsers();
+  renderPlans();
+  renderCandidatures();
+  renderPartenaires();
+  renderRevenus();
+
+  const pending = allCandidatures.filter(c => c.statut === 'en_attente').length;
+  if (pending > 0) {
+    document.getElementById('navBadge').textContent = pending;
+    document.getElementById('navBadge').style.display = 'inline';
+  }
 }
 
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
+// ── DASHBOARD ──
+function renderDashboard() {
+  const total = allUsers.length;
+  const essentiel = allUsers.filter(u => u.Plan === 'essentiel').length;
+  const complet = allUsers.filter(u => u.Plan === 'complet').length;
+  const premium = allUsers.filter(u => u.Plan === 'premium').length;
+  const partenairesActifs = allPartenaires.filter(p => p.statut === 'actif').length;
+  const pending = allCandidatures.filter(c => c.statut === 'en_attente').length;
+
+  const mrr = (essentiel * 39) + (complet * 69) + (premium * 99) + (partenairesActifs * 39);
+  const conversion = total > 0 ? Math.round(((essentiel + complet + premium) / total) * 100) : 0;
+
+  document.getElementById('dTotalUsers').textContent = total;
+  document.getElementById('dMRR').textContent = mrr.toLocaleString('fr-FR') + '€';
+  document.getElementById('dPartenaires').textContent = partenairesActifs;
+  document.getElementById('dConversion').textContent = conversion + '%';
+  document.getElementById('dCandidatures').textContent = pending + ' en attente';
+
+  const week = new Date(); week.setDate(week.getDate() - 7);
+  const newThisWeek = allUsers.filter(u => new Date(u.created_at) > week).length;
+  document.getElementById('dNewUsers').textContent = '+' + newThisWeek + ' cette semaine';
+
+  // Plan breakdown
+  const plans = [
+    { name: 'Essentiel', count: essentiel, color: 'var(--sand)', price: 39 },
+    { name: 'Complet', count: complet, color: 'var(--gold)', price: 69 },
+    { name: 'Premium', count: premium, color: 'var(--terracotta)', price: 99 },
+  ];
+  document.getElementById('planBreakdown').innerHTML = plans.map(p => `
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0"></div>
+      <div style="font-size:12px;font-weight:300;color:var(--espresso);flex:1">${p.name}</div>
+      <div style="font-size:12px;font-weight:300;color:var(--text-light)">${p.count} utilisateur${p.count > 1 ? 's' : ''}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--espresso)">${(p.count * p.price).toLocaleString('fr-FR')}€/mois</div>
+    </div>
+    <div style="height:4px;background:var(--linen);border-radius:2px;overflow:hidden">
+      <div style="height:100%;background:${p.color};width:${total > 0 ? Math.round((p.count/total)*100) : 0}%;border-radius:2px;transition:width 0.6s ease"></div>
+    </div>`).join('');
+
+  // Recent users
+  const recent = allUsers.slice(0, 5);
+  document.getElementById('recentUsersBody').innerHTML = recent.map(u => `
+    <tr>
+      <td>${u.prenom || u.Email?.split('@')[0] || '—'}</td>
+      <td><span class="plan-badge plan-${u.Plan || 'essentiel'}">${u.Plan || 'essentiel'}</span></td>
+      <td>${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
+    </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-light);font-style:italic">Aucun utilisateur</td></tr>';
+
+  // Pending candidatures
+  const pendingList = allCandidatures.filter(c => c.statut === 'en_attente').slice(0, 5);
+  document.getElementById('dashCandidatures').innerHTML = pendingList.map(c => `
+    <tr>
+      <td><strong>${c.prenom} ${c.nom}</strong><br><span style="font-size:10px;color:var(--text-light)">${c.email}</span></td>
+      <td>${c.activite}</td>
+      <td>${c.zone}</td>
+      <td>${new Date(c.created_at).toLocaleDateString('fr-FR')}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="action-btn btn-validate" onclick="validerCandidature('${c.id}','${c.email}','${c.prenom}','${c.nom}')">✓ Valider</button>
+        <button class="action-btn btn-refuse" onclick="refuserCandidature('${c.id}','${c.email}','${c.prenom}')">✕ Refuser</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="5" class="empty">Aucune candidature en attente</td></tr>';
 }
 
-function renderList() {
-  const filtered = activeFilter === 'all' ? candidatures : candidatures.filter(c => c.statut === activeFilter);
-  const list = document.getElementById('candidaturesList');
-  if (!filtered.length) { list.innerHTML = '<div class="empty-state">Aucune candidature dans cette catégorie.</div>'; return; }
+// ── USERS ──
+function renderUsers() {
+  document.getElementById('usersCount').textContent = allUsers.length + ' utilisateurs';
+  updateUsersTable(allUsers);
+}
 
-  list.innerHTML = filtered.map(c => {
-    const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-    const isAttente = c.statut === 'en_attente';
-    return `<div class="candidature-card" id="card-${c.id}">
-      <div class="card-header">
+function updateUsersTable(users) {
+  document.getElementById('usersTableBody').innerHTML = users.map(u => `
+    <tr>
+      <td>${u.prenom || '—'}</td>
+      <td style="font-size:11px">${u.Email || '—'}</td>
+      <td><span class="plan-badge plan-${u.Plan || 'essentiel'}">${u.Plan || 'essentiel'}</span></td>
+      <td>${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
+      <td>${u.date_emmenagement ? new Date(u.date_emmenagement).toLocaleDateString('fr-FR') : '—'}</td>
+      <td style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="action-btn btn-edit" onclick="openUserModal(${JSON.stringify(u).replace(/"/g,'&quot;')})">Modifier</button>
+        <button class="action-btn btn-email" onclick="openEmailModal('${u.Email}')">Email</button>
+        <button class="action-btn btn-delete" onclick="deleteUser('${u.id}','${u.Email}')">Supprimer</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="6" class="empty">Aucun utilisateur</td></tr>';
+}
+
+function filterUsers() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  const plan = document.getElementById('userPlanFilter').value;
+  let filtered = allUsers;
+  if (q) filtered = filtered.filter(u => (u.Email||'').toLowerCase().includes(q) || (u.prenom||'').toLowerCase().includes(q));
+  if (plan) filtered = filtered.filter(u => u.Plan === plan);
+  updateUsersTable(filtered);
+}
+
+// ── PLANS ──
+function renderPlans() {
+  updatePlansTable(allUsers);
+}
+
+function updatePlansTable(users) {
+  document.getElementById('plansTableBody').innerHTML = users.map(u => `
+    <tr>
+      <td>${u.prenom || '—'}</td>
+      <td style="font-size:11px">${u.Email || '—'}</td>
+      <td><span class="plan-badge plan-${u.Plan || 'essentiel'}">${u.Plan || 'essentiel'}</span></td>
+      <td>
+        <select class="filter-select" style="font-size:11px;padding:5px 10px" onchange="quickChangePlan('${u.id}', this.value)">
+          <option value="essentiel" ${(u.Plan||'essentiel')==='essentiel'?'selected':''}>Essentiel — 39€</option>
+          <option value="complet" ${u.Plan==='complet'?'selected':''}>Complet — 69€</option>
+          <option value="premium" ${u.Plan==='premium'?'selected':''}>Premium — 99€</option>
+        </select>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4" class="empty">Aucun utilisateur</td></tr>';
+}
+
+function filterPlans() {
+  const q = document.getElementById('planSearch').value.toLowerCase();
+  updatePlansTable(allUsers.filter(u => (u.Email||'').toLowerCase().includes(q) || (u.prenom||'').toLowerCase().includes(q)));
+}
+
+async function quickChangePlan(userId, newPlan) {
+  await sb.from('Users').update({ Plan: newPlan }).eq('id', userId);
+  const u = allUsers.find(u => u.id === userId);
+  if (u) u.Plan = newPlan;
+  showToast('Plan mis à jour → ' + newPlan);
+  renderDashboard();
+  renderRevenus();
+}
+
+// ── USER MODAL ──
+function openUserModal(user) {
+  editingUser = user;
+  document.getElementById('userModalTitle').textContent = (user.prenom || user.Email?.split('@')[0] || 'Utilisateur');
+  document.getElementById('userModalPlan').value = user.Plan || 'essentiel';
+  document.getElementById('userModalInfo').innerHTML = `
+    <div class="info-item"><div class="info-label">Email</div><div class="info-value">${user.Email || '—'}</div></div>
+    <div class="info-item"><div class="info-label">Prénom</div><div class="info-value">${user.prenom || '—'}</div></div>
+    <div class="info-item"><div class="info-label">Inscription</div><div class="info-value">${new Date(user.created_at).toLocaleDateString('fr-FR')}</div></div>
+    <div class="info-item"><div class="info-label">Déménagement</div><div class="info-value">${user.date_emmenagement ? new Date(user.date_emmenagement).toLocaleDateString('fr-FR') : '—'}</div></div>
+    <div class="info-item"><div class="info-label">Type logement</div><div class="info-value">${user.type_logement || '—'}</div></div>
+    <div class="info-item"><div class="info-label">Ville</div><div class="info-value">${user.ville || '—'}</div></div>`;
+  document.getElementById('userModal').classList.add('open');
+}
+
+async function saveUserPlan() {
+  if (!editingUser) return;
+  const newPlan = document.getElementById('userModalPlan').value;
+  await sb.from('Users').update({ Plan: newPlan }).eq('id', editingUser.id);
+  const u = allUsers.find(u => u.id === editingUser.id);
+  if (u) u.Plan = newPlan;
+  closeModal('userModal');
+  renderDashboard(); renderUsers(); renderPlans(); renderRevenus();
+  showToast('Plan mis à jour !');
+}
+
+async function deleteUser(id, email) {
+  if (!confirm('Supprimer définitivement ' + email + ' ? Cette action est irréversible.')) return;
+  await sb.from('Users').delete().eq('id', id);
+  allUsers = allUsers.filter(u => u.id !== id);
+  renderDashboard(); renderUsers(); renderPlans();
+  showToast('Utilisateur supprimé.');
+}
+
+// ── EMAIL ──
+function openEmailModal(email) {
+  document.getElementById('emailTo').value = email;
+  document.getElementById('emailSubject').value = '';
+  document.getElementById('emailBody').value = '';
+  document.getElementById('emailModal').classList.add('open');
+}
+
+async function sendEmail() {
+  const to = document.getElementById('emailTo').value;
+  const subject = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
+  if (!subject || !body) { alert('Remplis le sujet et le message.'); return; }
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
+    body: JSON.stringify({
+      from: 'Le Move <bonjour@lemove.fr>', to,
+      subject,
+      html: '<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px">' + body.replace(/\n/g,'<br>') + '<br><br><hr><p style="font-size:11px;color:#9C8B7E">L\'équipe Le Move · lemove.fr</p></div>'
+    })
+  });
+  closeModal('emailModal');
+  showToast('Email envoyé à ' + to);
+}
+
+// ── CANDIDATURES ──
+function renderCandidatures() {
+  document.getElementById('candidaturesCount').textContent = allCandidatures.length + ' candidatures';
+  updateCandidaturesList(allCandidatures);
+}
+
+function filterCandidatures() {
+  const q = document.getElementById('candidatureSearch').value.toLowerCase();
+  const status = document.getElementById('candidatureStatusFilter').value;
+  let filtered = allCandidatures;
+  if (q) filtered = filtered.filter(c => (c.nom||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.entreprise||'').toLowerCase().includes(q));
+  if (status) filtered = filtered.filter(c => c.statut === status);
+  updateCandidaturesList(filtered);
+}
+
+function updateCandidaturesList(list) {
+  document.getElementById('candidaturesList').innerHTML = list.map(c => `
+    <div style="background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
         <div>
-          <div class="card-name">${c.prenom} ${c.nom} — ${c.entreprise}</div>
-          <div class="card-meta">${c.activite} · ${c.zone} · Candidaté le ${date}</div>
+          <div style="font-size:14px;font-weight:400">${c.prenom} ${c.nom} — ${c.entreprise}</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:2px">${c.activite} · ${c.zone} · ${new Date(c.created_at).toLocaleDateString('fr-FR')}</div>
         </div>
-        <div class="card-status status-${c.statut}">${c.statut === 'en_attente' ? 'En attente' : c.statut === 'valide' ? '✓ Validé' : '✕ Refusé'}</div>
+        <span style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 12px;border-radius:20px;${c.statut==='en_attente'?'background:rgba(184,154,106,0.12);color:var(--gold)':c.statut==='valide'?'background:rgba(122,140,126,0.12);color:var(--sage)':'background:rgba(196,113,74,0.1);color:var(--terracotta)'}">${c.statut==='en_attente'?'En attente':c.statut==='valide'?'✓ Validé':'✕ Refusé'}</span>
       </div>
-      <div class="card-body">
-        <div class="card-field"><div class="card-field-label">Email</div><div class="card-field-value"><a href="mailto:${c.email}" style="color:var(--terracotta)">${c.email}</a></div></div>
-        <div class="card-field"><div class="card-field-label">Téléphone</div><div class="card-field-value">${c.telephone || '—'}</div></div>
-        <div class="card-field"><div class="card-field-label">SIRET</div><div class="card-field-value">${c.siret || '—'}</div></div>
-        <div class="card-field"><div class="card-field-label">Site web</div><div class="card-field-value">${c.site ? `<a href="${c.site}" target="_blank" style="color:var(--terracotta)">${c.site}</a>` : '—'}</div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+        <div><div style="font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)">Email</div><div style="font-size:11px">${c.email}</div></div>
+        <div><div style="font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)">SIRET</div><div style="font-size:11px">${c.siret||'—'}</div></div>
+        <div><div style="font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)">Téléphone</div><div style="font-size:11px">${c.telephone||'—'}</div></div>
       </div>
-      ${c.message ? `<div class="card-message">"${c.message}"</div>` : ''}
-      <div class="card-docs">
-        ${c.kbis_url ? `<button class="doc-btn" onclick="viewDoc('${c.kbis_url}')">📄 Kbis</button>` : '<span style="font-size:10px;color:var(--terracotta)">⚠ Kbis manquant</span>'}
-        ${c.rc_pro_url ? `<button class="doc-btn" onclick="viewDoc('${c.rc_pro_url}')">🛡️ RC Pro</button>` : '<span style="font-size:10px;color:var(--terracotta)">⚠ RC Pro manquant</span>'}
-        ${c.diplomes_url ? `<button class="doc-btn" onclick="viewDoc('${c.diplomes_url}')">🎓 Diplômes</button>` : ''}
+      ${c.message?`<div style="background:var(--cream);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text-light);font-style:italic;margin-bottom:12px">"${c.message}"</div>`:''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${c.kbis_url?`<button class="action-btn btn-edit" onclick="viewDoc('${c.kbis_url}')">📄 Kbis</button>`:'<span style="font-size:10px;color:var(--terracotta)">⚠ Kbis manquant</span>'}
+        ${c.rc_pro_url?`<button class="action-btn btn-edit" onclick="viewDoc('${c.rc_pro_url}')">🛡️ RC Pro</button>`:''}
+        ${c.diplomes_url?`<button class="action-btn btn-edit" onclick="viewDoc('${c.diplomes_url}')">🎓 Diplômes</button>`:''}
+        <div style="flex:1"></div>
+        <button class="action-btn btn-email" onclick="openEmailModal('${c.email}')">✉ Contacter</button>
+        ${c.statut==='en_attente'?`
+        <button class="action-btn btn-validate" onclick="validerCandidature('${c.id}','${c.email}','${c.prenom}','${c.nom}')">✓ Valider</button>
+        <button class="action-btn btn-refuse" onclick="refuserCandidature('${c.id}','${c.email}','${c.prenom}')">✕ Refuser</button>`:''}
       </div>
-      ${isAttente ? `<div class="card-actions">
-        <button class="btn-valider" onclick="valider('${c.id}','${c.email}','${c.prenom}','${c.nom}')">✓ Valider</button>
-        <button class="btn-refuser" onclick="refuser('${c.id}','${c.email}','${c.prenom}')">✕ Refuser</button>
-        <a href="mailto:${c.email}" class="btn-contact">✉ Contacter</a>
-      </div>` : `<div style="font-size:11px;font-weight:200;color:var(--text-light);font-style:italic">
-        ${c.statut === 'valide' ? '✓ Dossier validé — lien Stripe envoyé' : '✕ Candidature refusée'}
-      </div>`}
-    </div>`;
-  }).join('');
+    </div>`).join('') || '<div class="empty">Aucune candidature</div>';
 }
 
 async function viewDoc(path) {
@@ -208,94 +643,170 @@ async function viewDoc(path) {
   if (data?.signedUrl) window.open(data.signedUrl, '_blank');
 }
 
-async function valider(id, email, prenom, nom) {
-  if (!confirm(`Valider la candidature de ${prenom} ${nom} et envoyer le lien de paiement ?`)) return;
+async function validerCandidature(id, email, prenom, nom) {
+  if (!confirm('Valider la candidature de ' + prenom + ' ' + nom + ' et envoyer le lien de paiement ?')) return;
   await sb.from('candidatures_partenaires').update({ statut: 'valide', stripe_link_sent: true }).eq('id', id);
-
-  // Send validation email with Stripe link
-  // TODO: Replace with real Stripe payment link after creating it
-  const stripeLink = 'https://buy.stripe.com/9B63cv9HickT8pLeF56EU06';
-
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
     body: JSON.stringify({
-      from: 'Le Move <bonjour@lemove.fr>',
-      to: email,
+      from: 'Le Move <bonjour@lemove.fr>', to: email,
       subject: '✦ Votre candidature Partenaire Le Move est validée !',
-      html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#F7F3EE;padding:40px 20px">
-        <div style="max-width:560px;margin:0 auto;background:white;border-radius:16px;overflow:hidden">
-          <div style="background:#2C1F14;padding:40px;text-align:center">
-            <div style="font-family:Georgia,serif;font-style:italic;font-size:28px;color:#F7F3EE">Le Move</div>
+      html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto">
+        <div style="background:#2C1F14;padding:32px;text-align:center;border-radius:16px 16px 0 0">
+          <div style="font-family:Georgia,serif;font-style:italic;font-size:24px;color:#F7F3EE">Le Move</div>
+        </div>
+        <div style="background:white;padding:40px;border-radius:0 0 16px 16px">
+          <h2 style="font-family:Georgia,serif;font-style:italic;font-weight:300;color:#2C1F14">Félicitations ${prenom} ! ✦</h2>
+          <p style="color:#6B5C4E;line-height:1.8">Votre candidature a été <strong>validée</strong>. Bienvenue dans le réseau Le Move !</p>
+          <div style="background:#F7F3EE;border-radius:12px;padding:20px;margin:20px 0">
+            <div style="font-family:Georgia,serif;font-size:40px;color:#2C1F14;text-align:center">39€<span style="font-size:16px">/mois</span></div>
+            <div style="text-align:center;font-size:11px;color:#9C8B7E">Tarif Fondateurs · Sans engagement · Garanti 6 mois</div>
           </div>
-          <div style="padding:40px">
-            <div style="font-family:Georgia,serif;font-style:italic;font-size:26px;color:#2C1F14;margin-bottom:16px">Félicitations ${prenom} ! ✦</div>
-            <p style="font-size:14px;color:#6B5C4E;line-height:1.8;margin-bottom:24px">
-              Votre candidature Partenaire Le Move a été examinée et <strong>validée</strong>. Bienvenue dans notre réseau de professionnels de confiance !
-            </p>
-            <div style="background:#F7F3EE;border-radius:12px;padding:24px;margin-bottom:28px">
-              <div style="font-size:13px;font-weight:bold;color:#2C1F14;margin-bottom:12px">Ce qui vous attend :</div>
-              <div style="font-size:12px;color:#6B5C4E;line-height:2">
-                ✦ Badge "Partenaire vérifié" dans l'annuaire<br>
-                📊 Dashboard stats (vues, clics, contacts)<br>
-                💬 Messagerie directe avec les utilisateurs<br>
-                📍 Mise en avant dans votre zone géographique<br>
-                📈 Accès aux données de votre secteur
-              </div>
-            </div>
-            <div style="background:#2C1F14;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">
-              <div style="font-size:12px;color:rgba(247,243,238,0.5);margin-bottom:8px">Tarif Fondateurs · Offre limitée</div>
-              <div style="font-family:Georgia,serif;font-size:48px;color:#F7F3EE;line-height:1">39€<span style="font-size:16px">/mois</span></div>
-              <div style="font-size:11px;color:rgba(247,243,238,0.4);margin-top:4px">Sans engagement · Garanti 6 mois</div>
-            </div>
-            <div style="text-align:center;margin-bottom:24px">
-              <a href="${stripeLink}" style="display:inline-block;background:#C4714A;color:white;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase">
-                Activer mon accès Partenaire →
-              </a>
-            </div>
-            <p style="font-size:11px;color:#9C8B7E;text-align:center">Des questions ? Répondez à cet email, nous répondons sous 24h.</p>
+          <div style="text-align:center">
+            <a href="${STRIPE_LINK}" style="background:#C4714A;color:white;padding:14px 32px;border-radius:8px;text-decoration:none;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;display:inline-block">Activer mon accès →</a>
           </div>
         </div>
-      </body></html>`
-    })
-  });
-
-  const c = candidatures.find(c => c.id === id);
-  if (c) c.statut = 'valide';
-  updateStats();
-  renderList();
-  alert('✓ Candidature validée et email envoyé !');
-}
-
-async function refuser(id, email, prenom) {
-  const raison = prompt('Motif de refus (optionnel) :');
-  if (raison === null) return;
-  await sb.from('candidatures_partenaires').update({ statut: 'refuse' }).eq('id', id);
-
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn' },
-    body: JSON.stringify({
-      from: 'Le Move <bonjour@lemove.fr>',
-      to: email,
-      subject: 'Votre candidature Partenaire Le Move',
-      html: `<div style="font-family:Arial,sans-serif;padding:40px;max-width:560px;margin:0 auto">
-        <div style="font-family:Georgia,serif;font-style:italic;font-size:24px;color:#2C1F14;margin-bottom:20px">Le Move</div>
-        <p style="font-size:14px;color:#6B5C4E;line-height:1.8">Bonjour ${prenom},</p>
-        <p style="font-size:14px;color:#6B5C4E;line-height:1.8">Nous avons examiné votre candidature et ne sommes pas en mesure de l'accepter à ce stade.${raison ? '<br><br>Motif : ' + raison : ''}</p>
-        <p style="font-size:14px;color:#6B5C4E;line-height:1.8">Vous pouvez soumettre une nouvelle candidature dans 3 mois ou contacter notre équipe pour plus d'informations.</p>
-        <p style="font-size:12px;color:#9C8B7E;margin-top:24px">L'équipe Le Move · bonjour@lemove.fr</p>
       </div>`
     })
   });
-
-  const c = candidatures.find(c => c.id === id);
-  if (c) c.statut = 'refuse';
-  updateStats();
-  renderList();
-  alert('✕ Candidature refusée et email envoyé.');
+  const c = allCandidatures.find(c => c.id === id);
+  if (c) c.statut = 'valide';
+  renderDashboard(); renderCandidatures();
+  showToast('✓ Validé — email envoyé à ' + email);
 }
 
+async function refuserCandidature(id, email, prenom) {
+  const raison = prompt('Motif de refus (optionnel) :');
+  if (raison === null) return;
+  await sb.from('candidatures_partenaires').update({ statut: 'refuse' }).eq('id', id);
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
+    body: JSON.stringify({
+      from: 'Le Move <bonjour@lemove.fr>', to: email,
+      subject: 'Votre candidature Partenaire Le Move',
+      html: `<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px">
+        <p>Bonjour ${prenom},</p>
+        <p>Nous avons examiné votre candidature et ne sommes pas en mesure de l'accepter à ce stade.${raison?'<br><br>Motif : '+raison:''}</p>
+        <p style="color:#9C8B7E;font-size:12px">L'équipe Le Move</p>
+      </div>`
+    })
+  });
+  const c = allCandidatures.find(c => c.id === id);
+  if (c) c.statut = 'refuse';
+  renderDashboard(); renderCandidatures();
+  showToast('✕ Refusé — email envoyé.');
+}
+
+// ── PARTENAIRES ──
+function renderPartenaires() {
+  document.getElementById('partenairesCount').textContent = allPartenaires.length + ' partenaires';
+  document.getElementById('partenairesTableBody').innerHTML = allPartenaires.map(p => `
+    <tr>
+      <td><strong>${p.entreprise||'—'}</strong></td>
+      <td>${p.activite||'—'}</td>
+      <td>${p.zone||'—'}</td>
+      <td>${p.vues||0}</td>
+      <td>${p.contacts||0}</td>
+      <td><span style="font-size:10px;font-weight:300" class="${p.statut==='actif'?'status-actif':'status-suspendu'}">● ${p.statut||'actif'}</span></td>
+      <td style="display:flex;gap:5px">
+        <button class="action-btn btn-edit" onclick="openPartenaireModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Modifier</button>
+        <button class="action-btn btn-email" onclick="openEmailModal('${p.email}')">Email</button>
+        <button class="action-btn btn-suspend" onclick="togglePartenaire('${p.id}','${p.statut}')">${p.statut==='actif'?'Suspendre':'Réactiver'}</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" class="empty">Aucun partenaire actif</td></tr>';
+}
+
+function openPartenaireModal(p) {
+  document.getElementById('partenaireModalId').value = p.id;
+  document.getElementById('pmEntreprise').value = p.entreprise || '';
+  document.getElementById('pmActivite').value = p.activite || '';
+  document.getElementById('pmZone').value = p.zone || '';
+  document.getElementById('pmStatut').value = p.statut || 'actif';
+  document.getElementById('partenaireModal').classList.add('open');
+}
+
+async function savePartenaire() {
+  const id = document.getElementById('partenaireModalId').value;
+  const updates = {
+    entreprise: document.getElementById('pmEntreprise').value,
+    activite: document.getElementById('pmActivite').value,
+    zone: document.getElementById('pmZone').value,
+    statut: document.getElementById('pmStatut').value,
+  };
+  await sb.from('partenaires').update(updates).eq('id', id);
+  const p = allPartenaires.find(p => p.id === id);
+  if (p) Object.assign(p, updates);
+  closeModal('partenaireModal');
+  renderPartenaires(); renderDashboard();
+  showToast('Partenaire mis à jour !');
+}
+
+async function togglePartenaire(id, currentStatus) {
+  const newStatus = currentStatus === 'actif' ? 'suspendu' : 'actif';
+  if (!confirm(newStatus === 'suspendu' ? 'Suspendre ce partenaire ?' : 'Réactiver ce partenaire ?')) return;
+  await sb.from('partenaires').update({ statut: newStatus }).eq('id', id);
+  const p = allPartenaires.find(p => p.id === id);
+  if (p) p.statut = newStatus;
+  renderPartenaires(); renderDashboard();
+  showToast(newStatus === 'actif' ? 'Partenaire réactivé !' : 'Partenaire suspendu.');
+}
+
+// ── REVENUS ──
+function renderRevenus() {
+  const essentiel = allUsers.filter(u => u.Plan === 'essentiel').length;
+  const complet = allUsers.filter(u => u.Plan === 'complet').length;
+  const premium = allUsers.filter(u => u.Plan === 'premium').length;
+  const partenairesActifs = allPartenaires.filter(p => p.statut === 'actif').length;
+
+  const mrrUsers = (essentiel * 39) + (complet * 69) + (premium * 99);
+  const mrrPart = partenairesActifs * 39;
+  const mrrTotal = mrrUsers + mrrPart;
+
+  document.getElementById('mrrTotal').textContent = mrrTotal.toLocaleString('fr-FR') + '€';
+  document.getElementById('mrrUsers').textContent = mrrUsers.toLocaleString('fr-FR') + '€';
+  document.getElementById('mrrPartenaires').textContent = mrrPart.toLocaleString('fr-FR') + '€';
+
+  document.getElementById('revenusBreakdown').innerHTML = [
+    { name: 'Essentiel', count: essentiel, price: 39, color: 'var(--sand)' },
+    { name: 'Complet', count: complet, price: 69, color: 'var(--gold)' },
+    { name: 'Premium', count: premium, price: 99, color: 'var(--terracotta)' },
+    { name: 'Partenaires', count: partenairesActifs, price: 39, color: 'var(--sage)' },
+  ].map(r => `
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0"></div>
+      <div style="flex:1;font-size:13px;font-weight:300">${r.name}</div>
+      <div style="font-size:12px;color:var(--text-light)">${r.count} × ${r.price}€</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;width:100px;text-align:right">${(r.count*r.price).toLocaleString('fr-FR')}€/mois</div>
+    </div>
+    <div style="height:3px;background:var(--linen);border-radius:2px;overflow:hidden">
+      <div style="height:100%;background:${r.color};width:${mrrTotal>0?Math.round((r.count*r.price/mrrTotal)*100):0}%;border-radius:2px;transition:width 0.6s ease"></div>
+    </div>`).join('');
+}
+
+// ── NAVIGATION ──
+function showSection(name, btn) {
+  ['Dashboard','Users','Plans','Candidatures','Partenaires','Revenus'].forEach(s => {
+    document.getElementById('section' + s).style.display = s.toLowerCase() === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const titles = { dashboard: 'Dashboard', users: 'Utilisateurs', plans: 'Plans', candidatures: 'Candidatures', partenaires: 'Partenaires', revenus: 'Revenus' };
+}
+
+// ── UTILS ──
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
 document.getElementById('adminPwd')?.addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
 </script>
 </body>
