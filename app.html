@@ -594,8 +594,8 @@ async function loadApp(user) {
 
   const { data: userData, error: userError } = await sb.from('Users').select('Plan').eq('Email', user.email).maybeSingle();
   if (userError) console.warn('Users query:', userError.message);
-  // Always read plan fresh from DB — never trust localStorage alone
-  const { data: freshUser } = await sb.from('Users').select('Plan').eq('id', user.id).single();
+  // Always read plan fresh from DB by email (Users.id is bigint, not uuid)
+  const { data: freshUser } = await sb.from('Users').select('Plan').ilike('Email', user.email).maybeSingle();
   currentPlan = (freshUser?.Plan || userData?.Plan || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
