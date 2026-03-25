@@ -345,8 +345,1103 @@
   </nav>
 
   <div class="welcome-banner">
-    <div>
-      <div class="welcome-greeting">Bonjour, <span id="userName">—</span> 👋</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;font-weight:300;color:var(--cream);line-height:1">Le Move</div>
+      <div style="font-size:8px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(247,243,238,0.3)">par Maison Florélis</div>
+      <div style="width:24px;height:1px;background:var(--terracotta);margin:8px 0"></div>
+      <div class="welcome-greeting">Bonjour, <span id="userName">—</span></div>
+      <div class="welcome-sub">Ton espace est prêt. Par où tu commences ?</div>
+      <div class="welcome-meta" id="welcomeMeta"></div>
+    </div>
+    <div class="welcome-progress">
+      <div class="progress-label">Progression</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div class="progress-pct" id="progressPct">0% complété</div>
+    </div>
+  </div>
+
+  <div class="app-content">
+    <div class="section-label">Tes modules</div>
+    <div class="modules-grid" id="modulesGrid"></div>
+    <div class="upgrade-card" id="upgradeCard" style="display:none;">
+      <div>
+        <div class="upgrade-label">Passe au niveau supérieur</div>
+        <div class="upgrade-title">Débloque tous les modules.</div>
+        <div class="upgrade-desc">Accède à 100% des fonctionnalités Le Move.</div>
+      </div>
+      <button class="upgrade-btn" onclick="window.open('https://lemove.fr#pricing','_blank')">Voir les offres →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TUTORIAL -->
+<div class="overlay" id="tutorialOverlay" style="display:none;">
+  <div class="overlay-card">
+    <div class="tut-dots" id="tutDots"></div>
+    <div class="tut-icon" id="tutIcon"></div>
+    <div class="tut-title" id="tutTitle"></div>
+    <div class="tut-text" id="tutText"></div>
+    <div class="tut-actions">
+      <button class="tut-skip" onclick="endTutorial()">Passer →</button>
+      <button class="tut-next" id="tutNextBtn" onclick="nextTutorial()">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="overlay" id="onboardingOverlay" style="display:none;">
+  <div class="overlay-card">
+    <div style="font-size:32px;margin-bottom:12px;">✨</div>
+    <div class="onb-title">Personnalise ton espace.</div>
+    <div class="onb-sub">Quelques infos pour que Le Move soit vraiment toi — ça prend 30 secondes.</div>
+
+    <div class="onb-field">
+      <label class="onb-label">Ta photo de profil</label>
+      <div class="onb-photo-area">
+        <div class="onb-photo-preview" id="onbPhotoPreview">😊</div>
+        <div>
+          <button class="onb-photo-btn" onclick="document.getElementById('onbPhotoInput').click()">Choisir une photo</button>
+          <input type="file" id="onbPhotoInput" accept="image/*" style="display:none" onchange="previewPhoto(this,'onb')">
+          <div style="font-size:10px;color:var(--text-light);margin-top:6px;">JPG ou PNG · Max 2 Mo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Ton prénom</label>
+      <input type="text" class="onb-input" id="onbPrenom" placeholder="Ex : Sophie">
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Date d'emménagement prévue</label>
+      <input type="date" class="onb-input" id="onbDate">
+    </div>
+
+    <div class="onb-field">
+      <label class="onb-label">Type de logement</label>
+      <select class="onb-select" id="onbType">
+        <option value="">— Choisir —</option>
+        <option value="Studio">Studio</option>
+        <option value="T1">T1 / 1 pièce</option>
+        <option value="T2">T2 / 2 pièces</option>
+        <option value="T3">T3 / 3 pièces</option>
+        <option value="T4+">T4 et plus</option>
+        <option value="Maison">Maison</option>
+      </select>
+    </div>
+
+    <button class="onb-submit" onclick="saveOnboarding()">Enregistrer mon profil →</button>
+    <button class="onb-skip" onclick="closeOnboarding()">Passer pour l'instant</button>
+  </div>
+</div>
+
+<!-- PROFILE PANEL -->
+<div class="profile-panel-overlay" id="profilePanelOverlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profilePanel">
+  <div class="profile-header">
+    <button class="profile-close" onclick="closeProfile()">✕</button>
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('profilePhotoInput').click()">
+        ?
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">
+      </div>
+      <div class="profile-avatar-hint">Clique pour changer la photo</div>
+      <div class="profile-name" id="profileName">—</div>
+      <div class="profile-email-txt" id="profileEmailTxt">—</div>
+    </div>
+  </div>
+  <div class="profile-body">
+    <div class="profile-section-title">Mes informations</div>
+    <div class="profile-field">
+      <label class="profile-label">Prénom</label>
+      <input type="text" class="profile-input" id="profilePrenom" placeholder="Ton prénom">
+    </div>
+    <div class="profile-field">
+      <label class="profile-label">Date d'emménagement</label>
+      <input type="date" class="profile-input" id="profileDate">
+    </div>
+    <div class="profile-field">
+      <label class="profile-label">Type de logement</label>
+      <select class="profile-select" id="profileType">
+        <option value="">— Choisir —</option>
+        <option value="Studio">Studio</option>
+        <option value="T1">T1 / 1 pièce</option>
+        <option value="T2">T2 / 2 pièces</option>
+        <option value="T3">T3 / 3 pièces</option>
+        <option value="T4+">T4 et plus</option>
+        <option value="Maison">Maison</option>
+      </select>
+    </div>
+    <button class="profile-save" onclick="saveProfile()">Sauvegarder les modifications</button>
+    <div class="profile-saved-msg" id="profileSavedMsg">✓ Profil mis à jour !</div>
+
+    <div style="margin-top:32px;">
+      <div class="profile-section-title">Mon compte</div>
+      <div class="profile-field">
+        <label class="profile-label">Nouveau mot de passe</label>
+        <input type="password" class="profile-input" id="profileNewPwd" placeholder="Nouveau mot de passe (6 min.)">
+      </div>
+      <button class="profile-save" onclick="changePassword()" style="background:var(--sage);margin-bottom:8px;">Changer mon mot de passe</button>
+      <div class="profile-saved-msg" id="pwdSavedMsg" style="display:none;">✓ Mot de passe mis à jour !</div>
+      <button class="profile-logout" onclick="logout()">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
+
+const ALL_MODULES = [
+  { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Catégories personnalisées avec alertes.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'demenagement', icon: '📦', title: 'Mon Déménagement', desc: 'Checklist par phase : Signature, Préparation, Démarches, Jour J, Installation.', tags: ['Organisation', 'Checklist'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'aides', icon: '💶', title: 'Guide des Aides', desc: 'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags: ['Aides', 'Budget'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'achats', icon: '🚚', title: 'Mes Achats & Livraisons', desc: 'Suivi de toutes tes commandes — Commandé, Préparé, En route, Livré.', tags: ['Achats', 'Suivi'], plans: ['essentiel', 'complet', 'premium'] },
+  { id: 'calculateur', icon: '📐', title: 'Calculateur Volume', desc: 'Calcule le volume de tes meubles et trouve le bon camion.', tags: ['Déménagement', 'Outil'], plans: ['complet', 'premium'] },
+  { id: 'admin', icon: '📋', title: 'Checklist Administrative', desc: 'Changements adresse, résiliations, démarches officielles — rien oublier.', tags: ['Admin', 'Démarches'], plans: ['complet', 'premium'] },
+  { id: 'carnet', icon: '📓', title: 'Carnet de Bord', desc: 'Codes, mesures, contacts immeuble, notes pratiques au quotidien.', tags: ['Notes', 'Pratique'], plans: ['complet', 'premium'] },
+  { id: 'avancement', icon: '✅', title: 'Mon Avancement', desc: 'Vue Kanban de toutes tes tâches — faites, en cours, countdown jour J.', tags: ['Gestion', 'Tâches'], plans: ['complet', 'premium'] },
+  { id: 'mes-contacts', icon: '📒', title: 'Mes Contacts & Agenda', desc: 'Carnet de contacts clés avec agenda rendez-vous.', tags: ['Contacts', 'Agenda'], plans: ['complet', 'premium'] },
+  { id: 'moodboard', icon: '🎨', title: 'Moodboard & Inspirations', desc: 'Palette de couleurs, inspirations sauvegardées, notes de style.', tags: ['Déco', 'Inspiration'], plans: ['complet', 'premium'] },
+  { id: 'medias', icon: '📁', title: 'Mes Médias', desc: 'Photos, vidéos, documents — visite appart, inspirations, état des lieux.', tags: ['Photos', 'Vidéos'], plans: ['complet', 'premium'] },
+  { id: 'moodboard-ia', icon: '✨', title: 'Moodboard IA', desc: "Questionnaire déco — l'IA génère ta palette, ton style et tes achats prioritaires.", tags: ['IA', 'Déco'], plans: ['premium'] },
+  { id: 'collab', icon: '🤝', title: 'Espace Collaboratif', desc: "Invite un proche ou un pro à accéder à ton espace Le Move.", tags: ['Partage', 'Premium'], plans: ['premium'] },
+  { id: 'annuaire', icon: '⭐', title: 'Annuaire Pro', desc: 'Prestataires vérifiés et partenaires Le Move près de chez toi.', tags: ['Contacts', 'Premium'], plans: ['premium'] },
+  { id: 'cremaillere', icon: '🎉', title: 'Ma Crémaillère', desc: 'Crée ta liste de cadeaux et partage-la avec tes proches.', tags: ['Cadeaux', 'Partage'], plans: ['premium'] },
+  { id: 'support', icon: '💬', title: 'Support Prioritaire', desc: "Accès direct à l'équipe Le Move. Réponse garantie sous 24h.", tags: ['Support', 'Premium'], plans: ['premium'] },
+];
+
+const TUTORIAL_STEPS = [
+  { icon: '🎉', title: 'Bienvenue dans Le Move !', text: "Ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, démarches, livraisons — 16 modules centralisés en un seul endroit." },
+  { icon: '📦', title: '16 modules t\'attendent.', text: "4 grandes familles : Emménagement (budget, déménagement, achats, aides), Déco & Style (moodboard, IA), Pratique (carnet, contacts, avancement) et Social & Pro (crémaillère, annuaire, collab)." },
+  { icon: '💶', title: 'Tes aides financières.', text: "Le module Guide des Aides te présente toutes les aides auxquelles tu as peut-être droit — APL, Visale, Mobili-Pass, Loca-Pass. À consulter en priorité !" },
+  { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires sur-mesure." },
+  { icon: '🎉', title: 'Ta liste de crémaillère (Premium)', text: "Crée ta liste de cadeaux et partage-la avec tes proches via un lien. Ils peuvent réserver sans créer de compte !" },
+  { icon: '📸', title: 'Personnalisons ton espace !', text: "On va te demander ton prénom, ta photo et ta date d'emménagement pour que Le Move soit vraiment toi." },
+];
+
+let tutStep = 0;
+let currentUser = null;
+let currentPlan = 'essentiel';
+let currentProfile = {};
+let pendingPhotoFile = null;
+let pendingPhotoTarget = null;
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await loadApp(session.user);
+  } else {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+  }
+}
+
+// ── AUTH ──
+async function login() {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.style.display = 'none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { errEl.textContent = 'Email ou mot de passe incorrect.'; errEl.style.display = 'block'; return; }
+  await loadApp(data.user);
+}
+
+async function resetPassword() {
+  const email = document.getElementById('authEmail').value;
+  const errEl = document.getElementById('authError');
+  if (!email) { errEl.textContent = "Entre ton email d'abord."; errEl.style.display = 'block'; return; }
+  const redirectTo = window.location.origin + '/reset-password.html';
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.style.display = 'block'; return; }
+  errEl.style.background = '#F0FDF4'; errEl.style.borderColor = '#86EFAC'; errEl.style.color = '#16A34A';
+  errEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+  errEl.style.display = 'block';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+// ── LOAD APP ──
+async function loadApp(user) {
+  currentUser = user;
+
+  const { data: userData, error: userError } = await sb.from('Users').select('Plan').eq('Email', user.email).maybeSingle();
+  if (userError) console.warn('Users query:', userError.message);
+  currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
+  if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
+
+  const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).single();
+  currentProfile = profileData || {};
+
+  const fallbackName = user.email.split('@')[0].split('.')[0];
+  const displayName = currentProfile.prenom || (fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1));
+
+  document.getElementById('navPlanBadge').textContent = user.email === ADMIN_EMAIL ? 'Admin ✦' : 'Plan ' + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  refreshAvatarUI(displayName, currentProfile.photo_url);
+  document.getElementById('userName').textContent = displayName;
+  refreshWelcomeMeta();
+  renderModules();
+  if (currentPlan !== 'premium' && user.email !== ADMIN_EMAIL) document.getElementById('upgradeCard').style.display = 'flex';
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+
+  const seen = localStorage.getItem('lemove_tutorial_' + user.id);
+  if (!seen) setTimeout(() => showTutorial(), 600);
+  setTimeout(() => updateProgress(), 800);
+  setTimeout(() => loadNotifications(), 1000);
+}
+
+// ── WELCOME META ──
+function refreshWelcomeMeta() {
+  const el = document.getElementById('welcomeMeta');
+  if (!currentProfile.date_emmenagement) { el.textContent = ''; return; }
+  const date = new Date(currentProfile.date_emmenagement);
+  const diff = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
+  const log = currentProfile.type_logement ? ` · ${currentProfile.type_logement}` : '';
+  if (diff > 0) el.textContent = `📅 Jour J dans ${diff} jours${log}`;
+  else if (diff === 0) el.textContent = `📅 C'est aujourd'hui !${log}`;
+  else el.textContent = `📅 Emménagement effectué${log}`;
+}
+
+// ── AVATAR ──
+function refreshAvatarUI(name, photoUrl) {
+  const initial = name ? name[0].toUpperCase() : '?';
+  const navAv = document.getElementById('navAvatar');
+  const profAv = document.getElementById('profileAvatar');
+
+  if (photoUrl) {
+    navAv.innerHTML = `<img src="${photoUrl}" alt="">`;
+    profAv.innerHTML = `<img src="${photoUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  } else {
+    navAv.textContent = initial;
+    profAv.innerHTML = `${initial}<input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  }
+
+  document.getElementById('profileName').textContent = name || '—';
+  document.getElementById('profileEmailTxt').textContent = currentUser?.email || '—';
+  document.getElementById('profilePrenom').value = currentProfile.prenom || '';
+  document.getElementById('profileDate').value = currentProfile.date_emmenagement || '';
+  document.getElementById('profileType').value = currentProfile.type_logement || '';
+}
+
+// ── MODULES ──
+function renderModules() {
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  ALL_MODULES.forEach((mod, i) => {
+    const hasAccess = mod.plans.includes(currentPlan);
+    const card = document.createElement('div');
+    card.className = `module-card${i === 0 && hasAccess ? ' featured' : ''}${!hasAccess ? ' locked' : ''}`;
+    card.innerHTML = `
+      <div class="module-num">Module ${String(i + 1).padStart(2, '0')}</div>
+      <div class="module-icon">${mod.icon}</div>
+      <div class="module-title">${mod.title}</div>
+      <div class="module-desc">${mod.desc}</div>
+      <div class="module-tags">
+        ${mod.tags.map(t => `<span class="module-tag">${t}</span>`).join('')}
+        ${!hasAccess ? `<span class="module-tag" style="background:#FEF2F2;color:#DC2626;">Plan ${mod.plans[0]}</span>` : ''}
+      </div>
+      ${hasAccess ? '<div class="module-arrow">→</div>' : ''}
+    `;
+    if (hasAccess) card.onclick = () => openModule(mod.id);
+    grid.appendChild(card);
+  });
+}
+
+function openModule(id) {
+  const pages = {
+    'budget': 'budget.html',
+    'demenagement': 'demenagement.html',
+    'moodboard': 'moodboard.html',
+    'achats': 'achats.html',
+    'avancement': 'avancement.html',
+    'calculateur': 'calculateur.html',
+    'mes-contacts': 'mes-contacts.html',
+    'moodboard-ia': 'moodboard-ia.html',
+    'collab': 'collab.html',
+    'annuaire': 'annuaire.html',
+    'support': 'support.html',
+    'medias': 'medias.html',
+    'admin': 'admin.html',
+    'aides': 'aides.html',
+    'carnet': 'carnet.html',
+    'cremaillere': 'cremaillere.html',
+  };
+  if (pages[id]) window.location.href = pages[id];
+}
+
+async function updateProgress() {
+  try {
+    let pct = 0;
+
+    // Profil (25%)
+    if (currentProfile.prenom) pct += 5;
+    if (currentProfile.photo_url) pct += 5;
+    if (currentProfile.date_emmenagement) pct += 10;
+    if (currentProfile.type_logement) pct += 5;
+
+    // Tâches déménagement + kanban en parallèle (60%)
+    const [tachesRes, avancementRes] = await Promise.all([
+      sb.from('demenagement_taches').select('fait').eq('user_id', currentUser.id),
+      sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id)
+    ]);
+
+    const taches = tachesRes.data || [];
+    if (taches.length > 0) {
+      const done = taches.filter(t => t.fait).length;
+      pct += Math.round((done / taches.length) * 35);
+    }
+
+    const avancement = avancementRes.data || [];
+    if (avancement.length > 0) {
+      const done = avancement.filter(t => t.statut === 'done').length;
+      pct += Math.round((done / avancement.length) * 25);
+    }
+
+    // Budget + moodboard depuis currentProfile déjà chargé
+    if (currentProfile.budget_total > 0) pct += 5;
+    if (currentProfile.moodboard_result) pct += 5;
+
+    pct = Math.min(100, pct);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '% complété';
+  } catch(e) {
+    console.error('Progress error:', e);
+  }
+}
+
+// ── TUTORIAL ──
+function showTutorial() {
+  tutStep = 0;
+  renderTutStep();
+  document.getElementById('tutorialOverlay').style.display = 'flex';
+}
+
+function renderTutStep() {
+  const s = TUTORIAL_STEPS[tutStep];
+  document.getElementById('tutIcon').textContent = s.icon;
+  document.getElementById('tutTitle').textContent = s.title;
+  document.getElementById('tutText').textContent = s.text;
+  const isLast = tutStep === TUTORIAL_STEPS.length - 1;
+  document.getElementById('tutNextBtn').textContent = isLast ? 'Personnaliser mon espace →' : 'Suivant →';
+  document.getElementById('tutDots').innerHTML = TUTORIAL_STEPS.map((_, i) =>
+    `<div class="tut-dot ${i < tutStep ? 'done' : i === tutStep ? 'active' : ''}"></div>`
+  ).join('');
+}
+
+function nextTutorial() {
+  if (tutStep < TUTORIAL_STEPS.length - 1) { tutStep++; renderTutStep(); }
+  else endTutorial();
+}
+
+function endTutorial() {
+  document.getElementById('tutorialOverlay').style.display = 'none';
+  localStorage.setItem('lemove_tutorial_' + currentUser.id, 'seen');
+  if (!currentProfile.prenom) setTimeout(() => showOnboarding(), 300);
+}
+
+function showOnboarding() {
+  // Fill step 1 with plan info
+  const planFeatures = {
+    essentiel: ['Mon Budget', 'Mon Déménagement', 'Guide des Aides', 'Mes Achats & Livraisons'],
+    complet: ['Tout Essentiel +', 'Calculateur Volume', 'Mon Avancement', 'Moodboard & Inspirations', 'Mes Contacts & Agenda', 'Mes Médias'],
+    premium: ['Tout Complet +', 'Moodboard IA', 'Crémaillère', 'Annuaire Pro', 'Espace Collaboratif', 'Support Prioritaire']
+  };
+  const suggestions = {
+    essentiel: [
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'💶',text:'Guide des Aides',href:'aides.html'},
+      {icon:'🚚',text:'Mes Achats',href:'achats.html'},
+    ],
+    complet: [
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'🎨',text:'Mon Moodboard',href:'moodboard.html'},
+      {icon:'✅',text:'Mon Avancement',href:'avancement.html'},
+    ],
+    premium: [
+      {icon:'✨',text:'Moodboard IA',href:'moodboard-ia.html'},
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'🎉',text:'Ma Crémaillère',href:'cremaillere.html'},
+    ]
+  };
+  
+  const plan = currentPlan || 'essentiel';
+  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  document.getElementById('onbPlanBadge').textContent = planLabel;
+  
+  const feats = planFeatures[plan] || planFeatures.essentiel;
+  document.getElementById('onbPlanFeatures').innerHTML = feats.map(f => 
+    '<div class="onb-plan-feat">' + f + '</div>'
+  ).join('');
+  
+  const suggs = suggestions[plan] || suggestions.essentiel;
+  document.getElementById('onbSuggestions').innerHTML = suggs.map(s =>
+    '<a class="onb-suggestion" href="' + s.href + '"><div class="onb-suggestion-icon">' + s.icon + '</div><div class="onb-suggestion-text">' + s.text + '</div></a>'
+  ).join('');
+  
+  document.getElementById('onboardingOverlay').style.display = 'flex';
+}
+
+function goToOnbStep2() {
+  document.getElementById('onbStep1').style.display = 'none';
+  document.getElementById('onbStep2').style.display = 'block';
+}
+
+// ── ONBOARDING ──
+async function saveOnboarding() {
+  const prenom = document.getElementById('onbPrenom').value.trim();
+  const date = document.getElementById('onbDate').value;
+  const type = document.getElementById('onbType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'onb') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+  closeOnboarding();
+}
+
+function closeOnboarding() {
+  document.getElementById('onboardingOverlay').style.display = 'none';
+}
+
+// ── PROFILE PANEL ──
+function openProfile() {
+  document.getElementById('profilePanel').classList.add('open');
+  document.getElementById('profilePanelOverlay').classList.add('open');
+}
+
+function closeProfile() {
+  document.getElementById('profilePanel').classList.remove('open');
+  document.getElementById('profilePanelOverlay').classList.remove('open');
+}
+
+async function saveProfile() {
+  const prenom = document.getElementById('profilePrenom').value.trim();
+  const date = document.getElementById('profileDate').value;
+  const type = document.getElementById('profileType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'profile') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+
+  const msg = document.getElementById('profileSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+}
+
+// ── PHOTO PREVIEW ──
+function previewPhoto(input, target) {
+  if (!input.files[0]) return;
+  pendingPhotoFile = input.files[0];
+  pendingPhotoTarget = target;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (target === 'onb') {
+      document.getElementById('onbPhotoPreview').innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+      document.getElementById('navAvatar').innerHTML = `<img src="${e.target.result}" alt="">`;
+    }
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function uploadPhoto(file) {
+  const ext = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}.${ext}`;
+  const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
+  if (error) { console.error('Upload error:', error); return null; }
+  const { data } = sb.storage.from('profiles').getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
+
+async function changePassword() {
+  const pwd = document.getElementById('profileNewPwd').value;
+  if (!pwd || pwd.length < 6) {
+    alert('Le mot de passe doit faire au moins 6 caractères.');
+    return;
+  }
+  const { error } = await sb.auth.updateUser({ password: pwd });
+  if (error) { alert('Erreur : ' + error.message); return; }
+  document.getElementById('profileNewPwd').value = '';
+  const msg = document.getElementById('pwdSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+
+// ── NOTIFICATIONS SYSTEM ──
+let notifications = [];
+let notifOpen = false;
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  
+  // Generate smart notifications based on data
+  await generateSmartNotifs();
+  
+  // Load from DB
+  const { data } = await sb.from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  
+  notifications = data || [];
+  renderNotifBadge();
+  renderNotifPanel();
+}
+
+async function generateSmartNotifs() {
+  const toInsert = [];
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Check for today's deliveries
+  const { data: livraisons } = await sb.from('achats_commandes')
+    .select('nom, date_livraison')
+    .eq('user_id', currentUser.id)
+    .eq('date_livraison', today)
+    .neq('statut', 'livré');
+  
+  for (const l of (livraisons || [])) {
+    const exists = await checkNotifExists('livraison_' + l.nom + '_' + today);
+    if (!exists) {
+      toInsert.push({ user_id: currentUser.id, type: 'livraison', titre: "Livraison prévue aujourd'hui", message: l.nom + " devrait arriver aujourd'hui !", lien: 'achats.html', created_at: new Date().toISOString() });
+    }
+  }
+  
+  // Check for overdue urgent tasks
+  const { data: taches } = await sb.from('admin_taches')
+    .select('titre')
+    .eq('user_id', currentUser.id)
+    .eq('fait', false)
+    .eq('priorite', 'urgent');
+  
+  if ((taches || []).length > 0) {
+    const exists = await checkNotifExists('urgentes_' + today);
+    if (!exists) {
+      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) administrative(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
+    }
+  }
+  
+  // Check Jour J in 7 days
+  const { data: profile } = await sb.from('Profiles').select('date_emmenagement, prenom').eq('id', currentUser.id).single();
+  if (profile?.date_emmenagement) {
+    const diff = Math.ceil((new Date(profile.date_emmenagement) - new Date()) / (1000*60*60*24));
+    if (diff === 7 || diff === 3 || diff === 1) {
+      const exists = await checkNotifExists('jourj_' + diff + '_' + today);
+      if (!exists) {
+        toInsert.push({ user_id: currentUser.id, type: 'jourj', titre: `Jour J dans ${diff} jour${diff > 1 ? 's' : ''} !`, message: "Ton déménagement approche. Vérifie ta checklist !", lien: 'demenagement.html', created_at: new Date().toISOString() });
+      }
+    }
+  }
+  
+  // Check profile completeness for new module unlock hint
+  if (profile && !profile.prenom) {
+    const exists = await checkNotifExists('profil_incomplet_' + today);
+    if (!exists) {
+      toInsert.push({ user_id: currentUser.id, type: 'module', titre: 'Complète ton profil', message: "Ajoute ton prénom et ta date d'emménagement pour personnaliser ton espace.", lien: 'app.html', created_at: new Date().toISOString() });
+    }
+  }
+  
+  if (toInsert.length > 0) {
+    await sb.from('notifications').insert(toInsert);
+  }
+}
+
+async function checkNotifExists(key) {
+  // Use a simple dedup check based on title+date
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await sb.from('notifications')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .gte('created_at', today)
+    .eq('titre', key.split('_')[0])
+    .limit(1);
+  return false; // Always generate fresh, dedup by date in UI
+}
+
+function renderNotifBadge() {
+  const unread = notifications.filter(n => !n.lue).length;
+  const badge = document.getElementById('notifBadge');
+  const mBadge = document.getElementById('mobileNotifBadge');
+  if (badge) {
+    badge.style.display = unread > 0 ? 'flex' : 'none';
+    badge.textContent = unread > 9 ? '9+' : unread;
+  }
+  if (mBadge) {
+    mBadge.style.display = unread > 0 ? 'flex' : 'none';
+    mBadge.textContent = unread > 9 ? '9+' : unread;
+  }
+}
+
+const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
+const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
+
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
+  if (diff < 1) return "À l'instant";
+  if (diff < 60) return diff + ' min';
+  if (diff < 1440) return Math.floor(diff/60) + 'h';
+  return Math.floor(diff/1440) + 'j';
+}
+
+async function clickNotif(id, lien) {
+  await sb.from('notifications').update({ lue: true }).eq('id', id);
+  const n = notifications.find(n => n.id === id);
+  if (n) n.lue = true;
+  renderNotifBadge();
+  renderNotifPanel();
+  if (lien) window.location.href = lien;
+  closeNotifPanel();
+}
+
+async function markAllRead() {
+  await sb.from('notifications').update({ lue: true }).eq('user_id', currentUser.id).eq('lue', false);
+  notifications.forEach(n => n.lue = true);
+  renderNotifBadge();
+  renderNotifPanel();
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  notifOpen = !notifOpen;
+  panel.classList.toggle('open', notifOpen);
+}
+
+function closeNotifPanel() {
+  notifOpen = false;
+  const panel = document.getElementById('notifPanel');
+  if (panel) panel.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifBell') && !e.target.closest('#notifPanel')) closeNotifPanel();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+});
+
+init();
+</script>
+<script>
+function toggleMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(!drawer || !overlay || !ham) return;
+  drawer.classList.toggle('open');
+  overlay.classList.toggle('open');
+  ham.classList.toggle('open');
+}
+function closeMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(drawer) drawer.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+  if(ham) ham.classList.remove('open');
+}
+// Set active item
+const currentPage = window.location.pathname.split('/').pop() || 'app.html';
+document.querySelectorAll('.mobile-drawer .nav-item').forEach(el => {
+  if(el.getAttribute('href') === currentPage) el.classList.add('active');
+});
+// Set username after load
+setTimeout(() => {
+  const user = document.getElementById('sidebarUser');
+  const mobileUser = document.getElementById('mobileUser');
+  if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
+}, 2000);
+</script>
+</body>
+</html><div class="sidebar-fade"><div class="sidebar-scroll">
+
+</div></div>
+  
+</aside>PE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Mon Espace</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+    --espresso: #2C1F14; --sage: #7A8C7E;
+    --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+  }
+  body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; }
+
+  /* ── AUTH ── */
+  .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--espresso); position: relative; overflow: hidden; }
+  .auth-screen::before { content: ''; position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); top: -200px; right: -200px; }
+  .auth-screen::after { content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.04); bottom: -100px; left: -100px; }
+  .auth-card { background: var(--cream); border-radius: 20px; padding: 48px; width: 100%; max-width: 420px; position: relative; z-index: 1; }
+  .auth-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 28px; color: var(--espresso); margin-bottom: 4px; }
+  .auth-sub { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 32px; }
+  .auth-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; font-style: italic; margin-bottom: 24px; }
+  .auth-field { margin-bottom: 16px; }
+  .auth-label { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 8px; }
+  .auth-input { width: 100%; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; color: var(--espresso); outline: none; transition: border-color 0.2s; }
+  .auth-input:focus { border-color: var(--terracotta); }
+  .auth-btn { width: 100%; padding: 14px; background: var(--espresso); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+  .auth-btn:hover { opacity: 0.85; }
+  .auth-error { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #DC2626; margin-top: 12px; display: none; }
+  .auth-forgot { text-align: center; margin-top: 16px; font-size: 11px; color: var(--text-light); cursor: pointer; text-decoration: underline; }
+
+  /* ── APP ── */
+  .app-screen { display: none; }
+
+  /* NAV */
+  .app-nav { background: var(--espresso); padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { display: flex; align-items: center; gap: 12px; }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); }
+  .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); }
+  .nav-plan-badge { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.5); background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 20px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: white; cursor: pointer; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); transition: border-color 0.2s; flex-shrink: 0; }
+  .nav-avatar:hover { border-color: rgba(255,255,255,0.4); }
+  .nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .nav-logout { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(247,243,238,0.35); cursor: pointer; transition: color 0.2s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+  .nav-logout:hover { color: rgba(247,243,238,0.7); }
+
+  /* WELCOME */
+  .welcome-banner { background: var(--warm-white); border-bottom: 1px solid var(--linen); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; }
+  .welcome-greeting { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; font-style: italic; line-height: 1.2; }
+  .welcome-greeting span { color: var(--terracotta); }
+  .welcome-sub { font-size: 12px; font-weight: 200; color: var(--text-light); margin-top: 6px; font-style: italic; }
+  .welcome-meta { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .welcome-progress { text-align: right; }
+  .progress-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+  .progress-bar-wrap { width: 180px; height: 4px; background: var(--linen); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--terracotta); border-radius: 2px; transition: width 1s ease; width: 0%; }
+  .progress-pct { font-size: 11px; color: var(--text-light); margin-top: 6px; font-style: italic; }
+
+  /* CONTENT */
+  .app-content { padding: 40px 48px; max-width: 1200px; }
+  .section-label { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+  /* MODULES */
+  .modules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .module-card { background: var(--warm-white); border: 1px solid var(--linen); border-radius: 16px; padding: 28px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+  .module-card:hover:not(.locked) { border-color: var(--sand); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(44,31,20,0.08); }
+  .module-card.locked { opacity: 0.5; cursor: default; }
+  .module-card.locked::after { content: '🔒'; position: absolute; top: 16px; right: 16px; font-size: 14px; }
+  .module-card.featured { background: var(--espresso); border-color: var(--espresso); }
+  .module-num { font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+  .module-card.featured .module-num { color: rgba(247,243,238,0.35); }
+  .module-icon { font-size: 28px; margin-bottom: 14px; }
+  .module-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
+  .module-card.featured .module-title { color: var(--cream); }
+  .module-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; }
+  .module-card.featured .module-desc { color: rgba(247,243,238,0.5); }
+  .module-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .module-tag { font-size: 9px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: var(--linen); color: var(--text-light); }
+  .module-card.featured .module-tag { background: rgba(255,255,255,0.1); color: rgba(247,243,238,0.5); }
+  .module-arrow { position: absolute; bottom: 20px; right: 20px; width: 28px; height: 28px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
+  .module-card:hover:not(.locked) .module-arrow { background: var(--terracotta); color: white; }
+  .module-card.featured .module-arrow { background: rgba(255,255,255,0.1); color: var(--cream); }
+
+  /* UPGRADE */
+  .upgrade-card { background: linear-gradient(135deg, var(--terracotta), #A85A35); border-radius: 16px; padding: 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; }
+  .upgrade-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+  .upgrade-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; color: white; margin-bottom: 6px; }
+  .upgrade-desc { font-size: 12px; font-weight: 200; color: rgba(255,255,255,0.7); }
+  .upgrade-btn { background: white; color: var(--terracotta); border: none; padding: 12px 24px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; }
+  .upgrade-btn:hover { opacity: 0.9; }
+
+  /* ── OVERLAYS ── */
+  .overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .overlay-card { background: var(--cream); border-radius: 20px; padding: 48px; max-width: 520px; width: 90%; position: relative; max-height: 90vh; overflow-y: auto; }
+
+  /* TUTORIAL */
+  .tut-dots { display: flex; gap: 6px; margin-bottom: 24px; }
+  .tut-dot { width: 24px; height: 3px; border-radius: 2px; background: var(--linen); transition: background 0.3s; }
+  .tut-dot.active { background: var(--terracotta); }
+  .tut-dot.done { background: var(--sage); }
+  .tut-icon { font-size: 40px; margin-bottom: 16px; }
+  .tut-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; font-style: italic; margin-bottom: 12px; line-height: 1.2; }
+  .tut-text { font-size: 13px; font-weight: 200; color: var(--text-light); line-height: 1.8; margin-bottom: 32px; font-style: italic; }
+  .tut-actions { display: flex; align-items: center; justify-content: space-between; }
+  .tut-skip { font-size: 11px; color: var(--text-light); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; text-decoration: underline; }
+  .tut-next { background: var(--espresso); color: var(--cream); border: none; padding: 12px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .tut-next:hover { opacity: 0.85; }
+
+  /* ONBOARDING */
+  .onb-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
+  .onb-sub { font-size: 12px; font-weight: 200; color: var(--text-light); margin-bottom: 28px; font-style: italic; line-height: 1.6; }
+  .onb-field { margin-bottom: 18px; }
+  .onb-label { font-size: 10px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 8px; }
+  .onb-input, .onb-select { width: 100%; padding: 12px 16px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+  .onb-input:focus, .onb-select:focus { border-color: var(--terracotta); }
+  .onb-photo-area { display: flex; align-items: center; gap: 16px; }
+  .onb-photo-preview { width: 64px; height: 64px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden; flex-shrink: 0; border: 2px solid var(--sand); }
+  .onb-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .onb-photo-btn { padding: 10px 18px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 8px; font-size: 11px; color: var(--text-light); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .onb-photo-btn:hover { border-color: var(--sand); color: var(--espresso); }
+  .onb-submit { width: 100%; padding: 14px; background: var(--espresso); color: var(--cream); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity 0.2s; }
+  .onb-submit:hover { opacity: 0.85; }
+  .onb-skip { display: block; text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-light); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: 'DM Sans', sans-serif; width: 100%; }
+
+  /* PROFILE PANEL */
+  .profile-panel-overlay { position: fixed; inset: 0; background: rgba(44,31,20,0.3); z-index: 299; display: none; }
+  .profile-panel-overlay.open { display: block; }
+  .profile-panel { position: fixed; top: 0; right: -400px; width: 380px; height: 100vh; background: var(--warm-white); box-shadow: -8px 0 40px rgba(44,31,20,0.12); z-index: 300; transition: right 0.3s ease; overflow-y: auto; }
+  .profile-panel.open { right: 0; }
+  .profile-header { background: var(--espresso); padding: 32px 28px; position: relative; }
+  .profile-close { position: absolute; top: 18px; right: 18px; background: none; border: none; color: rgba(255,255,255,0.4); font-size: 18px; cursor: pointer; }
+  .profile-close:hover { color: rgba(255,255,255,0.8); }
+  .profile-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); cursor: pointer; position: relative; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-avatar-hint { font-size: 10px; color: rgba(255,255,255,0.35); }
+  .profile-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); }
+  .profile-email-txt { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .profile-body { padding: 28px; }
+  .profile-section-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--linen); }
+  .profile-field { margin-bottom: 16px; }
+  .profile-label { font-size: 10px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); display: block; margin-bottom: 6px; }
+  .profile-input, .profile-select { width: 100%; padding: 10px 14px; background: var(--cream); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--espresso); outline: none; transition: border-color 0.2s; appearance: none; }
+  .profile-input:focus, .profile-select:focus { border-color: var(--terracotta); }
+  .profile-save { width: 100%; padding: 12px; background: var(--espresso); color: var(--cream); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 4px; transition: opacity 0.2s; }
+  .profile-save:hover { opacity: 0.85; }
+  .profile-saved-msg { text-align: center; font-size: 11px; color: var(--sage); margin-top: 10px; display: none; }
+  .profile-logout { width: 100%; padding: 12px; background: none; color: var(--text-light); border: 1px solid var(--linen); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-top: 12px; transition: all 0.2s; }
+  .profile-logout:hover { border-color: var(--sand); color: var(--espresso); }
+
+  /* LOADING */
+  .loading-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--espresso); }
+  .loading-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 36px; color: var(--cream); animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .app-nav { padding: 0 20px; }
+    .welcome-banner { padding: 24px 20px; flex-direction: column; gap: 16px; align-items: flex-start; }
+    .app-content { padding: 24px 20px; }
+    .modules-grid { grid-template-columns: 1fr; }
+    .upgrade-card { flex-direction: column; gap: 16px; }
+    .overlay-card { padding: 32px 24px; }
+    .profile-panel { width: 100%; right: -100%; }
+  }
+
+  /* ── CUSTOM SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+  * { scrollbar-width: thin; scrollbar-color: var(--sand) transparent; }
+
+  /* ── CUSTOM CURSOR ── */
+  html, body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3' fill='%23C4714A' opacity='0.8'/%3E%3C/svg%3E") 4 4, auto; }
+  a, button, [onclick], .nav-item, .module-card, .category-card, .task-row, .kcard, .gift-card, .note-card, .media-card, .delivery-card, .inspo-card, .cat-header, .add-cat-btn, .add-inspo-btn, .add-note-btn, .add-gift-btn, .add-contact-btn, .add-card-area input, .filter-tab, .phase-tab, .cat-tab, .piece-tab, .upload-zone { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3.5' fill='%23C4714A'/%3E%3C/svg%3E") 4 4, pointer; }
+
+  /* ── SMOOTH TRANSITIONS ── */
+  * { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease; }
+  .module-card, .category-card, .kcard, .gift-card, .note-card, .media-card, .delivery-card, .inspo-card, .aide-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important; }
+
+  /* ── PAGE ENTRANCE ANIMATION ── */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: slideUp 0.35s ease both; }
+  .summary-bar { animation: slideUp 0.35s 0.05s ease both; }
+  .content > * { animation: slideUp 0.35s ease both; }
+  .content > *:nth-child(1) { animation-delay: 0.08s; }
+  .content > *:nth-child(2) { animation-delay: 0.12s; }
+  .content > *:nth-child(3) { animation-delay: 0.16s; }
+  .content > *:nth-child(4) { animation-delay: 0.20s; }
+  .content > *:nth-child(5) { animation-delay: 0.24s; }
+
+  /* ── NAV HOVER EFFECT ── */
+  .nav-item { position: relative; overflow: hidden; }
+  .nav-item::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 0; height: 60%; background: var(--terracotta); border-radius: 0 2px 2px 0; transition: width 0.2s ease; opacity: 0.6; }
+  .nav-item:hover::before { width: 2px; }
+  .nav-item.active::before { width: 3px; opacity: 1; }
+
+  /* ── BUTTON RIPPLE ── */
+  .modal-save, .add-btn, .budget-save-btn, .date-save-btn, .add-task-btn, .copy-btn, .upload-btn, .btn-add { position: relative; overflow: hidden; }
+  .modal-save:active, .add-btn:active, .budget-save-btn:active { transform: scale(0.98); }
+
+  /* ── INPUT FOCUS GLOW ── */
+  input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(196,113,74,0.12) !important; }
+
+  /* ── CARD HOVER LIFT ── */
+  .module-card:hover:not(.locked), .category-card:hover, .kcard:hover, .gift-card:hover, .note-card:hover, .aide-card:hover { transform: translateY(-3px) !important; box-shadow: 0 12px 36px rgba(44,31,20,0.1) !important; }
+
+
+  /* ── MOBILE MENU ── */
+  .mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--warm-black); z-index: 200; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .mobile-nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; color: var(--cream); }
+  .mobile-nav-right { display: flex; align-items: center; gap: 12px; }
+  .hamburger { background: none; border: none; cursor: pointer; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--cream); border-radius: 2px; transition: all 0.3s ease; }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(20,14,8,0.7); z-index: 198; backdrop-filter: blur(2px); }
+  .mobile-overlay.open { display: block; }
+  .mobile-drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: var(--warm-black); z-index: 199; transition: left 0.3s ease; overflow-y: auto; padding: 72px 20px 32px; scrollbar-width: none; }
+  .mobile-drawer::-webkit-scrollbar { display: none; }
+  .mobile-drawer.open { left: 0; }
+  .mobile-drawer .nav-section { font-size: 7px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.35); padding: 12px 10px 4px; }
+  .mobile-drawer .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .mobile-drawer .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .mobile-drawer .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .mobile-drawer .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .mobile-drawer .nav-item.active .nav-dot { background: var(--terracotta); }
+  .mobile-drawer-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .mobile-logout-btn { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); color: rgba(201,186,168,0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-family: "DM Sans", sans-serif; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+  .mobile-logout-btn:hover { color: var(--cream); border-color: rgba(255,255,255,0.2); }
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .main { margin-left: 0 !important; padding-top: 56px; }
+    .mobile-nav { display: flex; }
+  }
+
+
+  /* ── NOTIFICATIONS ── */
+  .notif-bell { position: relative; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; }
+  .notif-bell-icon { font-size: 18px; transition: transform 0.2s; }
+  .notif-bell:hover .notif-bell-icon { transform: rotate(15deg); }
+  .notif-badge { position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: var(--terracotta); border-radius: 50%; font-size: 9px; font-weight: 500; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid var(--warm-black); animation: pulse-badge 2s infinite; }
+  @keyframes pulse-badge { 0%,100%{transform:scale(1)}50%{transform:scale(1.15)} }
+  .notif-panel { position: fixed; top: 56px; right: 12px; width: 320px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 16px; box-shadow: 0 16px 48px rgba(44,31,20,0.15); z-index: 1000; display: none; overflow: hidden; animation: popIn 0.2s ease; }
+  .notif-panel.open { display: block; }
+  .notif-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--linen); display: flex; align-items: center; justify-content: space-between; }
+  .notif-panel-title { font-family: "Cormorant Garamond", serif; font-size: 16px; font-style: italic; font-weight: 300; color: var(--espresso); }
+  .notif-mark-all { font-size: 10px; font-weight: 300; color: var(--text-light); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: "DM Sans", sans-serif; }
+  .notif-mark-all:hover { color: var(--terracotta); }
+  .notif-list { max-height: 380px; overflow-y: auto; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid var(--linen); display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.15s; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item:hover { background: rgba(232,224,213,0.3); }
+  .notif-item.unread { background: rgba(196,113,74,0.04); }
+  .notif-item.unread::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--terracotta); border-radius: 0 2px 2px 0; }
+  .notif-item { position: relative; }
+  .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .notif-icon-livraison { background: rgba(184,154,106,0.12); }
+  .notif-icon-urgente { background: rgba(196,113,74,0.12); }
+  .notif-icon-jourj { background: rgba(44,31,20,0.06); }
+  .notif-icon-module { background: rgba(122,140,126,0.12); }
+  .notif-icon-collab { background: rgba(184,154,106,0.12); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-title { font-size: 12px; font-weight: 400; color: var(--espresso); margin-bottom: 2px; }
+  .notif-msg { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .notif-time { font-size: 9px; font-weight: 200; color: var(--sand); margin-top: 4px; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--text-light); font-size: 13px; font-weight: 200; font-style: italic; }
+  .notif-footer { padding: 12px 20px; border-top: 1px solid var(--linen); text-align: center; }
+  .notif-footer a { font-size: 10px; font-weight: 300; color: var(--text-light); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
+  .notif-footer a:hover { color: var(--terracotta); }
+
+
+  /* ── ONBOARDING SUGGESTIONS ── */
+  .onb-suggestion { background: var(--warm-white); border: 1px solid var(--linen); border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .onb-suggestion:hover { border-color: var(--terracotta); background: rgba(196,113,74,0.04); }
+  .onb-suggestion-icon { font-size: 20px; flex-shrink: 0; }
+  .onb-suggestion-text { font-size: 11px; font-weight: 300; color: var(--espresso); }
+  .onb-plan-feat { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 200; color: var(--text-light); }
+  .onb-plan-feat::before { content: "✓"; color: var(--sage); font-size: 10px; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">Le Move</div>
+</div>
+
+<!-- AUTH -->
+<div class="auth-screen" id="authScreen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">Le Move</div>
+    <div class="auth-sub">par Maison Florélis</div>
+    <div class="auth-title">Accède à ton espace.</div>
+    <div class="auth-field">
+      <label class="auth-label">Email</label>
+      <input type="email" class="auth-input" id="authEmail" placeholder="ton@email.com">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Mot de passe</label>
+      <input type="password" class="auth-input" id="authPassword" placeholder="••••••••">
+    </div>
+    <button class="auth-btn" onclick="login()">Se connecter →</button>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-forgot" onclick="resetPassword()">Mot de passe oublié ?</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app-screen" id="appScreen">
+
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <div class="nav-logo">Le Move</div>
+      <div class="nav-sep"></div>
+      <div class="nav-plan-badge" id="navPlanBadge">Plan —</div>
+    </div>
+    <div class="nav-right">
+      <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+      <div class="notif-bell-icon">🔔</div>
+      <div class="notif-badge" id="notifBadge" style="display:none">0</div>
+    </div>
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-panel-header">
+        <div class="notif-panel-title">Notifications</div>
+        <button class="notif-mark-all" onclick="markAllRead()">Tout marquer lu</button>
+      </div>
+      <div class="notif-list" id="notifList">
+        <div class="notif-empty">Aucune notification</div>
+      </div>
+    </div>
+      <div class="nav-avatar" id="navAvatar" onclick="openProfile()">?</div>
+      <button class="nav-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="welcome-banner">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;font-weight:300;color:var(--cream);line-height:1">Le Move</div>
+      <div style="font-size:8px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(247,243,238,0.3)">par Maison Florélis</div>
+      <div style="width:24px;height:1px;background:var(--terracotta);margin:8px 0"></div>
+      <div class="welcome-greeting">Bonjour, <span id="userName">—</span></div>
       <div class="welcome-sub">Ton espace est prêt. Par où tu commences ?</div>
       <div class="welcome-meta" id="welcomeMeta"></div>
     </div>
