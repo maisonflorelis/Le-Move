@@ -267,6 +267,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   .module-pip.active { background: var(--terracotta); }
   @media (max-width: 768px) { .module-progress-strip { padding: 10px 16px; } .module-progress-modules { display: none; } }
 
+  .sidebar-scroll{flex:1;overflow-y:auto;padding:0 0 20px;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.4) transparent;position:relative}
+  .sidebar-scroll::-webkit-scrollbar{width:3px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.4);border-radius:3px}
+  .sidebar-fade{position:relative}.sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
 </style>
 </head>
 <body>

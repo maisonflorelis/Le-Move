@@ -30,7 +30,11 @@ async function renderModuleProgress() {
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:28px 20px 20px;display:flex;flex-direction:column;gap:2px;z-index:100;overflow-y:auto;scrollbar-width:none}.sidebar::-webkit-scrollbar{display:none}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:28px 20px 0;display:flex;flex-direction:column;gap:0;z-index:100;overflow:hidden}  .sidebar-scroll{flex:1;overflow-y:auto;padding:0 0 20px;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.4) transparent;position:relative}
+  .sidebar-scroll::-webkit-scrollbar{width:3px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.4);border-radius:3px}
+  .sidebar-fade{position:relative}.sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
 .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
 .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
 .nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}

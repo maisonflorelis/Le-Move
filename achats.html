@@ -248,6 +248,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   .module-pip.active { background: var(--terracotta); }
   @media (max-width: 768px) { .module-progress-strip { padding: 10px 16px; } .module-progress-modules { display: none; } }
 
+  .sidebar-scroll{flex:1;overflow-y:auto;padding:0 0 20px;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.4) transparent;position:relative}
+  .sidebar-scroll::-webkit-scrollbar{width:3px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.4);border-radius:3px}
+  .sidebar-fade{position:relative}.sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
 </style>
 </head>
 <body>
@@ -257,7 +262,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   
   <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
 
-  <div class="nav-section">Emménagement</div>
+  <div class="sidebar-fade"><div class="sidebar-scroll">
+<div class="nav-section">Emménagement</div>
   <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
   <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
   <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur</div>
@@ -281,6 +287,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collab</div>
   <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
 
+  
+</div></div>
   <div class="sidebar-footer">
     <div class="progress-mini">Avancement global</div>
     <div class="progress-bar-mini"></div>
@@ -289,6 +297,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
       <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
     </div>
   </div>
+
 </aside>
 
 <main class="main">
