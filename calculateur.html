@@ -20,9 +20,9 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 /* SIDEBAR */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:28px 20px 0;display:flex;flex-direction:column;gap:0;z-index:100;overflow:hidden}
   .sidebar-scroll{flex:1;overflow-y:scroll;padding:0 8px 20px 0;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.35) rgba(255,255,255,0.04)}
-  .sidebar-scroll::-webkit-scrollbar{width:6px}
-  .sidebar-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.04);border-radius:20px;margin:4px 0}
-  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.35);border-radius:20px;border:1px solid rgba(255,255,255,0.04)}
+  .sidebar-scroll::-webkit-scrollbar{width:6px !important}
+  .sidebar-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.06) !important;border-radius:20px !important}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.5) !important;border-radius:20px !important;border:none !important}
   .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.6)}
   .sidebar-fade{position:relative;flex:1;display:flex;flex-direction:column}
   .sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:8px;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}

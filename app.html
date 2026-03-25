@@ -366,7 +366,10 @@
       </div>
     </div>
   </div>
-  <div class="welcome-progress-block">
+  <div class="welcome-progress-block" style="background:var(--espresso);padding:0 48px 0;border-bottom:none">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06)" id="quickModules"></div>
+  </div>
+  <div class="welcome-progress-block" style="border-bottom:1px solid rgba(255,255,255,0.06)">
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
       <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.3)">Avancement global</div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#F7F3EE" id="progressPct">0%</div>
@@ -827,14 +830,40 @@ async function updateProgress() {
       const diff = Math.ceil((new Date(currentProfile.date_emmenagement) - new Date()) / (1000*60*60*24));
       const cdEl = document.getElementById('countdownNum');
       const dateEl = document.getElementById('countdownDate');
-      if (cdEl) cdEl.textContent = diff > 0 ? 'J-' + diff : diff === 0 ? "Aujourd'hui !" : "C'est fait !";
+      if (cdEl) cdEl.textContent = diff > 0 ? 'J — ' + diff : diff === 0 ? "Aujourd'hui !" : "C'est fait !";
       if (dateEl) {
         const d = new Date(currentProfile.date_emmenagement);
         dateEl.textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       }
     }
 
-    // Citation du jour
+    // Quick modules strip
+    const quickModulesEl = document.getElementById('quickModules');
+    if (quickModulesEl && scores.length > 0) {
+      const topModules = [
+        { name: 'Budget', icon: '💰', score: scores.find(s=>s.name==='Budget')?.score||0, href: 'budget.html' },
+        { name: 'Déménagement', icon: '📦', score: scores.find(s=>s.name==='Déménagement')?.score||0, href: 'demenagement.html' },
+        { name: 'Achats', icon: '🚚', score: scores.find(s=>s.name==='Achats')?.score||0, href: 'achats.html' },
+        { name: 'Admin', icon: '📋', score: scores.find(s=>s.name==='Admin')?.score||0, href: 'admin.html' },
+      ];
+      quickModulesEl.innerHTML = topModules.map(function(m) {
+        var color = m.score >= 100 ? '#7A8C7E' : '#C4714A';
+        var el = document.createElement('div');
+        el.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s';
+        el.onclick = function() { window.location.href = m.href; };
+        el.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.08)'; };
+        el.onmouseout = function() { this.style.background = 'rgba(255,255,255,0.04)'; };
+        el.innerHTML = '<div style="font-size:16px;margin-bottom:6px">' + m.icon + '</div>' +
+          '<div style="font-size:11px;font-weight:300;color:rgba(247,243,238,0.7);margin-bottom:6px">' + m.name + '</div>' +
+          '<div style="height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">' +
+            '<div style="height:100%;background:' + color + ';width:' + m.score + '%;border-radius:2px;transition:width 1s ease"></div>' +
+          '</div>' +
+          '<div style="font-size:9px;color:rgba(247,243,238,0.3);margin-top:4px">' + m.score + '%</div>';
+        return el.outerHTML;
+      }).join('');
+    }
+
+        // Citation du jour
     const citations = [
       "Chaque grande maison commence par un premier carton.",
       "Un chez-soi, ça se mérite. Tu y es presque.",
@@ -1217,7 +1246,7 @@ setTimeout(() => {
 
 </div></div>
   
-</aside>PE html>
+</aside>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
