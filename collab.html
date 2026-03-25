@@ -123,11 +123,15 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 }
 
   /* ── CUSTOM SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
-  * { scrollbar-width: thin; scrollbar-color: var(--sand) transparent; }
+  :not(.sidebar-scroll)::-webkit-scrollbar { width: 4px; height: 4px; }
+  :not(.sidebar-scroll)::-webkit-scrollbar-track { background: transparent; }
+  :not(.sidebar-scroll)::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
+  :not(.sidebar-scroll)::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+  .sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgba(122,140,126,0.5) rgba(255,255,255,0.06); }
+  aside .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+  aside .sidebar-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 20px; margin: 4px 0; }
+  aside .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(122,140,126,0.5); border-radius: 20px; }
+  aside .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(122,140,126,0.75); }
 
   /* ── CUSTOM CURSOR ── */
   html, body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3' fill='%23C4714A' opacity='0.8'/%3E%3C/svg%3E") 4 4, auto; }
