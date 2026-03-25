@@ -358,12 +358,10 @@
       <div class="welcome-greeting">Bonjour, <span id="userName">—</span></div>
       <div class="welcome-sub" id="dailyCitation">Chaque grande maison commence par un premier carton.</div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
-      <div style="text-align:right;margin-top:-10px">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:#F7F3EE;line-height:1" id="countdownNum">—</div>
-        <div style="font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-top:2px">Avant le Jour J</div>
-        <div style="font-size:11px;font-weight:200;color:#C4714A;margin-top:3px" id="countdownDate"></div>
-      </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:6px;min-width:140px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:#F7F3EE;line-height:1;text-align:right" id="countdownNum">—</div>
+      <div style="font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.3);text-align:right">Avant le Jour J</div>
+      <div style="font-size:11px;font-weight:200;color:#C4714A;text-align:right" id="countdownDate"></div>
     </div>
   </div>
   <div class="welcome-progress-block" style="background:var(--espresso);padding:0 48px 0;border-bottom:none">
@@ -710,8 +708,8 @@ async function updateProgress() {
     sb.from('demenagement_taches').select('fait').eq('user_id', uid),
     sb.from('achats_commandes').select('statut').eq('user_id', uid),
     sb.from('avancement_taches').select('statut').eq('user_id', uid),
-    sb.from('admin_taches').select('fait').eq('user_id', uid),
-    sb.from('carnet_notes').select('id', { count: 'exact', head: true }).eq('user_id', uid),
+    Promise.resolve({data:[]}), // admin_taches - table optionnelle
+    sb.from('carnet_notes').select('id', { count: 'exact', head: true }).eq('user_id', uid).limit(1).maybeSingle().then(()=>({count:0})).catch(()=>({count:0})),
     sb.from('moodboard_items').select('id', { count: 'exact', head: true }).eq('user_id', uid),
     sb.from('mes_contacts').select('id', { count: 'exact', head: true }).eq('user_id', uid),
     sb.from('medias').select('id', { count: 'exact', head: true }).eq('user_id', uid),
@@ -1030,19 +1028,14 @@ async function generateSmartNotifs() {
     }
   }
   
-  // Check for overdue urgent tasks
-  const { data: taches } = await sb.from('admin_taches')
-    .select('titre')
-    .eq('user_id', currentUser.id)
-    .eq('fait', false)
-    .eq('priorite', 'urgent');
-  
-  if ((taches || []).length > 0) {
-    const exists = await checkNotifExists('urgentes_' + today);
-    if (!exists) {
-      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) administrative(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
+  // Check for overdue urgent tasks (admin_taches - skip if table missing)
+  try {
+    const { data: taches } = await sb.from('admin_taches')
+      .select('titre').eq('user_id', currentUser.id).eq('fait', false).eq('priorite', 'urgent');
+    if ((taches || []).length > 0) {
+      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
     }
-  }
+  } catch(e) {}
   
   // Check Jour J in 7 days
   const { data: profile } = await sb.from('Profiles').select('date_emmenagement, prenom').eq('id', currentUser.id).single();
@@ -1098,6 +1091,37 @@ function renderNotifBadge() {
 const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
 const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
 
+
+function renderNotifPanel() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) { list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>'; return; }
+  list.innerHTML = notifications.map(function(n) {
+    var ago = timeAgo(n.created_at);
+    var cls = n.lue ? 'notif-item' : 'notif-item unread';
+    var icon = NOTIF_ICONS[n.type] || '🔔';
+    var iconCls = NOTIF_ICON_CLASS[n.type] || '';
+    return '<div class="' + cls + '" data-id="' + n.id + '" data-lien="' + (n.lien||'') + '" onclick="clickNotifEl(this)">' +
+      '<div class="notif-icon ' + iconCls + '">' + icon + '</div>' +
+      '<div class="notif-content">' +
+        '<div class="notif-title">' + n.titre + '</div>' +
+        '<div class="notif-msg">' + (n.message||'') + '</div>' +
+        '<div class="notif-time">' + ago + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function closeNotifPanel() {
+  notifOpen = false;
+  var p = document.getElementById('notifPanel');
+  if (p) p.classList.remove('open');
+}
+
+function clickNotifEl(el) {
+  var id = el.getAttribute('data-id');
+  var lien = el.getAttribute('data-lien');
+  clickNotif(id, lien);
+}
 
 function timeAgo(dateStr) {
   const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
