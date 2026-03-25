@@ -12,18 +12,23 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:40px 24px;display:flex;flex-direction:column;gap:8px;z-index:100}
-.sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
-.sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s}
-.nav-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
-.nav-item.active{background:rgba(122,140,126,0.18);color:#A8C4AB;border-left:3px solid #7A8C7E}
-  .nav-item{padding-left:9px}
-  .nav-item.active{padding-left:6px}
-.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
-.nav-item.active .nav-dot{background:#7A8C7E}
-.nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.35);padding:12px 10px 4px}
-.sidebar-footer{margin-top:auto;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:28px 20px 0;display:flex;flex-direction:column;gap:0;z-index:100;overflow:hidden}
+  .sidebar-scroll{flex:1;overflow-y:scroll;padding:0 8px 20px 0;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.35) rgba(255,255,255,0.04)}
+  .sidebar-scroll::-webkit-scrollbar{width:6px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.04);border-radius:20px;margin:4px 0}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.35);border-radius:20px;border:1px solid rgba(255,255,255,0.04)}
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.6)}
+  .sidebar-fade{position:relative;flex:1;display:flex;flex-direction:column}
+  .sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:8px;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 10px;border-radius:6px;font-size:13px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
+  .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--cream)}
+  .nav-item.active{background:rgba(122,140,126,0.15);color:#A8C4AB;border-left:3px solid #7A8C7E;padding-left:7px}
+  .nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+  .nav-item.active .nav-dot{background:#7A8C7E}
+  .nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.3);padding:10px 10px 4px}
+  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
+  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+  .sidebar-footer{padding:16px 0 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
 .progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
 .progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
 .main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
@@ -545,14 +550,20 @@ function renderNotifPanel() {
   if (!list) return;
   if (!notifications.length) { list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>'; return; }
   list.innerHTML = notifications.map(n => {
-    const diff = Math.floor((new Date() - new Date(n.created_at)) / 60000);
-    const ago = diff < 60 ? diff + ' min' : diff < 1440 ? Math.floor(diff/60) + 'h' : Math.floor(diff/1440) + 'j';
-    return \`<div class="notif-item \${n.lue?'':'unread'}" onclick="clickNotif('\${n.id}','\${n.lien||''}')">
-      <div class="notif-icon \${NOTIF_ICON_CLASS[n.type]||''}">\${NOTIF_ICONS[n.type]||'🔔'}</div>
-      <div class="notif-content"><div class="notif-title">\${n.titre}</div><div class="notif-msg">\${n.message||''}</div><div class="notif-time">\${ago}</div></div>
-    </div>\`;
+    const ago = timeAgo(n.created_at);
+    const cls = n.lue ? 'notif-item' : 'notif-item unread';
+    const icon = NOTIF_ICONS[n.type] || '🔔';
+    const iconCls = NOTIF_ICON_CLASS[n.type] || '';
+    return '<div class="' + cls + '" data-id="' + n.id + '" data-lien="' + (n.lien||'') + '" onclick="clickNotifEl(this)">' +
+      '<div class="notif-icon ' + iconCls + '">' + icon + '</div>' +
+      '<div class="notif-content">' +
+        '<div class="notif-title">' + n.titre + '</div>' +
+        '<div class="notif-msg">' + (n.message || '') + '</div>' +
+        '<div class="notif-time">' + ago + '</div>' +
+      '</div></div>';
   }).join('');
 }
+
 async function clickNotif(id, lien) {
   await sb.from('notifications').update({lue:true}).eq('id',id);
   notifications = notifications.filter(n=>n.id!==id);
