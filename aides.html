@@ -177,6 +177,12 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   .notif-footer a { font-size: 10px; font-weight: 300; color: var(--text-light); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
   .notif-footer a:hover { color: var(--terracotta); }
 
+
+  .nav-plan-lock{font-size:8px;margin-left:auto;opacity:0.4;letter-spacing:0.05em}
+  .nav-item.nav-locked{opacity:0.4;cursor:not-allowed}
+  .nav-item.nav-locked:hover{background:none;color:var(--sand)}
+  .nav-item.nav-locked .nav-plan-lock{opacity:1;color:var(--gold)}
+  .nav-lock-tooltip{position:fixed;background:var(--espresso);color:var(--cream);font-size:10px;padding:6px 12px;border-radius:6px;z-index:999;pointer-events:none;display:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.1)}
 </style>
 </head>
 <body>
@@ -189,23 +195,71 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <div class="nav-section">Emménagement</div>
     <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
     <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
-    <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur</div>
-    <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
-    <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
-    <div class="nav-section">Déco & Style</div>
-    <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
-    <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
-    <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
-    <div class="nav-section">Pratique</div>
-    <div class="nav-item" onclick="window.location.href='admin.html'"><div class="nav-dot"></div>Checklist Admin</div>
     <div class="nav-item active" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
-    <div class="nav-item" onclick="window.location.href='carnet.html'"><div class="nav-dot"></div>Carnet de Bord</div>
-    <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
+    <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'calculateur.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Calculateur</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-section">Déco & Style</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'moodboard.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mon Moodboard</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'moodboard-ia.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Moodboard IA</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'medias.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mes Médias</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-section">Pratique</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'admin.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Checklist Admin</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'carnet.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Carnet de Bord</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'avancement.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mon Avancement</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'mes-contacts.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mes Contacts</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
     <div class="nav-section">Social & Pro</div>
-    <div class="nav-item" onclick="window.location.href='cremaillere.html'"><div class="nav-dot"></div>Crémaillère</div>
-    <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
-    <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collab</div>
-    <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'cremaillere.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Crémaillère</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'annuaire.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Annuaire Pro</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'collab.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Espace Collab</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'support.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Support</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
     <div style="height:8px"></div>
   </div>
   <div class="sidebar-footer">
@@ -340,15 +394,82 @@ const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
+// ── PLAN GUARD ──
+(async function() {
+  var { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+  var { data: u } = await sb.from('Users').select('Plan').eq('id', session.user.id).single();
+  var plan = (u && u.Plan ? u.Plan : 'essentiel').toLowerCase();
+  var allowed = ["essentiel", "complet", "premium"];
+  if (!allowed.includes(plan)) {
+    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#2C1F14;font-family:DM Sans,sans-serif">' +
+      '<div style="text-align:center;padding:48px;max-width:420px">' +
+        '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:48px;color:#F7F3EE;margin-bottom:8px">Le Move</div>' +
+        '<div style="width:32px;height:1px;background:#C4714A;margin:16px auto"></div>' +
+        '<div style="font-size:14px;font-weight:300;color:rgba(247,243,238,0.6);margin-bottom:24px">Ce module est inclus dans le plan </div>' +
+        '<a href="https://lemove.fr#pricing" style="display:inline-block;padding:12px 28px;background:#C4714A;color:white;border-radius:8px;text-decoration:none;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Changer de plan →</a>' +
+        '<br><a href="app.html" style="font-size:11px;color:rgba(247,243,238,0.4);text-decoration:none">← Retour au dashboard</a>' +
+      '</div></div>';
+    return;
+  }
+})();
+
 (async()=>{
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
   const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  if(typeof setNavPlan==='function') setNavPlan(userData?.Plan||p?.Plan||'essentiel');
 })();
 async function logout(){await sb.auth.signOut();window.location.href='app.html';}
 </script>
 <script>
+
+// Apply plan restrictions to sidebar nav
+function applyPlanToSidebar(plan) {
+  var planRank = { essentiel: 1, complet: 2, premium: 3 };
+  var requiredRank = { essentiel: 1, complet: 2, premium: 3 };
+  var userRank = planRank[plan] || 1;
+  var tooltip = document.getElementById('navLockTooltip');
+
+  document.querySelectorAll('.nav-item[data-required]').forEach(function(el) {
+    var req = el.getAttribute('data-required');
+    var reqRank = requiredRank[req] || 1;
+    var lock = el.querySelector('.nav-plan-lock');
+
+    if (userRank < reqRank) {
+      el.classList.add('nav-locked');
+      if (lock) lock.textContent = '🔒';
+      el.onmouseenter = function(e) {
+        if (tooltip) {
+          var label = req === 'premium' ? 'Plan Premium' : 'Plan Complet';
+          tooltip.textContent = 'Accès ' + label;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (e.clientX + 12) + 'px';
+          tooltip.style.top = (e.clientY - 8) + 'px';
+        }
+      };
+      el.onmousemove = function(e) {
+        if (tooltip) {
+          tooltip.style.left = (e.clientX + 12) + 'px';
+          tooltip.style.top = (e.clientY - 8) + 'px';
+        }
+      };
+      el.onmouseleave = function() {
+        if (tooltip) tooltip.style.display = 'none';
+      };
+    } else {
+      el.classList.remove('nav-locked');
+      if (lock) lock.textContent = '✦';
+    }
+  });
+}
+
+function navClick(el, href) {
+  if (el.classList.contains('nav-locked')) return;
+  window.location.href = href;
+}
+
 function toggleMenu() {
   const drawer = document.getElementById('mobileDrawer');
   const overlay = document.getElementById('mobileOverlay');
@@ -452,5 +573,6 @@ window.addEventListener('load', () => {
   }, 1500);
 });
 </script>
+<div class="nav-lock-tooltip" id="navLockTooltip"></div>
 </body>
 </html>

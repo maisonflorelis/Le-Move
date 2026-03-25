@@ -388,7 +388,7 @@
         <div class="upgrade-title">Débloque tous les modules.</div>
         <div class="upgrade-desc">Accède à 100% des fonctionnalités Le Move.</div>
       </div>
-      <button class="upgrade-btn" onclick="window.open('https://lemove.fr#pricing','_blank')">Voir les offres →</button>
+      <button class="upgrade-btn" onclick="openPricing()">Voir les offres →</button>
     </div>
   </div>
 </div>
@@ -596,6 +596,7 @@ async function loadApp(user) {
   if (userError) console.warn('Users query:', userError.message);
   currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
+  localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
 
   const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).single();
   currentProfile = profileData || {};
@@ -654,28 +655,98 @@ function refreshAvatarUI(name, photoUrl) {
 }
 
 // ── MODULES ──
+function openPricing(){window.open('https://lemove.fr#pricing','_blank');}
+
 function renderModules() {
-  const grid = document.getElementById('modulesGrid');
+  var grid = document.getElementById('modulesGrid');
   grid.innerHTML = '';
-  ALL_MODULES.forEach((mod, i) => {
-    const hasAccess = mod.plans.includes(currentPlan);
-    const card = document.createElement('div');
-    card.className = `module-card${i === 0 && hasAccess ? ' featured' : ''}${!hasAccess ? ' locked' : ''}`;
-    card.innerHTML = `
-      <div class="module-num">Module ${String(i + 1).padStart(2, '0')}</div>
-      <div class="module-icon">${mod.icon}</div>
-      <div class="module-title">${mod.title}</div>
-      <div class="module-desc">${mod.desc}</div>
-      <div class="module-tags">
-        ${mod.tags.map(t => `<span class="module-tag">${t}</span>`).join('')}
-        ${!hasAccess ? `<span class="module-tag" style="background:#FEF2F2;color:#DC2626;">Plan ${mod.plans[0]}</span>` : ''}
-      </div>
-      ${hasAccess ? '<div class="module-arrow">→</div>' : ''}
-    `;
-    if (hasAccess) card.onclick = () => openModule(mod.id);
+  ALL_MODULES.forEach(function(mod, i) {
+    var hasAccess = mod.plans.includes(currentPlan);
+    var planRequired = mod.plans[0]; // lowest plan that gives access
+    var card = document.createElement('div');
+    card.className = 'module-card' + (!hasAccess ? ' locked' : '');
+    card.style.cssText = !hasAccess ? 'position:relative;overflow:hidden;opacity:0.7;cursor:default' : 'position:relative';
+
+    if (hasAccess) {
+      card.onclick = function() { window.location.href = mod.id + '.html'; };
+      card.innerHTML =
+        '<div class="module-num">Module ' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="module-icon">' + mod.icon + '</div>' +
+        '<div class="module-title">' + mod.title + '</div>' +
+        '<div class="module-desc">' + mod.desc + '</div>' +
+        '<div class="module-tags">' + mod.tags.map(function(t){return '<span class="module-tag">'+t+'</span>';}).join('') + '</div>';
+    } else {
+      // Plan label
+      var planLabel = planRequired === 'complet' ? 'Complet 89€' : 'Premium 150€';
+      var planColor = planRequired === 'complet' ? 'var(--gold)' : 'var(--terracotta)';
+      card.innerHTML =
+        '<div style="position:absolute;inset:0;background:rgba(26,20,16,0.55);border-radius:14px;z-index:1;backdrop-filter:blur(2px)"></div>' +
+        '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;gap:8px">' +
+          '<div style="font-size:28px">🔒</div>' +
+          '<div style="font-size:11px;font-weight:300;color:white;text-align:center">' + mod.title + '</div>' +
+          '<div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:' + planColor + ';text-align:center">' + planLabel + '</div>' +
+          '<button onclick="openPricing()" style="margin-top:4px;padding:7px 16px;background:' + planColor + ';color:white;border:none;border-radius:6px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:inherit">Débloquer →</button>' +
+        '</div>' +
+        '<div class="module-num" style="opacity:0.15">Module ' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="module-icon" style="opacity:0.15">' + mod.icon + '</div>' +
+        '<div class="module-title" style="opacity:0.15">' + mod.title + '</div>' +
+        '<div class="module-desc" style="opacity:0.15">' + mod.desc + '</div>';
+    }
     grid.appendChild(card);
   });
 }
+
+function renderSidebarNav() {
+  var planModules = {
+    essentiel: ['budget','demenagement','aides','achats'],
+    complet: ['budget','demenagement','aides','achats','calculateur','admin','carnet','avancement','mes-contacts','moodboard','medias'],
+    premium: ['budget','demenagement','aides','achats','calculateur','admin','carnet','avancement','mes-contacts','moodboard','medias','moodboard-ia','collab','annuaire','cremaillere','support']
+  };
+  var allowed = planModules[currentPlan] || planModules['essentiel'];
+  var sections = [
+    { label: 'Emménagement', items: [
+      {id:'budget',label:'Mon Budget'},{id:'demenagement',label:'Mon Déménagement'},
+      {id:'calculateur',label:'Calculateur'},{id:'achats',label:'Mes Achats'},
+      {id:'avancement',label:'Mon Avancement'}
+    ]},
+    { label: 'Déco & Style', items: [
+      {id:'moodboard',label:'Mon Moodboard'},{id:'moodboard-ia',label:'Moodboard IA'},
+      {id:'medias',label:'Mes Médias'}
+    ]},
+    { label: 'Pratique', items: [
+      {id:'admin',label:'Checklist Admin'},{id:'aides',label:'Guide des Aides'},
+      {id:'carnet',label:'Carnet de Bord'},{id:'mes-contacts',label:'Mes Contacts'}
+    ]},
+    { label: 'Social & Pro', items: [
+      {id:'cremaillere',label:'Crémaillère'},{id:'annuaire',label:'Annuaire Pro'},
+      {id:'collab',label:'Espace Collab'},{id:'support',label:'Support'}
+    ]}
+  ];
+  var scroll = document.getElementById('sidebarScroll');
+  if (!scroll) return;
+  var html = '';
+  sections.forEach(function(section) {
+    html += '<div class="nav-section">' + section.label + '</div>';
+    section.items.forEach(function(item) {
+      var hasAccess = allowed.indexOf(item.id) >= 0;
+      if (hasAccess) {
+        var el = document.createElement('div');
+        el.className = 'nav-item';
+        el.onclick = (function(id){ return function(){ window.location.href = id + '.html'; }; })(item.id);
+        el.innerHTML = '<div class="nav-dot"></div>' + item.label;
+        scroll.appendChild(el);
+        return;
+      } else {
+        var planNeeded = ['moodboard-ia','collab','annuaire','cremaillere','support'].indexOf(item.id) >= 0 ? 'Premium' : 'Complet';
+        html += '<div class="nav-item" style="opacity:0.35;cursor:default;pointer-events:none" title="Plan ' + planNeeded + ' requis">' +
+          '<div class="nav-dot"></div><span style="flex:1">' + item.label + '</span>' +
+          '<span style="font-size:10px">🔒</span></div>';
+      }
+    });
+  });
+  scroll.insertAdjacentHTML('beforeend', html);
+}
+
 
 function openModule(id) {
   const pages = {
@@ -704,15 +775,15 @@ async function updateProgress() {
   var uid = currentUser.id;
   Promise.all([
     sb.from('Profiles').select('budget_total').eq('id', uid).single(),
-    sb.from('budget_achats').select('id', { count: 'exact', head: true }).eq('user_id', uid),
+    sb.from('budget_achats').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
     sb.from('demenagement_taches').select('fait').eq('user_id', uid),
     sb.from('achats_commandes').select('statut').eq('user_id', uid),
     sb.from('avancement_taches').select('statut').eq('user_id', uid),
-    sb.from('admin_taches').select('fait').eq('user_id', uid),
-    sb.from('carnet_notes').select('id', { count: 'exact', head: true }).eq('user_id', uid),
-    sb.from('moodboard_items').select('id', { count: 'exact', head: true }).eq('user_id', uid),
-    sb.from('mes_contacts').select('id', { count: 'exact', head: true }).eq('user_id', uid),
-    sb.from('medias').select('id', { count: 'exact', head: true }).eq('user_id', uid),
+    Promise.resolve({data:[]}), // admin_taches - table optionnelle
+    sb.from('carnet_notes').select('id', { count: 'exact', head: true }).eq('user_id', uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('moodboard_items').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('mes_contacts').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('medias').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
   ]).then(function(r) {
     var scores = [];
     var ps = 0;
@@ -1028,19 +1099,14 @@ async function generateSmartNotifs() {
     }
   }
   
-  // Check for overdue urgent tasks
-  const { data: taches } = await sb.from('admin_taches')
-    .select('titre')
-    .eq('user_id', currentUser.id)
-    .eq('fait', false)
-    .eq('priorite', 'urgent');
-  
-  if ((taches || []).length > 0) {
-    const exists = await checkNotifExists('urgentes_' + today);
-    if (!exists) {
-      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) administrative(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
+  // Check for overdue urgent tasks (admin_taches - skip if table missing)
+  try {
+    const { data: taches } = await sb.from('admin_taches')
+      .select('titre').eq('user_id', currentUser.id).eq('fait', false).eq('priorite', 'urgent');
+    if ((taches || []).length > 0) {
+      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
     }
-  }
+  } catch(e) {}
   
   // Check Jour J in 7 days
   const { data: profile } = await sb.from('Profiles').select('date_emmenagement, prenom').eq('id', currentUser.id).single();
@@ -1096,6 +1162,37 @@ function renderNotifBadge() {
 const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
 const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
 
+
+function renderNotifPanel() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) { list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>'; return; }
+  list.innerHTML = notifications.map(function(n) {
+    var ago = timeAgo(n.created_at);
+    var cls = n.lue ? 'notif-item' : 'notif-item unread';
+    var icon = NOTIF_ICONS[n.type] || '🔔';
+    var iconCls = NOTIF_ICON_CLASS[n.type] || '';
+    return '<div class="' + cls + '" data-id="' + n.id + '" data-lien="' + (n.lien||'') + '" onclick="clickNotifEl(this)">' +
+      '<div class="notif-icon ' + iconCls + '">' + icon + '</div>' +
+      '<div class="notif-content">' +
+        '<div class="notif-title">' + n.titre + '</div>' +
+        '<div class="notif-msg">' + (n.message||'') + '</div>' +
+        '<div class="notif-time">' + ago + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function closeNotifPanel() {
+  notifOpen = false;
+  var p = document.getElementById('notifPanel');
+  if (p) p.classList.remove('open');
+}
+
+function clickNotifEl(el) {
+  var id = el.getAttribute('data-id');
+  var lien = el.getAttribute('data-lien');
+  clickNotif(id, lien);
+}
 
 function timeAgo(dateStr) {
   const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
