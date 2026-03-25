@@ -594,9 +594,12 @@ async function loadApp(user) {
 
   const { data: userData, error: userError } = await sb.from('Users').select('Plan').eq('Email', user.email).maybeSingle();
   if (userError) console.warn('Users query:', userError.message);
-  currentPlan = (userData?.Plan || 'essentiel').toLowerCase();
+  // Always read plan fresh from DB — never trust localStorage alone
+  const { data: freshUser } = await sb.from('Users').select('Plan').eq('id', user.id).single();
+  currentPlan = (freshUser?.Plan || userData?.Plan || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
+  console.log('Plan loaded:', currentPlan);
 
   const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).single();
   currentProfile = profileData || {};
@@ -617,6 +620,7 @@ async function loadApp(user) {
 
   const seen = localStorage.getItem('lemove_tutorial_' + user.id);
   if (!seen) setTimeout(() => showTutorial(), 600);
+  else if (!currentProfile?.prenom || !currentProfile?.date_emmenagement) setTimeout(() => showOnboarding(), 600);
   setTimeout(() => updateProgress(), 800);
   setTimeout(() => loadNotifications(), 1000);
 }
@@ -910,7 +914,7 @@ function nextTutorial() {
 function endTutorial() {
   document.getElementById('tutorialOverlay').style.display = 'none';
   localStorage.setItem('lemove_tutorial_' + currentUser.id, 'seen');
-  if (!currentProfile.prenom) setTimeout(() => showOnboarding(), 300);
+  if (!currentProfile.prenom || !currentProfile.date_emmenagement) setTimeout(() => showOnboarding(), 300);
 }
 
 function showOnboarding() {
