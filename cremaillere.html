@@ -349,6 +349,7 @@ const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const{createClient}=supabase;
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+window._sb=sb;
 
 // ── PLAN GUARD ──
 (async function() {
@@ -404,7 +405,7 @@ let currentUser=null,gifts=[];
   currentUser=session.user;
   const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
   document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
-  if(typeof setNavPlan==='function') setNavPlan(userData?.Plan||p?.Plan||'essentiel');
+  if(typeof setNavPlan==='function') setNavPlan((userData?.Plan||p?.Plan||'essentiel').toLowerCase());
   document.getElementById('shareLink').value=`${window.location.origin}/liste-cadeaux.html?user=${currentUser.id}`;
   await loadData();
   applyPlanToSidebar((p && p.Plan) || "essentiel");
@@ -619,5 +620,78 @@ window.addEventListener('load', () => {
 });
 </script>
 <div class="nav-lock-tooltip" id="navLockTooltip"></div>
+<script data-cfasync="false">
+// Plan verification from Supabase
+(function() {
+  var PLAN_ORDER = { essentiel: 0, complet: 1, premium: 2 };
+
+  async function getVerifiedPlan() {
+    try {
+      var cached = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+      // Verify against Supabase
+      var session = await window._sb?.auth.getSession();
+      if (!session?.data?.session) return cached;
+      var uid = session.data.session.user.id;
+      var res = await window._sb.from('Users').select('Plan').eq('id', uid).single();
+      if (res.data?.Plan) {
+        var plan = res.data.Plan.toLowerCase();
+        localStorage.setItem('lm_plan', JSON.stringify(plan));
+        return plan;
+      }
+      return cached;
+    } catch(e) {
+      return JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+    }
+  }
+
+  function applyNavLocks(plan) {
+    var planRank = PLAN_ORDER[plan] || 0;
+    document.querySelectorAll('.nav-locked').forEach(function(el) {
+      var required = el.getAttribute('data-plan');
+      var reqRank = PLAN_ORDER[required] || 0;
+      if (planRank >= reqRank) {
+        var lock = el.querySelector('.nav-lock');
+        if (lock) lock.style.display = 'none';
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+      } else {
+        el.style.opacity = '0.4';
+        el.style.pointerEvents = 'auto';
+      }
+    });
+  }
+
+  window.navItemClick = function(el, href) {
+    var plan = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+    var planRank = PLAN_ORDER[plan] || 0;
+    var required = el.getAttribute('data-plan');
+    var reqRank = PLAN_ORDER[required] || 0;
+    if (planRank >= reqRank) {
+      window.location.href = href;
+    } else {
+      var label = required === 'complet' ? 'Complet (89€)' : 'Premium (150€)';
+      if (confirm('Ce module nécessite le plan ' + label + '.\nVoir les offres ?')) {
+        window.open('https://lemove.fr#pricing', '_blank');
+      }
+    }
+  };
+
+  window.setNavPlan = function(plan) {
+    localStorage.setItem('lm_plan', JSON.stringify(plan));
+    applyNavLocks(plan);
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var cached = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+    applyNavLocks(cached);
+    // Verify with Supabase after page load
+    setTimeout(function() {
+      getVerifiedPlan().then(function(plan) {
+        applyNavLocks(plan);
+      });
+    }, 800);
+  });
+})();
+</script>
 </body>
 </html>
