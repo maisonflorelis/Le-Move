@@ -31,18 +31,20 @@ async function renderModuleProgress() {
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);padding:28px 20px 0;display:flex;flex-direction:column;gap:0;z-index:100;overflow:hidden}
-  .sidebar-scroll{flex:1;overflow-y:scroll;padding:0 8px 20px 0;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.35) rgba(255,255,255,0.04)}
-  .sidebar-scroll::-webkit-scrollbar{width:6px !important}
-  .sidebar-scroll::-webkit-scrollbar-track{background:rgba(255,255,255,0.06) !important;border-radius:20px !important}
-  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.5) !important;border-radius:20px !important;border:none !important}
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.6)}
-  .sidebar-fade{position:relative;flex:1;display:flex;flex-direction:column}
-  .sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:8px;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);display:flex;flex-direction:column;z-index:100}
+  .sidebar-top{padding:28px 20px 12px;flex-shrink:0}
+  .sidebar-scroll{flex:1;overflow-y:auto;padding:4px 8px 16px 20px;min-height:0}
+  .sidebar-scroll::-webkit-scrollbar{width:5px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.45);border-radius:10px}
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.75)}
+  .sidebar-footer{padding:14px 20px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
+  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
   .nav-item{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 10px;border-radius:6px;font-size:13px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
   .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--cream)}
-  .nav-item.active{background:rgba(122,140,126,0.15);color:#A8C4AB;border-left:3px solid #7A8C7E;padding-left:7px}
-  .nav-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0}
+  .nav-item.active{background:rgba(122,140,126,0.15);color:#A8C4AB;border-left-color:#7A8C7E;padding-left:7px}
+  .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(201,186,168,0.4);flex-shrink:0}
   .nav-item.active .nav-dot{background:#7A8C7E}
   .nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.3);padding:10px 10px 4px}
   .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
@@ -134,15 +136,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 }
 
   /* ── CUSTOM SCROLLBAR ── */
-  :not(.sidebar-scroll)::-webkit-scrollbar { width: 4px; height: 4px; }
-  :not(.sidebar-scroll)::-webkit-scrollbar-track { background: transparent; }
-  :not(.sidebar-scroll)::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
-  :not(.sidebar-scroll)::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
-  .sidebar-scroll { scrollbar-width: thin; scrollbar-color: rgba(122,140,126,0.5) rgba(255,255,255,0.06); }
-  aside .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-  aside .sidebar-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 20px; margin: 4px 0; }
-  aside .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(122,140,126,0.5); border-radius: 20px; }
-  aside .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(122,140,126,0.75); }
+  
 
   /* ── CUSTOM CURSOR ── */
   html, body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3' fill='%23C4714A' opacity='0.8'/%3E%3C/svg%3E") 4 4, auto; }
@@ -257,56 +251,47 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   .module-pip.active { background: var(--terracotta); }
   @media (max-width: 768px) { .module-progress-strip { padding: 10px 16px; } .module-progress-modules { display: none; } }
 
-  .sidebar-scroll{flex:1;overflow-y:auto;padding:0 0 20px;scrollbar-width:thin;scrollbar-color:rgba(122,140,126,0.4) transparent;position:relative}
-  .sidebar-scroll::-webkit-scrollbar{width:3px}
-  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
-  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.4);border-radius:3px}
-  .sidebar-fade{position:relative}.sidebar-fade::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--warm-black));pointer-events:none;z-index:1}
+  
 </style>
 </head>
 <body>
 
 <aside class="sidebar">
+  <div class="sidebar-top">
     <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
-  
-  <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
-
-  <div class="sidebar-fade"><div class="sidebar-scroll">
-<div class="nav-section">Emménagement</div>
-  <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
-  <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
-  <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur</div>
-  <div class="nav-item active" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
-  <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
-
-  <div class="nav-section">Déco & Style</div>
-  <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
-  <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
-  <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
-
-  <div class="nav-section">Pratique</div>
-  <div class="nav-item" onclick="window.location.href='admin.html'"><div class="nav-dot"></div>Checklist Admin</div>
-  <div class="nav-item" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
-  <div class="nav-item" onclick="window.location.href='carnet.html'"><div class="nav-dot"></div>Carnet de Bord</div>
-  <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
-
-  <div class="nav-section">Social & Pro</div>
-  <div class="nav-item" onclick="window.location.href='cremaillere.html'"><div class="nav-dot"></div>Crémaillère</div>
-  <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
-  <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collab</div>
-  <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
-
-  
-</div></div>
+    <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="nav-section">Emménagement</div>
+    <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+    <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+    <div class="nav-item" onclick="window.location.href='calculateur.html'"><div class="nav-dot"></div>Calculateur</div>
+    <div class="nav-item active" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+    <div class="nav-item" onclick="window.location.href='avancement.html'"><div class="nav-dot"></div>Mon Avancement</div>
+    <div class="nav-section">Déco & Style</div>
+    <div class="nav-item" onclick="window.location.href='moodboard.html'"><div class="nav-dot"></div>Mon Moodboard</div>
+    <div class="nav-item" onclick="window.location.href='moodboard-ia.html'"><div class="nav-dot"></div>Moodboard IA</div>
+    <div class="nav-item" onclick="window.location.href='medias.html'"><div class="nav-dot"></div>Mes Médias</div>
+    <div class="nav-section">Pratique</div>
+    <div class="nav-item" onclick="window.location.href='admin.html'"><div class="nav-dot"></div>Checklist Admin</div>
+    <div class="nav-item" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
+    <div class="nav-item" onclick="window.location.href='carnet.html'"><div class="nav-dot"></div>Carnet de Bord</div>
+    <div class="nav-item" onclick="window.location.href='mes-contacts.html'"><div class="nav-dot"></div>Mes Contacts</div>
+    <div class="nav-section">Social & Pro</div>
+    <div class="nav-item" onclick="window.location.href='cremaillere.html'"><div class="nav-dot"></div>Crémaillère</div>
+    <div class="nav-item" onclick="window.location.href='annuaire.html'"><div class="nav-dot"></div>Annuaire Pro</div>
+    <div class="nav-item" onclick="window.location.href='collab.html'"><div class="nav-dot"></div>Espace Collab</div>
+    <div class="nav-item" onclick="window.location.href='support.html'"><div class="nav-dot"></div>Support</div>
+    <div style="height:8px"></div>
+  </div>
   <div class="sidebar-footer">
     <div class="progress-mini">Avancement global</div>
     <div class="progress-bar-mini"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08)">
       <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
       <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
     </div>
   </div>
-
 </aside>
 
 <main class="main">
