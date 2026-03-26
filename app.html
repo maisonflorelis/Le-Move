@@ -592,19 +592,27 @@ async function logout() {
 async function loadApp(user) {
   currentUser = user;
 
-  const { data: userData, error: userError } = await sb.from('Users').select('Plan').eq('Email', user.email).maybeSingle();
-  if (userError) console.warn('Users query:', userError.message);
-  // Always read plan fresh from DB by email (Users.id is bigint, not uuid)
-  const { data: freshUser } = await sb.from('Users').select('Plan').ilike('Email', user.email).maybeSingle();
-  currentPlan = (freshUser?.Plan || userData?.Plan || 'essentiel').toLowerCase();
+  // Read plan from Profiles (uses uuid = auth.uid() — no RLS issue)
+  const { data: profilePlan } = await sb.from('Profiles').select('Plan').eq('id', user.id).maybeSingle();
+  
+  // Fallback: read from Users by email if Profiles.Plan not set
+  let planFromUsers = null;
+  if (!profilePlan?.Plan || profilePlan.Plan === 'essentiel') {
+    const { data: userData } = await sb.from('Users').select('Plan').ilike('Email', user.email).maybeSingle();
+    planFromUsers = userData?.Plan;
+  }
+  
+  currentPlan = (profilePlan?.Plan || planFromUsers || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
-  console.log('Plan loaded:', currentPlan);
+  console.log('Plan loaded from Profiles:', profilePlan?.Plan, '| from Users:', planFromUsers, '| final:', currentPlan);
 
   const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).maybeSingle();
   if (!profileData) {
-    // Create missing Profiles row
-    await sb.from('Profiles').upsert({ id: user.id, created_at: new Date().toISOString() });
+    await sb.from('Profiles').upsert({ id: user.id, Plan: currentPlan, created_at: new Date().toISOString() });
+  } else if (!profileData.Plan || profileData.Plan !== currentPlan) {
+    // Sync plan to Profiles for faster future reads
+    await sb.from('Profiles').update({ Plan: currentPlan }).eq('id', user.id);
   }
   currentProfile = profileData || {};
 
