@@ -601,7 +601,11 @@ async function loadApp(user) {
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
   console.log('Plan loaded:', currentPlan);
 
-  const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).single();
+  const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).maybeSingle();
+  if (!profileData) {
+    // Create missing Profiles row
+    await sb.from('Profiles').upsert({ id: user.id, created_at: new Date().toISOString() });
+  }
   currentProfile = profileData || {};
 
   const fallbackName = user.email.split('@')[0].split('.')[0];
