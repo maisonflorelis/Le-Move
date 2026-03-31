@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Le Move — Politique de cookies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--sage:#7A8C7E;--terracotta:#C4714A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh}
+.nav{position:sticky;top:0;background:var(--espresso);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);text-decoration:none}
+.nav-back{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.5);text-decoration:none}
+.nav-back:hover{color:var(--cream)}
+.hero{background:var(--espresso);padding:48px 48px 40px}
+.hero-label{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:12px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:42px;font-weight:300;color:var(--cream);line-height:1.1}
+.hero-line{width:40px;height:1px;background:var(--terracotta);margin:14px 0}
+.hero-date{font-size:11px;font-weight:200;color:rgba(247,243,238,0.35)}
+.content{max-width:760px;margin:0 auto;padding:56px 48px}
+.section{margin-bottom:40px}
+.section-num{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--terracotta);margin-bottom:6px}
+.section-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;font-weight:300;color:var(--espresso);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--linen)}
+p{font-size:13px;font-weight:300;color:#4A3728;line-height:1.85;margin-bottom:10px}
+.cookie-grid{display:grid;gap:12px;margin:16px 0}
+.cookie-item{background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:16px}
+.cookie-type{flex-shrink:0}
+.cookie-badge{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.badge-essential{background:rgba(44,31,20,0.08);color:var(--espresso)}
+.badge-functional{background:rgba(122,140,126,0.12);color:var(--sage)}
+.badge-analytics{background:rgba(184,154,106,0.12);color:#8A6A2A}
+.cookie-name{font-size:12px;font-weight:400;color:var(--espresso);margin-bottom:4px}
+.cookie-desc{font-size:11px;font-weight:200;color:var(--text-light);line-height:1.6}
+.footer-legal{background:var(--espresso);padding:24px 48px;text-align:center}
+.footer-copy{font-size:11px;color:rgba(247,243,238,0.5);margin-bottom:6px}
+.footer-text{font-size:10px;font-weight:200;color:rgba(247,243,238,0.3);line-height:1.8}
+.legal-links{display:flex;gap:24px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.legal-links a{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.3);text-decoration:none}
+.legal-links a:hover{color:var(--terracotta)}
+@media(max-width:768px){.nav{padding:16px 20px}.hero{padding:32px 20px}.content{padding:32px 20px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Le Move</a>
+  <a href="index.html" class="nav-back">← Retour</a>
+</nav>
+<div class="hero">
+  <div class="hero-label">Traçabilité & navigation</div>
+  <div class="hero-title">Politique de cookies</div>
+  <div class="hero-line"></div>
+  <div class="hero-date">Dernière mise à jour : mars 2026</div>
+</div>
+<div class="content">
+  <div class="section">
+    <div class="section-num">Article 1</div>
+    <div class="section-title">Qu'est-ce qu'un cookie ?</div>
+    <p>Un cookie est un petit fichier texte déposé sur votre appareil lors de la visite d'un site web. Il permet de mémoriser des informations relatives à votre navigation pour améliorer votre expérience et assurer le bon fonctionnement des services.</p>
+  </div>
+  <div class="section">
+    <div class="section-num">Article 2</div>
+    <div class="section-title">Cookies utilisés par Le Move</div>
+    <p>Le Move utilise uniquement des cookies strictement nécessaires au fonctionnement de l'application. Aucun cookie publicitaire ou de tracking commercial n'est utilisé.</p>
+    <div class="cookie-grid">
+      <div class="cookie-item">
+        <div class="cookie-type"><span class="cookie-badge badge-essential">Essentiel</span></div>
+        <div><div class="cookie-name">Session Supabase Auth</div><div class="cookie-desc">Maintient ta session de connexion active. Sans ce cookie, tu serais déconnecté à chaque page. Durée : session + 7 jours.</div></div>
+      </div>
+      <div class="cookie-item">
+        <div class="cookie-type"><span class="cookie-badge badge-essential">Essentiel</span></div>
+        <div><div class="cookie-name">lm_plan (localStorage)</div><div class="cookie-desc">Mémorise ton plan d'abonnement localement pour accélérer l'affichage. Synchronisé avec la base de données à chaque connexion.</div></div>
+      </div>
+      <div class="cookie-item">
+        <div class="cookie-type"><span class="cookie-badge badge-functional">Fonctionnel</span></div>
+        <div><div class="cookie-name">lemove_tutorial_[id]</div><div class="cookie-desc">Mémorise si tu as déjà vu le tutoriel de bienvenue pour ne pas te l'afficher à chaque connexion.</div></div>
+      </div>
+      <div class="cookie-item">
+        <div class="cookie-type"><span class="cookie-badge badge-functional">Fonctionnel</span></div>
+        <div><div class="cookie-name">lemove_onboarding_[id]</div><div class="cookie-desc">Mémorise si tu as complété la configuration initiale de ton profil.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-num">Article 3</div>
+    <div class="section-title">Cookies tiers</div>
+    <p>Certains prestataires utilisés par Le Move peuvent déposer leurs propres cookies :</p>
+    <div class="cookie-grid">
+      <div class="cookie-item">
+        <div class="cookie-type"><span class="cookie-badge badge-essential">Paiement</span></div>
+        <div><div class="cookie-name">Stripe</div><div class="cookie-desc">Cookies nécessaires à la sécurisation des transactions de paiement. Politique de confidentialité Stripe : stripe.com/privacy</div></div>
+      </div>
+    </div>
+    <p>Le Move n'utilise aucun outil d'analyse comportementale (Google Analytics, Hotjar, etc.) ni aucun cookie publicitaire ou de retargeting.</p>
+  </div>
+  <div class="section">
+    <div class="section-num">Article 4</div>
+    <div class="section-title">Gestion et refus des cookies</div>
+    <p>Les cookies essentiels ne peuvent pas être désactivés car ils sont nécessaires au fonctionnement de l'application. Pour les cookies fonctionnels, tu peux les supprimer à tout moment via les paramètres de ton navigateur.</p>
+    <p>La suppression des cookies de session entraînera ta déconnexion de l'application. La suppression des cookies fonctionnels réinitialisera certaines préférences (tutoriel, onboarding).</p>
+    <p>Pour gérer tes cookies : paramètres de ton navigateur → Confidentialité → Cookies. Tu peux également contacter bonjour@lemove.fr pour toute question.</p>
+  </div>
+</div>
+<div class="footer-legal">
+  <div class="footer-copy">© 2026 Maison Florélis — Le Move. Tous droits réservés.</div>
+  <div class="footer-text">SIRET 102 678 091 00012 · Auto-entrepreneur · France</div>
+  <div class="legal-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="cgv.html">CGV</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cookies.html">Cookies</a>
+  </div>
+</div>
+</body>
+</html>

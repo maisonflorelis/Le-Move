@@ -738,7 +738,7 @@
 <div class="agency-banner">
   <div class="agency-dot"></div>
   <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos nouveaux locataires comme cadeau de bienvenue. Tarifs partenaires disponibles à partir de 50 licences.</div>
-  <a class="agency-banner-cta" href="mailto:bonjour@lemove.fr" style="text-decoration:none">Nous contacter →</a>
+  <a class="agency-banner-cta" href="/cdn-cgi/l/email-protection#9efcf1f0f4f1ebecdef2fbf3f1e8fbb0f8ec" style="text-decoration:none">Nous contacter →</a>
 </div>
 
 <!-- ── COMMENT ÇA MARCHE ────────────────────────────────────────────── -->
@@ -1242,14 +1242,16 @@
   </div>
   <div class="footer-copy">© 2026 Maison Florélis. Tous droits réservés.</div>
   <div class="footer-links">
-    <a class="footer-link">Mentions légales</a>
-    <a class="footer-link">Politique de confidentialité</a>
+    <a class="footer-link" href="mentions-legales.html">Mentions légales</a>
+    <a class="footer-link" href="cgv.html">CGV</a>
+    <a class="footer-link" href="confidentialite.html">Politique de confidentialité</a>
+    <a class="footer-link" href="cookies.html">Cookies</a>
     <a class="footer-link" href="mailto:bonjour@lemove.fr">Contact</a>
     <a class="footer-link" href="partenaires.html">Partenaires →</a>
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Navigation active state
   const navLinks = document.querySelectorAll('.nav-link');
   const sections = document.querySelectorAll('section[id]');
@@ -1307,12 +1309,4 @@ async function submitPartner() {
         html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville || '—'}</p><p><b>Activité :</b> ${categorie}</p><p><b>Message :</b><br>${message || '—'}</p></div>`
       })
     });
-  } catch(e) { console.log('Email fallback'); }
-
-  document.getElementById('partnerFormWrap').style.display = 'none';
-  document.getElementById('partnerSuccess').style.display = 'block';
-}
-</script>
-
-</body>
-</html>
+  } catch(e) { console.log('
