@@ -635,6 +635,10 @@ async function loadApp(user) {
   else if (!currentProfile?.prenom || !currentProfile?.date_emmenagement) setTimeout(() => showOnboarding(), 600);
   setTimeout(() => updateProgress(), 800);
   setTimeout(() => loadNotifications(), 1000);
+  // Anti-fraud checks
+  setTimeout(() => {
+    if (typeof runAntiFraudCheck === 'function') runAntiFraudCheck(user.id);
+  }, 2000);
 }
 
 // ── WELCOME META ──
@@ -1287,6 +1291,322 @@ setTimeout(() => {
   const mobileUser = document.getElementById('mobileUser');
   if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
 }, 2000);
+</script>
+<script data-cfasync="false">
+// ═══════════════════════════════════════════
+// ANTI-FRAUD SYSTEM — Niveau 1, 2
+// ═══════════════════════════════════════════
+(function() {
+
+  // Generate device fingerprint
+  async function getFingerprint() {
+    const components = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      screen.colorDepth,
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || 0,
+      navigator.deviceMemory || 0,
+      window.devicePixelRatio || 1,
+    ];
+    const str = components.join('|');
+    // Hash with SubtleCrypto
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').slice(0,32);
+  }
+
+  // Get IP + geo info (free service)
+  async function getGeoInfo() {
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      return {
+        ip: data.ip,
+        country: data.country_code,
+        city: data.city,
+      };
+    } catch { return { ip: null, country: null, city: null }; }
+  }
+
+  // VPN/proxy detection heuristics
+  function isSuspiciousIP(geoInfo) {
+    // If timezone doesn't match country — likely VPN
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const tzCountry = {
+      'Europe/Paris': 'FR', 'Europe/London': 'GB', 'Europe/Berlin': 'DE',
+      'America/New_York': 'US', 'America/Los_Angeles': 'US',
+    };
+    const expectedCountry = tzCountry[tz];
+    if (expectedCountry && geoInfo.country && expectedCountry !== geoInfo.country) {
+      return { suspicious: true, reason: 'timezone_country_mismatch' };
+    }
+    return { suspicious: false };
+  }
+
+  window.runAntiFraudCheck = async function(userId) {
+    if (!userId) return;
+    try {
+      const [fingerprint, geoInfo] = await Promise.all([getFingerprint(), getGeoInfo()]);
+      const suspicious = isSuspiciousIP(geoInfo);
+
+      // Check if device is known
+      const { data: existingDevice } = await sb.from('user_devices')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('fingerprint', fingerprint)
+        .maybeSingle();
+
+      if (existingDevice) {
+        // Known device — update last seen
+        await sb.from('user_devices')
+          .update({ last_seen: new Date().toISOString(), login_count: (existingDevice.login_count || 1) + 1, ip_address: geoInfo.ip })
+          .eq('id', existingDevice.id);
+
+        // Check if country changed since last login
+        if (existingDevice.country && geoInfo.country && existingDevice.country !== geoInfo.country) {
+          console.warn('Country change detected:', existingDevice.country, '->', geoInfo.country);
+          await logFraudAlert(userId, 'country_change', { from: existingDevice.country, to: geoInfo.country, ip: geoInfo.ip });
+        }
+      } else {
+        // New device — register it
+        await sb.from('user_devices').insert({
+          user_id: userId,
+          fingerprint,
+          ip_address: geoInfo.ip,
+          user_agent: navigator.userAgent.slice(0, 200),
+          country: geoInfo.country,
+          city: geoInfo.city,
+          is_trusted: false,
+        });
+
+        // Log unknown device alert
+        await logFraudAlert(userId, 'unknown_device', {
+          fingerprint,
+          ip: geoInfo.ip,
+          country: geoInfo.country,
+          city: geoInfo.city,
+          user_agent: navigator.userAgent.slice(0, 100),
+        });
+
+        console.log('New device registered:', geoInfo.city, geoInfo.country);
+      }
+
+      // Flag suspicious IP
+      if (suspicious.suspicious) {
+        await logFraudAlert(userId, 'suspicious_ip', {
+          reason: suspicious.reason,
+          ip: geoInfo.ip,
+          country: geoInfo.country,
+        });
+      }
+
+      // Check for multiple active countries in last 24h
+      const yesterday = new Date(Date.now() - 86400000).toISOString();
+      const { data: recentDevices } = await sb.from('user_devices')
+        .select('country, ip_address')
+        .eq('user_id', userId)
+        .gte('last_seen', yesterday);
+
+      if (recentDevices && recentDevices.length > 0) {
+        const countries = [...new Set(recentDevices.map(d => d.country).filter(Boolean))];
+        if (countries.length >= 3) {
+          await logFraudAlert(userId, 'multiple_countries', {
+            countries,
+            count: countries.length,
+          });
+        }
+      }
+
+    } catch(e) {
+      console.warn('Anti-fraud check error:', e.message);
+    }
+  };
+
+  async function logFraudAlert(userId, type, details) {
+    try {
+      // Use service role via Edge Function to bypass RLS
+      await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/fraud-alert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session?.access_token,
+        },
+        body: JSON.stringify({ user_id: userId, type, details }),
+      });
+    } catch(e) {
+      console.warn('Could not log fraud alert:', e.message);
+    }
+  }
+
+})();
+</script>
+<script data-cfasync="<script data-cfasync="false">
+function showSMSSetup(userId) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,31,20,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#F7F3EE;border-radius:20px;padding:36px;max-width:400px;width:90%;text-align:center';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-style:italic;font-size:22px;color:#2C1F14;margin-bottom:8px';
+  title.textContent = 'Sécurise ton compte';
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'font-size:12px;font-weight:200;color:#8A7968;margin-bottom:20px;line-height:1.6';
+  desc.textContent = 'Pour protéger ton espace Le Move, ajoute ton numéro de téléphone. Un code sera envoyé à chaque connexion depuis un nouvel appareil.';
+
+  var input = document.createElement('input');
+  input.type = 'tel';
+  input.id = 'smsPhoneInput';
+  input.placeholder = '+33 6 XX XX XX XX';
+  input.style.cssText = 'width:100%;padding:12px;border:1px solid #E8E0D5;border-radius:8px;font-family:inherit;font-size:13px;outline:none;margin-bottom:12px;box-sizing:border-box';
+
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:12px;background:#2C1F14;color:#F7F3EE;border:none;border-radius:8px;font-family:inherit;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer';
+  btn.textContent = 'Ajouter mon numéro →';
+  btn.onclick = function() { saveSMSPhone(userId); };
+
+  var skip = document.createElement('div');
+  skip.style.cssText = 'margin-top:12px;font-size:10px;color:#C9BAA8;cursor:pointer';
+  skip.textContent = "Passer pour l'instant";
+  skip.onclick = function() { overlay.remove(); };
+
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(input);
+  card.appendChild(btn);
+  card.appendChild(skip);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+async function saveSMSPhone(userId) {
+  var phone = document.getElementById('smsPhoneInput') ? document.getElementById('smsPhoneInput').value.trim() : '';
+  if (!phone) return;
+  await sb.from('Profiles').update({ telephone: phone }).eq('id', userId);
+  await sendSMSOTP(userId, phone);
+  var overlay = document.getElementById('smsPhoneInput') ? document.getElementById('smsPhoneInput').closest('[style*="position:fixed"]') : null;
+  if (overlay) overlay.remove();
+  showSMSVerifyModal(userId, phone);
+}
+
+async function sendSMSOTP(userId, phone) {
+  var code = Math.floor(100000 + Math.random() * 900000).toString();
+  var expiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  await sb.from('Profiles').update({ sms_otp: code, sms_otp_expiry: expiry }).eq('id', userId);
+  try {
+    await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/send-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, code: code, user_id: userId }),
+    });
+  } catch(e) { console.warn('SMS error:', e.message); }
+}
+
+function showSMSVerifyModal(userId, phone) {
+  var masked = phone.replace(/(\+\d{2})\d+(\d{2})/, '$1••••••$2');
+  var overlay = document.createElement('div');
+  overlay.id = 'smsVerifyOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,31,20,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#F7F3EE;border-radius:20px;padding:36px;max-width:400px;width:90%;text-align:center';
+
+  var emoji = document.createElement('div');
+  emoji.style.cssText = 'font-size:36px;margin-bottom:12px';
+  emoji.textContent = '📱';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-style:italic;font-size:22px;color:#2C1F14;margin-bottom:8px';
+  title.textContent = 'Code de vérification';
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'font-size:12px;font-weight:200;color:#8A7968;margin-bottom:20px;line-height:1.6';
+  desc.innerHTML = 'Un code à 6 chiffres a été envoyé au <strong>' + masked + '</strong>.';
+
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'smsOTPInput';
+  input.maxLength = 6;
+  input.placeholder = '000000';
+  input.style.cssText = 'width:100%;padding:14px;border:1px solid #E8E0D5;border-radius:8px;font-family:Georgia,serif;font-size:28px;text-align:center;letter-spacing:0.3em;outline:none;margin-bottom:12px;box-sizing:border-box';
+
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:12px;background:#2C1F14;color:#F7F3EE;border:none;border-radius:8px;font-family:inherit;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer';
+  btn.textContent = 'Vérifier →';
+  btn.onclick = function() { verifySMSOTP(userId); };
+
+  var errEl = document.createElement('div');
+  errEl.id = 'smsError';
+  errEl.style.cssText = 'color:#C4714A;font-size:11px;margin-top:10px;display:none';
+  errEl.textContent = 'Code incorrect ou expiré.';
+
+  var resend = document.createElement('div');
+  resend.style.cssText = 'margin-top:12px;font-size:10px;color:#C9BAA8;cursor:pointer';
+  resend.textContent = 'Renvoyer le code';
+  resend.onclick = function() { resendSMSOTP(userId); };
+
+  card.appendChild(emoji);
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(input);
+  card.appendChild(btn);
+  card.appendChild(errEl);
+  card.appendChild(resend);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+async function verifySMSOTP(userId) {
+  var inputCode = document.getElementById('smsOTPInput') ? document.getElementById('smsOTPInput').value.trim() : '';
+  if (!inputCode) return;
+  var res = await sb.from('Profiles').select('sms_otp, sms_otp_expiry').eq('id', userId).single();
+  var profile = res.data;
+  if (!profile || !profile.sms_otp || profile.sms_otp !== inputCode) {
+    var err = document.getElementById('smsError');
+    if (err) err.style.display = 'block';
+    return;
+  }
+  if (new Date(profile.sms_otp_expiry) < new Date()) {
+    var err = document.getElementById('smsError');
+    if (err) { err.textContent = 'Code expiré. Demande-en un nouveau.'; err.style.display = 'block'; }
+    return;
+  }
+  await sb.from('Profiles').update({ sms_verified: true, sms_otp: null, sms_otp_expiry: null }).eq('id', userId);
+  localStorage.setItem('lm_sms_verified_' + userId, '1');
+  var overlay = document.getElementById('smsVerifyOverlay');
+  if (overlay) overlay.remove();
+}
+
+async function resendSMSOTP(userId) {
+  var res = await sb.from('Profiles').select('telephone').eq('id', userId).single();
+  if (res.data && res.data.telephone) await sendSMSOTP(userId, res.data.telephone);
+}
+
+async function checkSMSVerification(userId, isNewDevice) {
+  try {
+    var smsKey = 'lm_sms_verified_' + userId;
+    var alreadyVerified = localStorage.getItem(smsKey);
+    if (!alreadyVerified || isNewDevice) {
+      var res = await sb.from('Profiles').select('telephone, sms_verified').eq('id', userId).maybeSingle();
+      var profile = res.data;
+      if (!profile || !profile.telephone) {
+        showSMSSetup(userId);
+        return false;
+      }
+      if (!profile.sms_verified || isNewDevice) {
+        await sendSMSOTP(userId, profile.telephone);
+        showSMSVerifyModal(userId, profile.telephone);
+        return false;
+      }
+    }
+    return true;
+  } catch(e) {
+    console.warn('SMS check error:', e.message);
+    return true;
+  }
+}
 </script>
 </body>
 </html>
