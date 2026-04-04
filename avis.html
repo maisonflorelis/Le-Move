@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>Le Move — Avant. Après.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--sage:#7A8C7E;--terracotta:#C4714A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh}
+.nav{position:sticky;top:0;background:var(--espresso);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);text-decoration:none}
+.nav-back{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.5);text-decoration:none;transition:color 0.2s}
+.nav-back:hover{color:var(--cream)}
+.hero{background:var(--espresso);padding:72px 48px 64px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,186,168,0.04) 1px,transparent 1px);background-size:36px 36px}
+.hero-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(247,243,238,0.25);margin-bottom:16px;position:relative}
+.hero-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:72px;font-weight:300;color:var(--cream);line-height:1;position:relative}
+.hero-title span{color:var(--terracotta)}
+.hero-sep{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0;position:relative}
+.hero-line{width:40px;height:1px;background:rgba(247,243,238,0.15)}
+.hero-dot{width:4px;height:4px;border-radius:50%;background:var(--terracotta)}
+.hero-sub{font-size:14px;font-weight:200;color:rgba(247,243,238,0.4);max-width:440px;margin:0 auto 40px;line-height:1.8;position:relative;font-style:italic}
+.google-btn{display:inline-flex;align-items:center;gap:10px;background:white;color:var(--espresso);padding:14px 28px;border-radius:10px;font-size:12px;font-weight:400;letter-spacing:0.05em;text-decoration:none;transition:all 0.2s;position:relative}
+.google-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.google-star{color:#FBBC04;font-size:14px;letter-spacing:2px}
+
+/* BEFORE/AFTER CARDS */
+.transformation{max-width:960px;margin:0 auto;padding:72px 48px 0}
+.transform-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:start;margin-bottom:80px}
+.transform-col{display:flex;flex-direction:column;gap:16px}
+.transform-header{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:8px}
+.transform-header.before{color:var(--text-light)}
+.transform-header.after{color:var(--terracotta)}
+.transform-item{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:18px 20px;font-size:13px;font-weight:300;color:var(--espresso);line-height:1.6}
+.transform-item.before{border-left:3px solid var(--linen);color:var(--text-light)}
+.transform-item.after{border-left:3px solid var(--terracotta);background:rgba(196,113,74,0.03)}
+.transform-arrow{display:flex;align-items:center;justify-content:center;padding:0 24px;padding-top:40px}
+.arrow-icon{font-size:24px;color:var(--terracotta)}
+
+/* TESTIMONIALS */
+.testimonials-section{background:var(--espresso);padding:72px 48px}
+.section-eyebrow{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(247,243,238,0.3);text-align:center;margin-bottom:12px}
+.section-title-white{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;font-weight:300;color:var(--cream);text-align:center;margin-bottom:8px}
+.section-sub-white{font-size:12px;font-weight:200;color:rgba(247,243,238,0.3);text-align:center;margin-bottom:48px;font-style:italic}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto}
+.testimonial{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:28px}
+.testimonial-stars{color:#FBBC04;font-size:13px;letter-spacing:2px;margin-bottom:16px}
+.testimonial-text{font-size:13px;font-weight:200;color:rgba(247,243,238,0.7);line-height:1.9;font-style:italic;margin-bottom:20px}
+.testimonial-author{display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--terracotta);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:white;flex-shrink:0}
+.author-name{font-size:12px;font-weight:300;color:rgba(247,243,238,0.8)}
+.author-detail{font-size:10px;font-weight:200;color:rgba(247,243,238,0.3);margin-top:2px}
+
+/* CTA */
+.cta-section{padding:80px 48px;text-align:center;max-width:600px;margin:0 auto}
+.cta-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;font-weight:300;color:var(--espresso);margin-bottom:12px;line-height:1.2}
+.cta-sub{font-size:13px;font-weight:200;color:var(--text-light);margin-bottom:28px;line-height:1.7}
+.cta-line{width:32px;height:1px;background:var(--terracotta);margin:20px auto}
+.btn-primary{display:inline-flex;align-items:center;gap:10px;background:var(--espresso);color:var(--cream);padding:14px 28px;border-radius:10px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;transition:opacity 0.2s}
+.btn-primary:hover{opacity:0.85}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;color:var(--text-light);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;margin-top:14px;transition:color 0.2s}
+.btn-secondary:hover{color:var(--terracotta)}
+
+.footer-legal{background:var(--espresso);padding:24px 48px;text-align:center}
+.footer-copy{font-size:11px;color:rgba(247,243,238,0.4);margin-bottom:8px}
+.legal-links{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.legal-links a{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.25);text-decoration:none}
+.legal-links a:hover{color:var(--terracotta)}
+
+@media(max-width:768px){
+  .nav{padding:16px 20px}.hero{padding:48px 20px}
+  .hero-title{font-size:48px}
+  .transformation{padding:40px 20px 0}
+  .transform-grid{grid-template-columns:1fr;gap:12px}
+  .transform-arrow{padding:0;transform:rotate(90deg);margin:8px 0}
+  .testimonials-section{padding:48px 20px}
+  .testimonials-grid{grid-template-columns:1fr}
+  .cta-section{padding:48px 20px}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.testimonial{animation:fadeUp 0.4s ease both}
+.testimonial:nth-child(2){animation-delay:0.1s}
+.testimonial:nth-child(3){animation-delay:0.2s}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Le Move</a>
+  <a href="index.html" class="nav-back">← Retour</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Témoignages</div>
+  <div class="hero-title">Avant.<span> Après.</span></div>
+  <div class="hero-sep"><div class="hero-line"></div><div class="hero-dot"></div><div class="hero-line"></div></div>
+  <div class="hero-sub">L'emménagement, c'est souvent le chaos. Le Move, c'est la sérénité.</div>
+  <a href="https://share.google/52uWaVrRHmxti7jSp" target="_blank" class="google-btn">
+    <span class="google-star">★★★★★</span>
+    Laisser un avis Google
+  </a>
+</div>
+
+<div class="transformation">
+  <div class="transform-grid">
+    <div class="transform-col">
+      <div class="transform-header before">Avant Le Move</div>
+      <div class="transform-item before">Des dizaines d'onglets ouverts, des notes partout, rien de centralisé.</div>
+      <div class="transform-item before">Un budget approximatif sur un coin de nappe, des dépassements inévitables.</div>
+      <div class="transform-item before">Des démarches administratives oubliées découvertes trop tard.</div>
+      <div class="transform-item before">Un emménagement stressant, épuisant, qui part dans tous les sens.</div>
+    </div>
+    <div class="transform-arrow"><div class="arrow-icon">→</div></div>
+    <div class="transform-col">
+      <div class="transform-header after">Avec Le Move</div>
+      <div class="transform-item after">Un seul espace, tout est là. Budget, checklist, moodboard, livraisons.</div>
+      <div class="transform-item after">Un budget structuré, des alertes de dépassement, zéro mauvaise surprise.</div>
+      <div class="transform-item after">Une checklist admin complète. Changements d'adresse, résiliations — rien n'est oublié.</div>
+      <div class="transform-item after">Un emménagement maîtrisé, serein. Exactement comme il devrait être.</div>
+    </div>
+  </div>
+</div>
+
+<div class="testimonials-section">
+  <div class="section-eyebrow">Ce qu'ils en disent</div>
+  <div class="section-title-white">Leurs mots, pas les nôtres.</div>
+  <div class="section-sub-white">Des vraies personnes. De vrais emménagements.</div>
+  <div class="testimonials-grid">
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <div class="testimonial-text">"J'avais peur de me noyer dans l'organisation. Le Move m'a tout simplifié — le budget, les démarches, même la déco. Je n'aurais pas pu m'en passer."</div>
+      <div class="testimonial-author">
+        <div class="avatar">C</div>
+        <div>
+          <div class="author-name">Camille J.</div>
+          <div class="author-detail">Premier appartement · Paris</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <div class="testimonial-text">"Le moodboard IA m'a époustouflée. En quelques minutes j'avais une palette et des suggestions d'achats qui correspondaient exactement à ce que j'imaginais."</div>
+      <div class="testimonial-author">
+        <div class="avatar">W</div>
+        <div>
+          <div class="author-name">Wendy L.</div>
+          <div class="author-detail">Nouvelle colocation · Lyon</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-stars">★★★★★</div>
+      <div class="testimonial-text">"La checklist administrative m'a sauvée. Je n'aurais jamais pensé à tous ces changements d'adresse. Simple, beau, vraiment bien pensé."</div>
+      <div class="testimonial-author">
+        <div class="avatar">S</div>
+        <div>
+          <div class="author-name">Sarah M.</div>
+          <div class="author-detail">Déménagement inter-villes · Bordeaux</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="cta-title">Prêt à vivre<br>ton emménagement autrement ?</div>
+  <div class="cta-line"></div>
+  <div class="cta-sub">Rejoins les personnes qui ont décidé que s'installer pouvait être<br>une expérience agréable. Dès 39€, sans abonnement.</div>
+  <a href="index.html#pricing" class="btn-primary">Voir les offres →</a>
+  <br>
+  <a href="https://share.google/52uWaVrRHmxti7jSp" target="_blank" class="btn-secondary">★ Laisser mon avis Google</a>
+</div>
+
+<div class="footer-legal">
+  <div class="footer-copy">© 2026 Maison Florélis — Le Move. Tous droits réservés.</div>
+  <div class="legal-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="cgv.html">CGV</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cookies.html">Cookies</a>
+  </div>
+</div>
+
+</body>
+</html>
