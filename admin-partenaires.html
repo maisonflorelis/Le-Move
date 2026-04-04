@@ -346,7 +346,7 @@ const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = atob('c2hlcnlsLm1lcmNpZXJAZ21haWwuY29t');
 const RESEND_KEY = atob('cmVfQWtYNU5jUEVfQmhmaTRnWlh2R0gza2p3WHhhdEJkYUZHbg==');
-const STRIPE_LINK = 'https://buy.stripe.com/9B63cv9HickT8pLeF56EU06';
+const STRIPE_LINK = 'https://buy.stripe.com/dRm3cv8De1Gf21n8gH6EU09';
 const PLANS_PRICE = { essentiel: 39, complet: 69, premium: 99 };
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -787,7 +787,7 @@ function renderRevenus() {
   const partenairesActifs = allPartenaires.filter(p => p.statut === 'actif').length;
 
   const mrrUsers = (essentiel * 39) + (complet * 69) + (premium * 99);
-  const mrrPart = partenairesActifs * 39;
+  const mrrPart = Math.round(partenairesActifs * 349 / 12); // 349€/an = ~29€/mois
   const mrrTotal = mrrUsers + mrrPart;
 
   document.getElementById('mrrTotal').textContent = mrrTotal.toLocaleString('fr-FR') + '€';
