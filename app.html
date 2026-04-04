@@ -639,6 +639,10 @@ async function loadApp(user) {
   setTimeout(() => {
     if (typeof runAntiFraudCheck === 'function') runAntiFraudCheck(user.id);
   }, 2000);
+  // Review nudge
+  setTimeout(function() {
+    if (typeof checkReviewNudge === 'function') checkReviewNudge(user.id);
+  }, 4000);
 }
 
 // ── WELCOME META ──
@@ -1606,6 +1610,50 @@ async function checkSMSVerification(userId, isNewDevice) {
     console.warn('SMS check error:', e.message);
     return true;
   }
+}
+</script>
+<script data-cfasync="false">
+// ── REVIEW NUDGE ──
+async function checkReviewNudge(userId) {
+  try {
+    var key = 'lm_review_asked_' + userId;
+    if (localStorage.getItem(key)) return;
+
+    // Check account age
+    var res = await sb.from('Users').select('created_at').ilike('Email', currentUser.email).maybeSingle();
+    if (!res.data) return;
+
+    var created = new Date(res.data.created_at);
+    var daysSince = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Only after 7 days
+    if (daysSince < 7) return;
+
+    // Show nudge
+    localStorage.setItem(key, '1');
+    setTimeout(function() { showReviewNudge(); }, 3000);
+  } catch(e) {}
+}
+
+function showReviewNudge() {
+  var nudge = document.createElement('div');
+  nudge.id = 'reviewNudge';
+  nudge.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2C1F14;border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:16px;z-index:999;box-shadow:0 8px 32px rgba(44,31,20,0.3);max-width:480px;width:90%;animation:slideUp 0.3s ease';
+  nudge.innerHTML =
+    '<div style="font-size:28px">✦</div>' +
+    '<div style="flex:1">' +
+      '<div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#F7F3EE;margin-bottom:3px">Tu aimes Le Move ?</div>' +
+      '<div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.5);line-height:1.5">Un avis Google nous aide énormément à nous faire connaître.</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">' +
+      '<a href="https://share.google/52uWaVrRHmxti7jSp" target="_blank" style="padding:8px 16px;background:#C4714A;color:white;border-radius:8px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;text-align:center;white-space:nowrap;display:block">Laisser un avis →</a>' +
+      '<div onclick="var n=document.getElementById(\'reviewNudge\');if(n)n.remove();" style="font-size:10px;color:rgba(247,243,238,0.3);text-align:center;cursor:pointer">Plus tard</div>' +
+    '</div>';
+  document.body.appendChild(nudge);
+  setTimeout(function() {
+    var el = document.getElementById('reviewNudge');
+    if (el) el.style.opacity = '0', el.style.transition = 'opacity 0.5s', setTimeout(function(){if(el)el.remove();}, 500);
+  }, 12000);
 }
 </script>
 </body>
