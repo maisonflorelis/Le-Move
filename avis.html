@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K5BVKVHC');</script>
+<!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -87,6 +94,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5BVKVHC"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager -->
 
 <nav class="nav">
   <a href="index.html" class="nav-logo">Le Move</a>
@@ -184,5 +195,37 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   </div>
 </div>
 
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2C1F14;z-index:9998;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="flex:1;min-width:200px">
+    <div style="font-size:12px;font-weight:300;color:#F7F3EE;margin-bottom:3px">Nous utilisons des cookies analytics pour améliorer Le Move.</div>
+    <div style="font-size:10px;font-weight:200;color:rgba(247,243,238,0.4)">Aucune donnée vendue à des tiers. <a href="cookies.html" style="color:#C4714A;text-decoration:none">En savoir plus</a></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0">
+    <button onclick="refuseCookies()" style="padding:8px 18px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(247,243,238,0.5);font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer">Refuser</button>
+    <button onclick="acceptCookies()" style="padding:8px 18px;background:#C4714A;border:none;border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer">Accepter</button>
+  </div>
+</div>
+<script>
+(function(){
+  var consent = localStorage.getItem('lm_cookie_consent');
+  if (!consent) {
+    document.getElementById('cookieBanner').style.display = 'flex';
+  } else if (consent === 'accepted') {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({'event': 'cookie_consent_accepted'});
+  }
+})();
+function acceptCookies() {
+  localStorage.setItem('lm_cookie_consent', 'accepted');
+  document.getElementById('cookieBanner').style.display = 'none';
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({'event': 'cookie_consent_accepted'});
+}
+function refuseCookies() {
+  localStorage.setItem('lm_cookie_consent', 'refused');
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+</script>
 </body>
 </html>
