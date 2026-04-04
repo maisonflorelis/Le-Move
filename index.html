@@ -1246,12 +1246,12 @@
     <a class="footer-link" href="cgv.html">CGV</a>
     <a class="footer-link" href="confidentialite.html">Politique de confidentialité</a>
     <a class="footer-link" href="cookies.html">Cookies</a>
-    <a class="footer-link" href="mailto:bonjour@lemove.fr">Contact</a>
+    <a class="footer-link" href="/cdn-cgi/l/email-protection#b2d0dddcd8ddc7c0f2ded7dfddc4d79cd4c0">Contact</a>
     <a class="footer-link" href="partenaires.html">Partenaires →</a>
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Navigation active state
   const navLinks = document.querySelectorAll('.nav-link');
   const sections = document.querySelectorAll('section[id]');
@@ -1306,7 +1306,4 @@ async function submitPartner() {
         to: ['bonjour@lemove.fr'],
         reply_to: email,
         subject: `[Partenaire] ${nom} — ${entreprise} (${categorie})`,
-        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville || '—'}</p><p><b>Activité :</b> ${categorie}</p><p><b>Message :</b><br>${message || '—'}</p></div>`
-      })
-    });
-  } catch(e) { console.log('
+        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville ||
