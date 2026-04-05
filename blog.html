@@ -678,16 +678,14 @@ document.addEventListener('keydown', function(e) {
 function shareArticle(platform) {
   var title = document.getElementById('modalTitle').textContent;
   var url = 'https://lemove.fr/blog.html';
-  var text = title + ' — Le Move, l'art de bien s'installer.';
+  var text = title + " — Le Move, l'art de bien s'installer.";
   if (platform === 'whatsapp') {
     window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank');
   } else if (platform === 'instagram') {
     navigator.clipboard.writeText(text + ' ' + url);
     alert('Lien copié ! Colle-le dans ta story Instagram.');
   } else if (platform === 'email') {
-    window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text + '
-
-' + url);
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text + '\n\n' + url);
   }
 }
 </script>
