@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /app.html
+Disallow: /admin-partenaires.html
+Disallow: /partenaire-dashboard.html
+Disallow: /reset-password.html
+
+Sitemap: https://lemove.fr/sitemap.xml
