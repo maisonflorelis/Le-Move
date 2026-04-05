@@ -645,6 +645,19 @@ window.addEventListener('load', () => {
   }
 
   function applyNavLocks(plan) {
+    // Admin always has full access
+    var adminEmail = 'sheryl.mercier@gmail.com';
+    var storedEmail = localStorage.getItem('lm_user_email') || '';
+    if (storedEmail === adminEmail || plan === 'admin') {
+      document.querySelectorAll('.nav-locked').forEach(function(el) {
+        var lock = el.querySelector('.nav-lock');
+        if (lock) lock.style.display = 'none';
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+        el.classList.remove('nav-locked');
+      });
+      return;
+    }
     var planRank = PLAN_ORDER[plan] || 0;
     document.querySelectorAll('.nav-locked').forEach(function(el) {
       var required = el.getAttribute('data-plan');

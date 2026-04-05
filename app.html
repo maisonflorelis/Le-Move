@@ -616,6 +616,7 @@ async function loadApp(user) {
   currentPlan = (profilePlan?.Plan || planFromUsers || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
+  localStorage.setItem('lm_user_email', user.email);
   console.log('Plan loaded from Profiles:', profilePlan?.Plan, '| from Users:', planFromUsers, '| final:', currentPlan);
 
   const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).maybeSingle();
