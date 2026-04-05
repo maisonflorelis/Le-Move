@@ -740,7 +740,7 @@ window.addEventListener('load', () => {
       var session = await window._sb?.auth.getSession();
       if (!session?.data?.session) return cached;
       var uid = session.data.session.user.id;
-      var res = await window._sb.from('Users').select('Plan').eq('id', uid).single();
+      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).maybeSingle();
       if (res.data?.Plan) {
         var plan = res.data.Plan.toLowerCase();
         localStorage.setItem('lm_plan', JSON.stringify(plan));
