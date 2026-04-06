@@ -101,7 +101,6 @@ async function renderModuleProgress() {
 }
 
 </script>
-</script>
 <script>
 // ── NOTIFICATIONS (module) ──
 let notifications = [];
@@ -186,27 +185,27 @@ window.addEventListener('load', () => {
   async function getVerifiedPlan() {
     try {
       var cached = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+      // Verify against Supabase
       var session = await window._sb?.auth.getSession();
-      if (!session?.data?.session || !window._sb?.rpc) return cached;
-
-      var res = await window._sb.rpc('get_my_access');
-      if (res && res.error) {
-        console.warn('get_my_access unavailable, using cached plan', res.error);
-        return cached;
+      if (!session?.data?.session) return cached;
+      var uid = session.data.session.user.id;
+      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).maybeSingle();
+      if (res.data?.Plan) {
+        var plan = res.data.Plan.toLowerCase();
+        localStorage.setItem('lm_plan', JSON.stringify(plan));
+        return plan;
       }
-      var access = res && res.data ? res.data : null;
-      var plan = access && access.plan ? String(access.plan).toLowerCase() : cached;
-
-      localStorage.setItem('lm_plan', JSON.stringify(plan));
-      return plan;
+      return cached;
     } catch(e) {
-      console.warn('Plan verification fallback to cache', e);
       return JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
     }
   }
 
   function applyNavLocks(plan) {
-    if (plan === 'admin') {
+    // Admin always has full access
+    var adminEmail = 'sheryl.mercier@gmail.com';
+    var storedEmail = localStorage.getItem('lm_user_email') || '';
+    if (storedEmail === adminEmail || plan === 'admin') {
       document.querySelectorAll('.nav-locked').forEach(function(el) {
         var lock = el.querySelector('.nav-lock');
         if (lock) lock.style.display = 'none';
