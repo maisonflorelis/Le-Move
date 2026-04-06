@@ -885,15 +885,20 @@ window.addEventListener('load', () => {
     try {
       var cached = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
       var session = await window._sb?.auth.getSession();
-      if (!session?.data?.session) return cached;
+      if (!session?.data?.session || !window._sb?.rpc) return cached;
 
       var res = await window._sb.rpc('get_my_access');
+      if (res && res.error) {
+        console.warn('get_my_access unavailable, using cached plan', res.error);
+        return cached;
+      }
       var access = res && res.data ? res.data : null;
       var plan = access && access.plan ? String(access.plan).toLowerCase() : cached;
 
       localStorage.setItem('lm_plan', JSON.stringify(plan));
       return plan;
     } catch(e) {
+      console.warn('Plan verification fallback to cache', e);
       return JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
     }
   }
@@ -962,11 +967,25 @@ window.addEventListener('load', () => {
 // ── PLAN GUARD ──
 (async function() {
   try {
-    var { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'app.html'; return; }
+    var cachedPlan = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
+    if (!window.sb?.auth || !window.sb?.rpc) return;
 
-    var { data: access } = await sb.rpc('get_my_access');
-    var plan = (access && access.plan ? String(access.plan).toLowerCase() : 'essentiel');
+    var sessionRes = await sb.auth.getSession();
+    var session = sessionRes && sessionRes.data ? sessionRes.data.session : null;
+    if (!session) {
+      console.warn('No active session; keeping page visible and using cached plan.');
+      return;
+    }
+
+    var rpcRes = await sb.rpc('get_my_access');
+    if (rpcRes && rpcRes.error) {
+      console.warn('get_my_access unavailable; keeping page visible and using cached plan.', rpcRes.error);
+      return;
+    }
+
+    var access = rpcRes && rpcRes.data ? rpcRes.data : null;
+    var plan = (access && access.plan ? String(access.plan).toLowerCase() : cachedPlan);
+    localStorage.setItem('lm_plan', JSON.stringify(plan));
 
     var allowed = ["premium"];
     if (!(plan === 'admin' || allowed.includes(plan))) {
