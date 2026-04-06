@@ -157,12 +157,14 @@ function closeNotifPanel() {
   const p=document.getElementById('notifPanel');
   if(p) p.classList.remove('open');
 }
-</script><script>
+</script>
+<script>
 document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
-</script><script>
+</script>
+<script>
 window.addEventListener('load', () => {
   setTimeout(() => {
     if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
