@@ -442,10 +442,10 @@ let currentPlan = 'premium';
   currentUser = session.user;
 
   const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
-  const { data: userData } = await sb.from('Users').select('Plan').eq('Email', session.user.email).single();
+  const { data: access } = await sb.rpc('get_my_access');
 
   const prenom = profile?.prenom || session.user.email.split('@')[0];
-  currentPlan = (userData?.Plan || 'premium');
+  currentPlan = (access?.plan && access.plan !== 'admin') ? access.plan : 'premium';
 
   document.getElementById('sidebarUser').textContent = prenom;
   document.getElementById('fPrenom').value = prenom;
@@ -673,27 +673,22 @@ window.addEventListener('load', () => {
   async function getVerifiedPlan() {
     try {
       var cached = JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
-      // Verify against Supabase
       var session = await window._sb?.auth.getSession();
       if (!session?.data?.session) return cached;
-      var uid = session.data.session.user.id;
-      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).maybeSingle();
-      if (res.data?.Plan) {
-        var plan = res.data.Plan.toLowerCase();
-        localStorage.setItem('lm_plan', JSON.stringify(plan));
-        return plan;
-      }
-      return cached;
+
+      var res = await window._sb.rpc('get_my_access');
+      var access = res && res.data ? res.data : null;
+      var plan = access && access.plan ? String(access.plan).toLowerCase() : cached;
+
+      localStorage.setItem('lm_plan', JSON.stringify(plan));
+      return plan;
     } catch(e) {
       return JSON.parse(localStorage.getItem('lm_plan') || '"essentiel"');
     }
   }
 
   function applyNavLocks(plan) {
-    // Admin always has full access
-    var adminEmail = 'sheryl.mercier@gmail.com';
-    var storedEmail = localStorage.getItem('lm_user_email') || '';
-    if (storedEmail === adminEmail || plan === 'admin') {
+    if (plan === 'admin') {
       document.querySelectorAll('.nav-locked').forEach(function(el) {
         var lock = el.querySelector('.nav-lock');
         if (lock) lock.style.display = 'none';
@@ -751,26 +746,33 @@ window.addEventListener('load', () => {
   });
 })();
 </script>
+
 <script>
 // ── PLAN GUARD ──
 (async function() {
-  var { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'app.html'; return; }
-  var { data: u } = await sb.from('Users').select('Plan').eq('id', session.user.id).single();
-  var plan = (u && u.Plan ? u.Plan : 'essentiel').toLowerCase();
-  var allowed = ["premium"];
-  if (!allowed.includes(plan)) {
-    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#2C1F14;font-family:DM Sans,sans-serif">' +
-      '<div style="text-align:center;padding:48px;max-width:420px">' +
-        '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:48px;color:#F7F3EE;margin-bottom:8px">Le Move</div>' +
-        '<div style="width:32px;height:1px;background:#C4714A;margin:16px auto"></div>' +
-        '<div style="font-size:14px;font-weight:300;color:rgba(247,243,238,0.6);margin-bottom:24px">Ce module est inclus dans le plan Premium (150€)</div>' +
-        '<a href="https://lemove.fr#pricing" style="display:inline-block;padding:12px 28px;background:#C4714A;color:white;border-radius:8px;text-decoration:none;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Changer de plan →</a>' +
-        '<br><a href="app.html" style="font-size:11px;color:rgba(247,243,238,0.4);text-decoration:none">← Retour au dashboard</a>' +
-      '</div></div>';
-    return;
+  try {
+    var { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'app.html'; return; }
+
+    var { data: access } = await sb.rpc('get_my_access');
+    var plan = (access && access.plan ? String(access.plan).toLowerCase() : 'essentiel');
+
+    var allowed = ["premium"];
+    if (!(plan === 'admin' || allowed.includes(plan))) {
+      document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#2C1F14;font-family:DM Sans,sans-serif">' +
+        '<div style="text-align:center;padding:48px;max-width:420px">' +
+          '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:48px;color:#F7F3EE;margin-bottom:8px">Le Move</div>' +
+          '<div style="width:32px;height:1px;background:#C4714A;margin:16px auto"></div>' +
+          '<div style="font-size:14px;font-weight:300;color:rgba(247,243,238,0.6);margin-bottom:24px">Ce module nécessite un plan supérieur.</div>' +
+          '<a href="https://lemove.fr#pricing" style="display:inline-block;padding:12px 28px;background:#C4714A;color:white;border-radius:8px;text-decoration:none;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Changer de plan →</a>' +
+          '<br><a href="app.html" style="font-size:11px;color:rgba(247,243,238,0.4);text-decoration:none">← Retour au dashboard</a>' +
+        '</div></div>';
+    }
+  } catch (e) {
+    console.error('PLAN_GUARD_ERROR', e);
   }
 })();
 </script>
+
 </body>
 </html>
