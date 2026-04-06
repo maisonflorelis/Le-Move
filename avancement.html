@@ -1,8 +1,755 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Tag Manager -->
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
+<title>Le Move — Mon Avancement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+// ── JOURNAL ──
+let journalEntries = [];
 
+async function loadJournal() {
+  const { data } = await sb.from('journal_entries').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  journalEntries = data || [];
+  renderJournal();
+}
+
+function renderJournal() {
+  const el = document.getElementById('journalEntries');
+  if (!journalEntries.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic">Aucune entrée. Commence à écrire !</div>';
+    return;
+  }
+  el.innerHTML = journalEntries.map(e => `
+    <div class="journal-entry">
+      <button class="journal-delete" onclick="deleteJournalEntry('${e.id}')">🗑</button>
+      <div class="journal-date">${new Date(e.created_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+      <div class="journal-text">${e.contenu}</div>
+    </div>
+  `).join('');
+}
+
+async function addJournalEntry() {
+  const contenu = document.getElementById('journalInput').value.trim();
+  if (!contenu) return;
+  const { data } = await sb.from('journal_entries').insert({ user_id: currentUser.id, contenu }).select().single();
+  if (data) { journalEntries.unshift(data); renderJournal(); }
+  document.getElementById('journalInput').value = '';
+}
+
+async function deleteJournalEntry(id) {
+  if (!confirm('Supprimer cette entrée ?')) return;
+  await sb.from('journal_entries').delete().eq('id', id);
+  journalEntries = journalEntries.filter(e => e.id !== id);
+  renderJournal();
+}
+
+// Ctrl+Enter to submit
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter' && document.activeElement.id === 'journalInput') addJournalEntry();
+});
+async function getModuleProgress() {
+  const { data } = await sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id);
+  if (!data || !data.length) return 0;
+  return Math.round((data.filter(t=>t.statut==='done').length/data.length)*100);
+}
+
+async function renderModuleProgress() {
+  try {
+    const pct = await getModuleProgress();
+    const strip = document.getElementById('moduleProgressStrip');
+    const fill = document.getElementById('moduleProgressFill');
+    const pctEl = document.getElementById('moduleProgressPct');
+    if (strip) strip.style.display = 'flex';
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  } catch(e) { console.warn('Progress error:', e); }
+}
+
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);display:flex;flex-direction:column;z-index:100}
+  .sidebar-top{padding:28px 20px 12px;flex-shrink:0}
+  .sidebar-scroll{flex:1;overflow-y:auto;padding:4px 8px 16px 20px;min-height:0}
+  .sidebar-scroll::-webkit-scrollbar{width:5px}
+  .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.45);border-radius:10px}
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.75)}
+  .sidebar-footer{padding:14px 20px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
+  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 10px;border-radius:6px;font-size:13px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
+  .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--cream)}
+  .nav-item.active{background:rgba(122,140,126,0.15);color:#A8C4AB;border-left-color:#7A8C7E;padding-left:7px}
+  .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(201,186,168,0.4);flex-shrink:0}
+  .nav-item.active .nav-dot{background:#7A8C7E}
+  .nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.3);padding:10px 10px 4px}
+  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
+  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
+  .sidebar-footer{padding:16px 0 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+.progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
+.progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
+.main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
+.page-header{background:var(--espresso);padding:52px 52px 40px;position:relative;overflow:hidden}
+.page-header::before{content:'05';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-family:'Cormorant Garamond',serif;font-size:180px;font-weight:300;color:rgba(255,255,255,0.04);line-height:1;pointer-events:none}
+.breadcrumb{font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:16px}
+.breadcrumb span{color:rgba(247,243,238,0.6)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;font-style:italic;color:var(--cream);line-height:1.1;margin-bottom:8px}
+.page-line{width:40px;height:1px;background:var(--terracotta);margin:14px 0}
+.page-quote{font-size:12px;font-weight:200;font-style:italic;color:rgba(247,243,238,0.45)}
+.content{padding:44px 52px}
+.section-eyebrow{font-size:9px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-light);margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.section-eyebrow::after{content:'';flex:1;height:1px;background:var(--linen)}
+
+/* SCORE HERO */
+.score-hero{background:var(--espresso);border-radius:20px;padding:40px;margin-bottom:32px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:48px;position:relative;overflow:hidden}
+.score-hero::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;border:1px solid rgba(255,255,255,0.04);right:-80px;top:-80px}
+.score-circle{width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.score-num{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:var(--cream);line-height:1}
+.score-pct-sym{font-size:14px;color:var(--terracotta)}
+.score-lbl{font-size:8px;font-weight:200;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-top:2px}
+.score-details{flex:1}
+.score-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;font-weight:300;color:var(--cream);margin-bottom:6px}
+.score-sub{font-size:12px;font-weight:200;color:rgba(247,243,238,0.45);font-style:italic;margin-bottom:20px}
+.score-mini-stats{display:flex;gap:20px}
+.score-mini{text-align:center;padding:12px 16px;background:rgba(255,255,255,0.05);border-radius:10px}
+.score-mini-num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--cream);line-height:1}
+.score-mini-lbl{font-size:8px;font-weight:200;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-top:4px}
+.score-date{text-align:right;padding-left:40px;border-left:1px solid rgba(255,255,255,0.08)}
+.score-date-lbl{font-size:8px;font-weight:200;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:6px}
+.score-date-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--cream);line-height:1.3}
+.score-days{font-size:11px;font-weight:200;color:var(--terracotta);margin-top:6px}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:40px}
+.kanban-col{background:var(--cream);border:1px solid var(--linen);border-radius:14px;overflow:hidden}
+.kanban-header{padding:16px 20px;border-bottom:1px solid var(--linen);display:flex;align-items:center;justify-content:space-between}
+.kanban-title{font-size:10px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--espresso);display:flex;align-items:center;gap:8px}
+.kanban-dot{width:6px;height:6px;border-radius:50%}
+.dot-todo{background:var(--sand)}
+.dot-doing{background:var(--terracotta)}
+.dot-done{background:var(--sage)}
+.kanban-count{font-size:10px;font-weight:300;color:var(--text-light)}
+.kanban-body{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px}
+.kcard{background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.15s;position:relative}
+.kcard:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(44,31,20,0.07)}
+.kcard.done-card{opacity:0.55}
+.kcard-cat{font-size:8px;font-weight:300;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.kcard-title{font-size:12px;font-weight:300;color:var(--espresso);line-height:1.4;margin-bottom:8px}
+.kcard-title.striked{text-decoration:line-through;color:var(--text-light)}
+.kcard-meta{display:flex;align-items:center;justify-content:space-between}
+.kcard-date{font-size:9px;font-weight:200;color:var(--text-light)}
+.kcard-priority{width:6px;height:6px;border-radius:50%}
+.priority-high{background:var(--terracotta)}
+.priority-mid{background:var(--gold)}
+.priority-low{background:var(--sage)}
+.kcard-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity 0.2s}
+.kcard:hover .kcard-actions{opacity:1}
+.kcard-btn{width:20px;height:20px;border-radius:4px;border:none;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--linen);color:var(--text-light);transition:all 0.15s}
+.kcard-btn:hover{background:var(--espresso);color:white}
+.add-card-area{padding:8px 12px;border-top:1px solid var(--linen)}
+.add-card-input{width:100%;padding:8px 10px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--espresso);outline:none;transition:border-color 0.2s}
+.add-card-input:focus{border-color:var(--terracotta)}
+
+/* ADD TASK FORM */
+.add-task-form{background:var(--cream);border:1px solid var(--linen);border-radius:14px;padding:24px 28px;margin-bottom:40px}
+.add-task-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;font-weight:300;margin-bottom:16px}
+.add-task-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.add-field{display:flex;flex-direction:column;gap:5px}
+.add-label{font-size:8px;font-weight:300;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light)}
+.add-input,.add-select{padding:9px 13px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--espresso);outline:none;transition:border-color 0.2s;appearance:none}
+.add-input:focus,.add-select:focus{border-color:var(--terracotta)}
+.add-btn{padding:9px 20px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;align-self:end}
+.add-btn:hover{opacity:0.85}
+.empty-col{text-align:center;padding:24px 12px;color:var(--text-light);font-size:11px;font-weight:200;font-style:italic}
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}
+  .content{padding:24px 20px}
+  .score-hero{grid-template-columns:1fr;gap:20px}
+  .score-date{border-left:none;border-top:1px solid rgba(255,255,255,0.08);padding-left:0;padding-top:16px;text-align:left}
+  .kanban{grid-template-columns:1fr}
+  .add-task-grid{grid-template-columns:1fr 1fr}
+}
+
+/* JOURNAL */
+.journal-section{margin-bottom:40px}
+.journal-entries{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.journal-entry{background:var(--cream);border:1px solid var(--linen);border-radius:12px;padding:20px 24px;position:relative;transition:all 0.2s}
+.journal-entry:hover{border-color:var(--sand)}
+.journal-date{font-size:9px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px}
+.journal-text{font-size:13px;font-weight:300;color:var(--espresso);line-height:1.7;white-space:pre-wrap}
+.journal-delete{position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-light);opacity:0;transition:opacity 0.2s}
+.journal-entry:hover .journal-delete{opacity:1}
+.journal-add{background:var(--cream);border:1px solid var(--linen);border-radius:12px;padding:20px 24px}
+.journal-textarea{width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--espresso);outline:none;transition:border-color 0.2s;resize:none;min-height:100px;line-height:1.6}
+.journal-textarea:focus{border-color:var(--terracotta)}
+.journal-textarea::placeholder{color:var(--sand);font-style:italic}
+.journal-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.journal-hint{font-size:10px;font-weight:200;color:var(--text-light);font-style:italic}
+.journal-submit{padding:10px 24px;background:var(--espresso);color:var(--cream);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.journal-submit:hover{opacity:0.85}
+
+  /* ── CUSTOM SCROLLBAR ── */
+  
+
+  /* ── CUSTOM CURSOR ── */
+  html, body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3' fill='%23C4714A' opacity='0.8'/%3E%3C/svg%3E") 4 4, auto; }
+  a, button, [onclick], .nav-item, .module-card, .category-card, .task-row, .kcard, .gift-card, .note-card, .media-card, .delivery-card, .inspo-card, .cat-header, .add-cat-btn, .add-inspo-btn, .add-note-btn, .add-gift-btn, .add-contact-btn, .add-card-area input, .filter-tab, .phase-tab, .cat-tab, .piece-tab, .upload-zone { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='4' cy='4' r='3.5' fill='%23C4714A'/%3E%3C/svg%3E") 4 4, pointer; }
+
+  /* ── SMOOTH TRANSITIONS ── */
+  * { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease; }
+  .module-card, .category-card, .kcard, .gift-card, .note-card, .media-card, .delivery-card, .inspo-card, .aide-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important; }
+
+  /* ── PAGE ENTRANCE ANIMATION ── */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .page-header { animation: slideUp 0.35s ease both; }
+  .summary-bar { animation: slideUp 0.35s 0.05s ease both; }
+  .content > * { animation: slideUp 0.35s ease both; }
+  .content > *:nth-child(1) { animation-delay: 0.08s; }
+  .content > *:nth-child(2) { animation-delay: 0.12s; }
+  .content > *:nth-child(3) { animation-delay: 0.16s; }
+  .content > *:nth-child(4) { animation-delay: 0.20s; }
+  .content > *:nth-child(5) { animation-delay: 0.24s; }
+
+  /* ── NAV HOVER EFFECT ── */
+  .nav-item { position: relative; overflow: hidden; }
+  .nav-item::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 0; height: 60%; background: var(--terracotta); border-radius: 0 2px 2px 0; transition: width 0.2s ease; opacity: 0.6; }
+  .nav-item:hover::before { width: 2px; }
+  .nav-item.active::before { width: 3px; opacity: 1; }
+
+  /* ── BUTTON RIPPLE ── */
+  .modal-save, .add-btn, .budget-save-btn, .date-save-btn, .add-task-btn, .copy-btn, .upload-btn, .btn-add { position: relative; overflow: hidden; }
+  .modal-save:active, .add-btn:active, .budget-save-btn:active { transform: scale(0.98); }
+
+  /* ── INPUT FOCUS GLOW ── */
+  input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(196,113,74,0.12) !important; }
+
+  /* ── CARD HOVER LIFT ── */
+  .module-card:hover:not(.locked), .category-card:hover, .kcard:hover, .gift-card:hover, .note-card:hover, .aide-card:hover { transform: translateY(-3px) !important; box-shadow: 0 12px 36px rgba(44,31,20,0.1) !important; }
+
+
+  /* ── MOBILE MENU ── */
+  .mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; background: var(--warm-black); z-index: 200; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .mobile-nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; color: var(--cream); }
+  .mobile-nav-right { display: flex; align-items: center; gap: 12px; }
+  .hamburger { background: none; border: none; cursor: pointer; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--cream); border-radius: 2px; transition: all 0.3s ease; }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(20,14,8,0.7); z-index: 198; backdrop-filter: blur(2px); }
+  .mobile-overlay.open { display: block; }
+  .mobile-drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: var(--warm-black); z-index: 199; transition: left 0.3s ease; overflow-y: auto; padding: 72px 20px 32px; scrollbar-width: none; }
+  .mobile-drawer::-webkit-scrollbar { display: none; }
+  .mobile-drawer.open { left: 0; }
+  .mobile-drawer .nav-section { font-size: 7px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,186,168,0.35); padding: 12px 10px 4px; }
+  .mobile-drawer .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 6px; font-size: 12px; font-weight: 300; color: var(--sand); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+  .mobile-drawer .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+  .mobile-drawer .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); }
+  .mobile-drawer .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sand); flex-shrink: 0; }
+  .mobile-drawer .nav-item.active .nav-dot { background: var(--terracotta); }
+  .mobile-drawer-footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .mobile-logout-btn { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); color: rgba(201,186,168,0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-family: "DM Sans", sans-serif; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+  .mobile-logout-btn:hover { color: var(--cream); border-color: rgba(255,255,255,0.2); }
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .main { margin-left: 0 !important; padding-top: 56px; }
+    .mobile-nav { display: flex; }
+  }
+
+
+  /* ── NOTIFICATIONS ── */
+  .notif-bell { position: relative; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; }
+  .notif-bell-icon { font-size: 18px; transition: transform 0.2s; }
+  .notif-bell:hover .notif-bell-icon { transform: rotate(15deg); }
+  .notif-badge { position: absolute; top: 0; right: 0; width: 16px; height: 16px; background: var(--terracotta); border-radius: 50%; font-size: 9px; font-weight: 500; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid var(--warm-black); animation: pulse-badge 2s infinite; }
+  @keyframes pulse-badge { 0%,100%{transform:scale(1)}50%{transform:scale(1.15)} }
+  .notif-panel { position: fixed; top: 56px; right: 12px; width: 320px; background: var(--warm-white); border: 1px solid var(--linen); border-radius: 16px; box-shadow: 0 16px 48px rgba(44,31,20,0.15); z-index: 1000; display: none; overflow: hidden; animation: popIn 0.2s ease; }
+  .notif-panel.open { display: block; }
+  .notif-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--linen); display: flex; align-items: center; justify-content: space-between; }
+  .notif-panel-title { font-family: "Cormorant Garamond", serif; font-size: 16px; font-style: italic; font-weight: 300; color: var(--espresso); }
+  .notif-mark-all { font-size: 10px; font-weight: 300; color: var(--text-light); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: "DM Sans", sans-serif; }
+  .notif-mark-all:hover { color: var(--terracotta); }
+  .notif-list { max-height: 380px; overflow-y: auto; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid var(--linen); display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.15s; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item:hover { background: rgba(232,224,213,0.3); }
+  .notif-item.unread { background: rgba(196,113,74,0.04); }
+  .notif-item.unread::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--terracotta); border-radius: 0 2px 2px 0; }
+  .notif-item { position: relative; }
+  .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .notif-icon-livraison { background: rgba(184,154,106,0.12); }
+  .notif-icon-urgente { background: rgba(196,113,74,0.12); }
+  .notif-icon-jourj { background: rgba(44,31,20,0.06); }
+  .notif-icon-module { background: rgba(122,140,126,0.12); }
+  .notif-icon-collab { background: rgba(184,154,106,0.12); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-title { font-size: 12px; font-weight: 400; color: var(--espresso); margin-bottom: 2px; }
+  .notif-msg { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.5; }
+  .notif-time { font-size: 9px; font-weight: 200; color: var(--sand); margin-top: 4px; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--text-light); font-size: 13px; font-weight: 200; font-style: italic; }
+  .notif-footer { padding: 12px 20px; border-top: 1px solid var(--linen); text-align: center; }
+  .notif-footer a { font-size: 10px; font-weight: 300; color: var(--text-light); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; }
+  .notif-footer a:hover { color: var(--terracotta); }
+
+
+  /* ── MODULE PROGRESS BAR ── */
+  .module-progress-strip { background: var(--cream); border-bottom: 1px solid var(--linen); padding: 12px 52px; display: flex; align-items: center; gap: 20px; }
+  .module-progress-label { font-size: 9px; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-light); white-space: nowrap; }
+  .module-progress-bar { flex: 1; height: 3px; background: var(--linen); border-radius: 3px; overflow: hidden; }
+  .module-progress-fill { height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--gold)); border-radius: 3px; transition: width 0.8s ease; width: 0%; }
+  .module-progress-pct { font-size: 11px; font-weight: 300; color: var(--text-light); white-space: nowrap; font-family: "Cormorant Garamond", serif; }
+  .module-progress-modules { display: flex; gap: 6px; }
+  .module-pip { width: 20px; height: 3px; border-radius: 3px; background: var(--linen); transition: background 0.3s; cursor: pointer; }
+  .module-pip.done { background: var(--sage); }
+  .module-pip.active { background: var(--terracotta); }
+  @media (max-width: 768px) { .module-progress-strip { padding: 10px 16px; } .module-progress-modules { display: none; } }
+
+  
+
+  .nav-plan-lock{font-size:8px;margin-left:auto;opacity:0.4;letter-spacing:0.05em}
+  .nav-item.nav-locked{opacity:0.4;cursor:not-allowed}
+  .nav-item.nav-locked:hover{background:none;color:var(--sand)}
+  .nav-item.nav-locked .nav-plan-lock{opacity:1;color:var(--gold)}
+  .nav-lock-tooltip{position:fixed;background:var(--espresso);color:var(--cream);font-size:10px;padding:6px 12px;border-radius:6px;z-index:999;pointer-events:none;display:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.1)}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
+    <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="nav-section">Emménagement</div>
+    <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
+    <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
+    <div class="nav-item" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
+    <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'calculateur.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Calculateur</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-section">Déco & Style</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'moodboard.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mon Moodboard</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'moodboard-ia.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Moodboard IA</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'medias.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mes Médias</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-section">Pratique</div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'admin.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Checklist Admin</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'carnet.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Carnet de Bord</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item active nav-locked" data-plan="complet" onclick="navItemClick(this,'avancement.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mon Avancement</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'mes-contacts.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Mes Contacts</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-section">Social & Pro</div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'cremaillere.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Crémaillère</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'annuaire.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Annuaire Pro</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'collab.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Espace Collab</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'support.html')" style="position:relative">
+      <div class="nav-dot"></div>
+      <span class="nav-item-label">Support</span>
+      <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="progress-mini">Avancement global</div>
+    <div class="progress-bar-mini"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08)">
+      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
+      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="breadcrumb">Le Move <span>→ Mon Avancement</span></div>
+    <div class="page-title">Mon Avancement</div>
+    <div class="page-line"></div>
+    <div class="page-quote">"La page qui rend addictif de cocher des cases."</div>
+  </div>
+
+  <div class="module-progress-strip" id="moduleProgressStrip" style="display:none">
+  <div class="module-progress-label" id="moduleProgressLabel">Tâches complétées</div>
+  <div class="module-progress-bar"><div class="module-progress-fill" id="moduleProgressFill"></div></div>
+  <div class="module-progress-pct" id="moduleProgressPct">0%</div>
+</div>
+  <div class="content">
+
+    <div class="score-hero">
+      <div class="score-circle">
+        <div class="score-num" id="scorePct">0<span class="score-pct-sym">%</span></div>
+        <div class="score-lbl">complété</div>
+      </div>
+      <div class="score-details">
+        <div class="score-title" id="scoreTitle">Commence ton projet !</div>
+        <div class="score-sub" id="scoreSub">Ajoute tes premières tâches pour suivre ton avancement.</div>
+        <div class="score-mini-stats">
+          <div class="score-mini"><div class="score-mini-num" id="statDone">0</div><div class="score-mini-lbl">Terminées</div></div>
+          <div class="score-mini"><div class="score-mini-num" id="statDoing">0</div><div class="score-mini-lbl">En cours</div></div>
+          <div class="score-mini"><div class="score-mini-num" id="statTodo">0</div><div class="score-mini-lbl">À faire</div></div>
+        </div>
+      </div>
+      <div class="score-date">
+        <div class="score-date-lbl">Jour J dans</div>
+        <div class="score-date-val" id="jourJ">—</div>
+        <div class="score-days" id="jourJLabel">jours</div>
+      </div>
+    </div>
+
+    <div class="section-eyebrow">Vue Kanban</div>
+    <div class="kanban">
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-todo"></div>À faire</div>
+          <div class="kanban-count" id="countTodo">0</div>
+        </div>
+        <div class="kanban-body" id="colTodo"></div>
+        <div class="add-card-area">
+          <input type="text" class="add-card-input" id="quickTodo" placeholder="+ Ajouter une tâche..." onkeydown="if(event.key==='Enter')quickAdd('todo',this)">
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-doing"></div>En cours</div>
+          <div class="kanban-count" id="countDoing">0</div>
+        </div>
+        <div class="kanban-body" id="colDoing"></div>
+        <div class="add-card-area">
+          <input type="text" class="add-card-input" id="quickDoing" placeholder="+ Ajouter une tâche..." onkeydown="if(event.key==='Enter')quickAdd('doing',this)">
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div class="kanban-header">
+          <div class="kanban-title"><div class="kanban-dot dot-done"></div>Terminé</div>
+          <div class="kanban-count" id="countDone">0</div>
+        </div>
+        <div class="kanban-body" id="colDone"></div>
+        <div class="add-card-area">
+          <input type="text" class="add-card-input" id="quickDone" placeholder="+ Ajouter une tâche..." onkeydown="if(event.key==='Enter')quickAdd('done',this)">
+        </div>
+      </div>
+    </div>
+
+    <div class="section-eyebrow">Ajouter une tâche détaillée</div>
+    <div class="add-task-form">
+      <div class="add-task-grid">
+        <div class="add-field"><div class="add-label">Titre *</div><input type="text" class="add-input" id="tTitre" placeholder="Ex : Choisir les luminaires du salon"></div>
+        <div class="add-field"><div class="add-label">Catégorie</div>
+          <select class="add-select" id="tCat">
+            <option value="Général">Général</option>
+            <option value="Déco">Déco</option>
+            <option value="Admin">Admin</option>
+            <option value="Budget">Budget</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="add-field"><div class="add-label">Priorité</div>
+          <select class="add-select" id="tPrio">
+            <option value="mid">Normale</option>
+            <option value="high">Haute</option>
+            <option value="low">Basse</option>
+          </select>
+        </div>
+        <div class="add-field"><div class="add-label">Date limite</div><input type="date" class="add-input" id="tDate"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="add-btn" onclick="addTache()">+ Ajouter</button>
+      </div>
+    </div>
+
+  </div>
+
+    <div class="section-eyebrow" style="margin-top:48px">Journal du projet</div>
+    <div class="journal-section">
+      <div class="journal-entries" id="journalEntries">
+        <div style="text-align:center;padding:32px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic">Aucune entrée. Commence à écrire !</div>
+      </div>
+      <div class="journal-add">
+        <textarea class="journal-textarea" id="journalInput" placeholder="Note une décision, une idée, un moment clé de ton projet..."></textarea>
+        <div class="journal-footer">
+          <div class="journal-hint">Ctrl+Entrée pour publier</div>
+          <button class="journal-submit" onclick="addJournalEntry()">Publier l'entrée →</button>
+        </div>
+      </div>
+    </div>
+
+</main>
+
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+window._sb=sb;
+
+// ── PLAN GUARD ──
+(async function() {
+  var { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+  var { data: u } = await sb.from('Users').select('Plan').eq('id', session.user.id).single();
+  var plan = (u && u.Plan ? u.Plan : 'essentiel').toLowerCase();
+  var allowed = ["complet", "premium"];
+  if (!allowed.includes(plan)) {
+    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#2C1F14;font-family:DM Sans,sans-serif">' +
+      '<div style="text-align:center;padding:48px;max-width:420px">' +
+        '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:48px;color:#F7F3EE;margin-bottom:8px">Le Move</div>' +
+        '<div style="width:32px;height:1px;background:#C4714A;margin:16px auto"></div>' +
+        '<div style="font-size:14px;font-weight:300;color:rgba(247,243,238,0.6);margin-bottom:24px">Ce module est inclus dans le plan Complet (89€)</div>' +
+        '<a href="https://lemove.fr#pricing" style="display:inline-block;padding:12px 28px;background:#C4714A;color:white;border-radius:8px;text-decoration:none;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Changer de plan →</a>' +
+        '<br><a href="app.html" style="font-size:11px;color:rgba(247,243,238,0.4);text-decoration:none">← Retour au dashboard</a>' +
+      '</div></div>';
+    return;
+  }
+})();
+
+const CAT_COLORS={Général:'background:rgba(44,31,20,0.07);color:var(--text-light)',Déco:'background:rgba(184,154,106,0.1);color:var(--gold)',Admin:'background:rgba(122,140,126,0.1);color:var(--sage)',Budget:'background:rgba(122,140,126,0.1);color:var(--sage)',Urgent:'background:rgba(196,113,74,0.1);color:var(--terracotta)'};
+
+
+// ── ACCESS GUARD ──
+(async function checkAccess() {
+  var session = (await sb.auth.getSession()).data.session;
+  if (!session) { window.location.href = 'app.html'; return; }
+  var profile = (await sb.from('Profiles').select('Plan').eq('id', session.user.id).single()).data;
+  var plan = ((profile && profile.Plan) || 'essentiel').toLowerCase();
+  var rank = { essentiel: 1, complet: 2, premium: 3 };
+  var userRank = rank[plan] || 1;
+  var requiredRank = 2;
+  if (userRank < requiredRank) {
+    // Show access denied overlay
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(26,20,16,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:DM Sans,sans-serif';
+    overlay.innerHTML = '<div style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:36px;color:#F7F3EE">Le Move</div>' +
+      '<div style="font-size:13px;font-weight:300;color:rgba(247,243,238,0.6)">Ce module nécessite le plan <strong style=\'color:#C4714A\'>Complet (89€)</strong></div>' +
+      '<div style="font-size:48px">🔒</div>' +
+      '<button onclick=\'window.location.href=\'https://lemove.fr#pricing\'\'  style=\'padding:12px 28px;background:#C4714A;color:white;border:none;border-radius:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer\'>Débloquer ce module →</button>' +
+      '<button onclick=\'window.location.href=\'app.html\'\'  style=\'padding:10px 20px;background:none;color:rgba(247,243,238,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:11px;cursor:pointer\'>Retour au dashboard</button>';
+    document.body.appendChild(overlay);
+  }
+  // Apply plan to sidebar
+  if (typeof applyPlanToSidebar === 'function') applyPlanToSidebar(plan);
+})();
+
+let currentUser=null,taches=[];
+
+
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='app.html';return;}
+  currentUser=session.user;
+  const{data:p}=await sb.from('Profiles').select('prenom,date_emmenagement').eq('id',session.user.id).single();
+  document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  if(typeof setNavPlan==='function') setNavPlan((userData?.Plan||p?.Plan||'essentiel').toLowerCase());
+  if(p?.date_emmenagement){
+    const diff=Math.ceil((new Date(p.date_emmenagement)-new Date())/(1000*60*60*24));
+    document.getElementById('jourJ').textContent=Math.abs(diff);
+    document.getElementById('jourJLabel').textContent=diff>0?'jours restants':diff===0?"C'est aujourd'hui !":'jours passés';
+  }
+  await loadData();
+  applyPlanToSidebar((p && p.Plan) || "essentiel");
+})();
+
+async function logout(){await sb.auth.signOut();window.location.href='app.html';}
+
+async function loadData(){
+  const{data}=await sb.from('avancement_taches').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  taches=data||[];
+  renderAll();
+  await loadJournal();
+}
+
+function renderAll(){updateScore();renderKanban();}
+
+function updateScore(){
+  const total=taches.length;
+  const done=taches.filter(t=>t.statut==='done').length;
+  const doing=taches.filter(t=>t.statut==='doing').length;
+  const todo=taches.filter(t=>t.statut==='todo').length;
+  const pct=total>0?Math.round((done/total)*100):0;
+
+  document.getElementById('scorePct').innerHTML=pct+'<span class="score-pct-sym">%</span>';
+  document.getElementById('statDone').textContent=done;
+  document.getElementById('statDoing').textContent=doing;
+  document.getElementById('statTodo').textContent=todo;
+
+  const titles=['Commence ton projet !','Tu démarres bien !','Bonne progression !','Plus que la moitié !','Presque là !','Félicitations !'];
+  const idx=Math.min(5,Math.floor(pct/20));
+  document.getElementById('scoreTitle').textContent=titles[idx];
+  document.getElementById('scoreSub').textContent=total===0?'Ajoute tes premières tâches pour suivre ton avancement.':done+' tâche'+(done>1?'s':'')+' terminée'+(done>1?'s':'')+' sur '+total+'.';
+}
+
+function renderKanban(){
+  const cols={todo:[],doing:[],done:[]};
+  taches.forEach(t=>{if(cols[t.statut])cols[t.statut].push(t);});
+
+  ['todo','doing','done'].forEach(col=>{
+    const el=document.getElementById('col'+col.charAt(0).toUpperCase()+col.slice(1));
+    document.getElementById('count'+col.charAt(0).toUpperCase()+col.slice(1)).textContent=cols[col].length;
+    if(!cols[col].length){el.innerHTML='<div class="empty-col">Aucune tâche</div>';return;}
+    el.innerHTML=cols[col].map(t=>{
+      const catStyle=CAT_COLORS[t.categorie]||CAT_COLORS['Général'];
+      const overdue=t.date_limite&&new Date(t.date_limite)<new Date()&&t.statut!=='done';
+      return`<div class="kcard ${t.statut==='done'?'done-card':''}">
+        <div class="kcard-actions">
+          ${t.statut!=='done'?`<button class="kcard-btn" onclick="moveCard('${t.id}','${t.statut==='todo'?'doing':'done'}')" title="Avancer">→</button>`:''}
+          ${t.statut!=='todo'?`<button class="kcard-btn" onclick="moveCard('${t.id}','${t.statut==='done'?'doing':'todo'}')" title="Reculer">←</button>`:''}
+          <button class="kcard-btn" onclick="deleteCard('${t.id}')" title="Supprimer">🗑</button>
+        </div>
+        <div class="kcard-cat" style="${catStyle}">${t.categorie||'Général'}</div>
+        <div class="kcard-title ${t.statut==='done'?'striked':''}">${t.titre}</div>
+        <div class="kcard-meta">
+          <div class="kcard-date" style="${overdue?'color:var(--terracotta)':''}">${t.date_limite?new Date(t.date_limite).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}</div>
+          <div class="kcard-priority priority-${t.priorite||'mid'}"></div>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+async function moveCard(id,newStatut){
+  await sb.from('avancement_taches').update({statut:newStatut}).eq('id',id);
+  const t=taches.find(t=>t.id===id);
+  if(t){t.statut=newStatut;renderAll();}
+}
+
+async function deleteCard(id){
+  await sb.from('avancement_taches').delete().eq('id',id);
+  taches=taches.filter(t=>t.id!==id);renderAll();
+}
+
+async function quickAdd(statut,input){
+  const titre=input.value.trim();
+  if(!titre)return;
+  const{data}=await sb.from('avancement_taches').insert({user_id:currentUser.id,titre,statut,categorie:'Général',priorite:'mid'}).select().single();
+  if(data){taches.unshift(data);renderAll();}
+  input.value='';
+}
+
+async function addTache(){
+  const titre=document.getElementById('tTitre').value.trim();
+  if(!titre)return;
+  const{data}=await sb.from('avancement_taches').insert({
+    user_id:currentUser.id,
+    titre,
+    statut:'todo',
+    categorie:document.getElementById('tCat').value,
+    priorite:document.getElementById('tPrio').value,
+    date_limite:document.getElementById('tDate').value||null
+  }).select().single();
+  if(data){taches.unshift(data);renderAll();}
+  document.getElementById('tTitre').value='';
+  document.getElementById('tDate').value='';
+}
+
+// ── JOURNAL ──
+let journalEntries = [];
+
+async function loadJournal() {
+  const { data } = await sb.from('journal_entries').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  journalEntries = data || [];
+  renderJournal();
+}
+
+function renderJournal() {
+  const el = document.getElementById('journalEntries');
+  if (!journalEntries.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-light);font-size:13px;font-weight:200;font-style:italic">Aucune entrée. Commence à écrire !</div>';
+    return;
+  }
+  el.innerHTML = journalEntries.map(e => `
+    <div class="journal-entry">
+      <button class="journal-delete" onclick="deleteJournalEntry('${e.id}')">🗑</button>
+      <div class="journal-date">${new Date(e.created_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+      <div class="journal-text">${e.contenu}</div>
+    </div>
+  `).join('');
+}
+
+async function addJournalEntry() {
+  const contenu = document.getElementById('journalInput').value.trim();
+  if (!contenu) return;
+  const { data } = await sb.from('journal_entries').insert({ user_id: currentUser.id, contenu }).select().single();
+  if (data) { journalEntries.unshift(data); renderJournal(); }
+  document.getElementById('journalInput').value = '';
+}
+
+async function deleteJournalEntry(id) {
+  if (!confirm('Supprimer cette entrée ?')) return;
+  await sb.from('journal_entries').delete().eq('id', id);
+  journalEntries = journalEntries.filter(e => e.id !== id);
+  renderJournal();
+}
+
+// Ctrl+Enter to submit
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter' && document.activeElement.id === 'journalInput') addJournalEntry();
+});
+async function getModuleProgress() {
+  const { data } = await sb.from('avancement_taches').select('statut').eq('user_id', currentUser.id);
+  if (!data || !data.length) return 0;
+  return Math.round((data.filter(t=>t.statut==='done').length/data.length)*100);
+}
+
+async function renderModuleProgress() {
+  try {
+    const pct = await getModuleProgress();
+    const strip = document.getElementById('moduleProgressStrip');
+    const fill = document.getElementById('moduleProgressFill');
+    const pctEl = document.getElementById('moduleProgressPct');
+    if (strip) strip.style.display = 'flex';
+    if (fill) fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  } catch(e) { console.warn('Progress error:', e); }
+}
+
+</script>
 <script>
 
 // Apply plan restrictions to sidebar nav
@@ -97,6 +844,7 @@ async function renderModuleProgress() {
 }
 
 </script>
+</script>
 <script>
 // ── NOTIFICATIONS (module) ──
 let notifications = [];
@@ -156,14 +904,12 @@ function closeNotifPanel() {
   const p=document.getElementById('notifPanel');
   if(p) p.classList.remove('open');
 }
-</script>
-<script>
+</script><script>
 document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
-</script>
-<script>
+</script><script>
 window.addEventListener('load', () => {
   setTimeout(() => {
     if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
@@ -185,7 +931,7 @@ window.addEventListener('load', () => {
       var session = await window._sb?.auth.getSession();
       if (!session?.data?.session) return cached;
       var uid = session.data.session.user.id;
-      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).maybeSingle();
+      var res = await window._sb.from('Users').select('Plan').eq('id', uid).single();
       if (res.data?.Plan) {
         var plan = res.data.Plan.toLowerCase();
         localStorage.setItem('lm_plan', JSON.stringify(plan));
@@ -198,19 +944,6 @@ window.addEventListener('load', () => {
   }
 
   function applyNavLocks(plan) {
-    // Admin always has full access
-    var adminEmail = 'sheryl.mercier@gmail.com';
-    var storedEmail = localStorage.getItem('lm_user_email') || '';
-    if (storedEmail === adminEmail || plan === 'admin') {
-      document.querySelectorAll('.nav-locked').forEach(function(el) {
-        var lock = el.querySelector('.nav-lock');
-        if (lock) lock.style.display = 'none';
-        el.style.opacity = '1';
-        el.style.pointerEvents = 'auto';
-        el.classList.remove('nav-locked');
-      });
-      return;
-    }
     var planRank = PLAN_ORDER[plan] || 0;
     document.querySelectorAll('.nav-locked').forEach(function(el) {
       var required = el.getAttribute('data-plan');

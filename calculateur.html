@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-K5BVKVHC');</script>
-<!-- End Google Tag Manager -->
 <meta charset="UTF-8">
-<meta name="description" content="Estimez le volume de vos affaires pour préparer votre déménagement et choisir le bon camion.">
-<meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
@@ -273,10 +268,6 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 </style>
 </head>
 <body>
-
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5BVKVHC" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager -->
 
 <aside class="sidebar">
   <div class="sidebar-top">
@@ -779,6 +770,7 @@ setTimeout(() => {
   if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
 }, 2000);
 </script>
+</script>
 <script>
 // ── NOTIFICATIONS (module) ──
 let notifications = [];
@@ -838,14 +830,12 @@ function closeNotifPanel() {
   const p=document.getElementById('notifPanel');
   if(p) p.classList.remove('open');
 }
-</script>
-<script>
+</script><script>
 document.addEventListener('click',e=>{
   if(!e.target.closest('#notifBell')&&!e.target.closest('#notifPanel')) closeNotifPanel();
 });
 
-</script>
-<script>
+</script><script>
 window.addEventListener('load', () => {
   setTimeout(() => {
     if(typeof loadNotifications === 'function' && typeof currentUser !== 'undefined' && currentUser) {
@@ -867,7 +857,7 @@ window.addEventListener('load', () => {
       var session = await window._sb?.auth.getSession();
       if (!session?.data?.session) return cached;
       var uid = session.data.session.user.id;
-      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).maybeSingle();
+      var res = await window._sb.from('Users').select('Plan').eq('id', uid).single();
       if (res.data?.Plan) {
         var plan = res.data.Plan.toLowerCase();
         localStorage.setItem('lm_plan', JSON.stringify(plan));
@@ -880,19 +870,6 @@ window.addEventListener('load', () => {
   }
 
   function applyNavLocks(plan) {
-    // Admin always has full access
-    var adminEmail = 'sheryl.mercier@gmail.com';
-    var storedEmail = localStorage.getItem('lm_user_email') || '';
-    if (storedEmail === adminEmail || plan === 'admin') {
-      document.querySelectorAll('.nav-locked').forEach(function(el) {
-        var lock = el.querySelector('.nav-lock');
-        if (lock) lock.style.display = 'none';
-        el.style.opacity = '1';
-        el.style.pointerEvents = 'auto';
-        el.classList.remove('nav-locked');
-      });
-      return;
-    }
     var planRank = PLAN_ORDER[plan] || 0;
     document.querySelectorAll('.nav-locked').forEach(function(el) {
       var required = el.getAttribute('data-plan');
