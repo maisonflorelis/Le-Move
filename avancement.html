@@ -559,6 +559,8 @@ const CAT_COLORS={Général:'background:rgba(44,31,20,0.07);color:var(--text-lig
 (async function checkAccess() {
   var session = (await sb.auth.getSession()).data.session;
   if (!session) { window.location.href = 'app.html'; return; }
+  // Admin bypass
+  if (session.user.email === 'sheryl.mercier@gmail.com') { return; }
   var profile = (await sb.from('Profiles').select('Plan').eq('id', session.user.id).single()).data;
   var plan = ((profile && profile.Plan) || 'essentiel').toLowerCase();
   var rank = { essentiel: 1, complet: 2, premium: 3 };
