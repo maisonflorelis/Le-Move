@@ -534,6 +534,8 @@ window._sb=sb;
 (async function() {
   var { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'app.html'; return; }
+  // Admin bypass
+  if (session.user.email === 'sheryl.mercier@gmail.com') { return; }
   var { data: u } = await sb.from('Users').select('Plan').eq('id', session.user.id).single();
   var plan = (u && u.Plan ? u.Plan : 'essentiel').toLowerCase();
   var allowed = ["complet", "premium"];
