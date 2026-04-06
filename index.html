@@ -1398,4 +1398,18 @@ async function submitPartner() {
         to: ['bonjour@lemove.fr'],
         reply_to: email,
         subject: `[Partenaire] ${nom} — ${entreprise} (${categorie})`,
-        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville ||
+        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville || '—'}</p><p><b>Message :</b><br>${message || '—'}</p></div>`
+      })
+    });
+    const partnerForm = document.getElementById('partnerForm');
+    if (partnerForm) partnerForm.style.display = 'none';
+    const partnerSuccess = document.getElementById('partnerSuccess');
+    if (partnerSuccess) partnerSuccess.style.display = 'block';
+  } catch(e) {
+    console.error('Erreur envoi:', e);
+    alert('Une erreur est survenue. Veuillez réessayer ou contacter bonjour@lemove.fr');
+  }
+}
+</script>
+</body>
+</html>

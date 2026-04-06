@@ -15,7 +15,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="keywords" content="partenaire déménagement, annuaire professionnel emménagement, prestataire déménagement, artisan déménagement">
 <meta name="author" content="Maison Florélis">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://lemove.fr/partenairespartenaires.html">
+<link rel="canonical" href="https://lemove.fr/partenaires.html">
 <!-- Open Graph -->
 <meta property="og:title" content="Devenez Partenaire Le Move">
 <meta property="og:description" content="Rejoignez notre réseau de professionnels vérifiés et touchez des clients en plein emménagement.">
@@ -32,7 +32,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
-<title>Le Move — Programme Partenaires</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -506,4 +506,13 @@ async function submitForm() {
     });
 
     document.getElementById('formContent').style.display = 'none';
-    document.getElementById('formSu
+    document.getElementById('formSuccess').style.display = 'block';
+    window.scrollTo({ top: document.getElementById('formSuccess').offsetTop - 100, behavior: 'smooth' });
+  } catch(e) {
+    console.error('Erreur envoi:', e);
+    alert('Une erreur est survenue. Veuillez réessayer ou contacter bonjour@lemove.fr');
+  }
+}
+</script>
+</body>
+</html>
