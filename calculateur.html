@@ -918,9 +918,8 @@ window.addEventListener('load', () => {
   });
 })();
 </script>
-</body>
-</html>
 
+<script>
 // ── PLAN GUARD ──
 (async function() {
   var { data: { session } } = await sb.auth.getSession();
@@ -940,3 +939,6 @@ window.addEventListener('load', () => {
     return;
   }
 })();
+</script>
+</body>
+</html>
