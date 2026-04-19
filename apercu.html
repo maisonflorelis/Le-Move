@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move — Aperçu Interactif</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F7F3EE; --warm-white: #FDFAF6; --linen: #E8E0D5; --sand: #C9BAA8;
+  --espresso: #2C1F14; --espresso-dark: #1A1410; --sage: #7A8C7E;
+  --terracotta: #C4714A; --gold: #B89A6A; --text-light: #8A7968;
+}
+body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(--espresso); min-height: 100vh; }
+
+/* ── DEMO BANNER ── */
+.demo-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  background: var(--terracotta);
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  padding: 10px 24px; height: 40px;
+}
+.demo-banner p { font-size: 11px; font-weight: 300; color: white; letter-spacing: 0.05em; }
+.demo-banner a {
+  background: white; color: var(--terracotta);
+  padding: 5px 16px; border-radius: 2px;
+  font-size: 10px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap; transition: opacity 0.2s;
+}
+.demo-banner a:hover { opacity: 0.85; }
+
+/* ── NAV ── */
+.app-nav {
+  background: var(--espresso); padding: 0 48px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 40px; z-index: 100;
+}
+.nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--cream); }
+.nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); }
+.nav-plan-badge { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.5); background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 20px; }
+.nav-brand { display: flex; align-items: center; gap: 12px; }
+.nav-right { display: flex; align-items: center; gap: 14px; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: white; border: 2px solid rgba(255,255,255,0.15); }
+.nav-user { font-size: 11px; color: rgba(247,243,238,0.5); }
+
+/* ── WELCOME ── */
+.welcome-banner {
+  background: var(--espresso); padding: 32px 48px 20px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+}
+.welcome-greeting { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; font-style: italic; color: var(--cream); line-height: 1; }
+.welcome-greeting span { color: var(--terracotta); }
+.welcome-sub { font-size: 12px; font-weight: 200; color: rgba(247,243,238,0.45); font-style: italic; margin-top: 6px; }
+.countdown-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--cream); line-height: 1; text-align: right; }
+.countdown-label { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.3); text-align: right; margin-top: 4px; }
+.countdown-date { font-size: 11px; font-weight: 200; color: var(--terracotta); text-align: right; margin-top: 4px; }
+
+/* QUICK MODULES */
+.quick-modules {
+  background: var(--espresso); padding: 0 48px 20px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.quick-mod {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; padding: 14px 16px;
+  cursor: pointer; transition: all 0.2s;
+}
+.quick-mod:hover { background: rgba(196,113,74,0.12); border-color: rgba(196,113,74,0.3); }
+.quick-mod.active { background: rgba(196,113,74,0.15); border-color: var(--terracotta); }
+.quick-mod-icon { font-size: 18px; margin-bottom: 6px; }
+.quick-mod-label { font-size: 10px; font-weight: 300; color: rgba(247,243,238,0.6); }
+
+/* PROGRESS */
+.progress-block {
+  background: var(--espresso); padding: 16px 48px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.progress-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.progress-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(247,243,238,0.3); }
+.progress-pct { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: var(--cream); }
+.progress-bar-wrap { height: 6px; background: rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #C4714A, #B89A6A); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+/* ── CONTENT ── */
+.app-content { padding: 40px 48px; max-width: 1200px; }
+.section-label { font-size: 9px; font-weight: 300; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-light); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--linen); }
+
+/* ── MODULE DASHBOARD GRID ── */
+.modules-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+.module-card {
+  background: var(--warm-white); border: 1px solid var(--linen);
+  border-radius: 16px; padding: 28px;
+  cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+}
+.module-card:hover { border-color: var(--sand); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(44,31,20,0.08); }
+.module-card.featured { background: var(--espresso); border-color: var(--espresso); }
+.module-card.locked { opacity: 0.45; cursor: default; }
+.module-card.locked::after { content: '🔒'; position: absolute; top: 16px; right: 16px; font-size: 14px; }
+.module-num { font-size: 9px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 16px; }
+.module-card.featured .module-num { color: rgba(247,243,238,0.35); }
+.module-icon { font-size: 28px; margin-bottom: 14px; }
+.module-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
+.module-card.featured .module-title { color: var(--cream); }
+.module-desc { font-size: 11px; font-weight: 200; color: var(--text-light); line-height: 1.7; }
+.module-card.featured .module-desc { color: rgba(247,243,238,0.5); }
+.module-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.module-tag { font-size: 9px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: var(--linen); color: var(--text-light); }
+.module-card.featured .module-tag { background: rgba(255,255,255,0.1); color: rgba(247,243,238,0.5); }
+.module-arrow { position: absolute; bottom: 20px; right: 20px; width: 28px; height: 28px; border-radius: 50%; background: var(--linen); display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
+.module-card:hover:not(.locked) .module-arrow { background: var(--terracotta); color: white; }
+.module-card.featured .module-arrow { background: rgba(255,255,255,0.1); color: var(--cream); }
+
+/* ── MODULE CONTENT PANEL ── */
+.module-panel {
+  display: none;
+  background: var(--warm-white); border: 1px solid var(--linen);
+  border-radius: 20px; padding: 40px; margin-bottom: 40px;
+  animation: slideIn 0.3s ease;
+}
+.module-panel.active { display: block; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.panel-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; font-style: italic; }
+.panel-close { background: var(--linen); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+.panel-close:hover { background: var(--sand); }
+
+/* BUDGET MODULE */
+.budget-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.budget-card { background: var(--cream); border-radius: 12px; padding: 20px 24px; }
+.budget-card-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+.budget-card-amount { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; }
+.budget-card-amount.green { color: var(--sage); }
+.budget-card-amount.red { color: var(--terracotta); }
+.budget-card-sub { font-size: 10px; color: var(--text-light); margin-top: 4px; }
+.budget-bar-wrap { height: 8px; background: var(--linen); border-radius: 4px; overflow: hidden; margin: 20px 0 8px; }
+.budget-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--sage), var(--terracotta)); }
+.budget-categories { display: flex; flex-direction: column; gap: 12px; }
+.budget-cat { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--cream); border-radius: 10px; }
+.budget-cat-left { display: flex; align-items: center; gap: 12px; }
+.budget-cat-dot { width: 8px; height: 8px; border-radius: 50%; }
+.budget-cat-name { font-size: 13px; font-weight: 300; }
+.budget-cat-bar-wrap { width: 80px; height: 4px; background: var(--linen); border-radius: 2px; overflow: hidden; }
+.budget-cat-bar { height: 100%; border-radius: 2px; }
+.budget-cat-amount { font-size: 13px; font-weight: 400; }
+
+/* CHECKLIST MODULE */
+.checklist-phases { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.phase-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid var(--linen); background: var(--cream); font-size: 11px; font-weight: 300; cursor: pointer; transition: all 0.2s; }
+.phase-btn.active { background: var(--espresso); color: var(--cream); border-color: var(--espresso); }
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+.task-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--cream); border-radius: 10px; transition: background 0.15s; }
+.task-row:hover { background: var(--linen); }
+.task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--linen); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all 0.2s; }
+.task-check.done { background: var(--sage); border-color: var(--sage); color: white; font-size: 10px; }
+.task-text { font-size: 13px; font-weight: 300; flex: 1; }
+.task-text.done { text-decoration: line-through; color: var(--text-light); }
+.task-tag { font-size: 9px; padding: 3px 8px; border-radius: 10px; background: var(--linen); color: var(--text-light); letter-spacing: 0.08em; }
+
+/* MOODBOARD MODULE */
+.moodboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.inspo-card { border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; }
+.inspo-img { width: 100%; height: 160px; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.inspo-label { padding: 10px 14px; background: white; font-size: 11px; font-weight: 300; color: var(--espresso); }
+.palette-row { display: flex; gap: 8px; margin-bottom: 24px; }
+.palette-swatch { flex: 1; height: 48px; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+.palette-swatch:hover { transform: scale(1.05); }
+
+/* LIVRAISONS MODULE */
+.delivery-list { display: flex; flex-direction: column; gap: 10px; }
+.delivery-card { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--cream); border-radius: 12px; border-left: 3px solid var(--linen); transition: transform 0.2s; }
+.delivery-card:hover { transform: translateX(4px); }
+.delivery-card.en-route { border-left-color: var(--gold); }
+.delivery-card.livre { border-left-color: var(--sage); }
+.delivery-card.commande { border-left-color: var(--terracotta); }
+.delivery-info { display: flex; flex-direction: column; gap: 3px; }
+.delivery-name { font-size: 13px; font-weight: 400; }
+.delivery-shop { font-size: 11px; color: var(--text-light); }
+.delivery-status { font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: 300; }
+.delivery-status.en-route { background: rgba(184,154,106,0.15); color: var(--gold); }
+.delivery-status.livre { background: rgba(122,140,126,0.15); color: var(--sage); }
+.delivery-status.commande { background: rgba(196,113,74,0.12); color: var(--terracotta); }
+.delivery-date { font-size: 10px; color: var(--text-light); }
+
+/* UPGRADE CARD */
+.upgrade-card { background: linear-gradient(135deg, var(--terracotta), #A85A35); border-radius: 16px; padding: 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; }
+.upgrade-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+.upgrade-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-style: italic; color: white; margin-bottom: 6px; }
+.upgrade-desc { font-size: 12px; font-weight: 200; color: rgba(255,255,255,0.7); }
+.upgrade-btn { background: white; color: var(--terracotta); border: none; padding: 12px 24px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; text-decoration: none; display: inline-block; }
+.upgrade-btn:hover { opacity: 0.9; }
+
+/* TOAST */
+.demo-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--espresso); color: var(--cream); padding: 12px 24px; border-radius: 8px; font-size: 12px; font-weight: 300; transition: transform 0.3s ease; z-index: 9999; white-space: nowrap; }
+.demo-toast.show { transform: translateX(-50%) translateY(0); }
+
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
+
+/* HOVER GLOW */
+.module-card { position: relative; }
+.module-card::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(196,113,74,0.08) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; border-radius: inherit; pointer-events: none; }
+.module-card.glow::after { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- DEMO BANNER -->
+<div class="demo-banner">
+  <p>✦ Aperçu interactif — Toutes les données sont fictives</p>
+  <a href="https://www.lemove.fr" target="_blank">Créer mon espace →</a>
+</div>
+
+<!-- NAV -->
+<nav class="app-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">Le Move</div>
+    <div class="nav-sep"></div>
+    <div class="nav-plan-badge">Plan Complet</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user">Sophie D.</span>
+    <div class="nav-avatar">S</div>
+  </div>
+</nav>
+
+<!-- WELCOME -->
+<div class="welcome-banner">
+  <div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:34px;font-weight:300;color:#F7F3EE;line-height:1">Le Move</div>
+    <div style="font-size:8px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(247,243,238,0.25);margin-top:2px">par Maison Florélis</div>
+    <div style="width:24px;height:1px;background:#C4714A;margin:10px 0 8px"></div>
+    <div class="welcome-greeting">Bonjour, <span>Sophie</span> ✨</div>
+    <div class="welcome-sub">Chaque grande maison commence par un premier carton.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+    <div class="countdown-num">12</div>
+    <div class="countdown-label">Avant le Jour J</div>
+    <div class="countdown-date">15 mai 2025</div>
+  </div>
+</div>
+
+<!-- QUICK MODULES -->
+<div class="quick-modules" id="quickMods">
+  <div class="quick-mod active" onclick="openModule('budget')">
+    <div class="quick-mod-icon">💰</div>
+    <div class="quick-mod-label">Mon Budget</div>
+  </div>
+  <div class="quick-mod" onclick="openModule('demenagement')">
+    <div class="quick-mod-icon">📦</div>
+    <div class="quick-mod-label">Déménagement</div>
+  </div>
+  <div class="quick-mod" onclick="openModule('moodboard')">
+    <div class="quick-mod-icon">🎨</div>
+    <div class="quick-mod-label">Moodboard</div>
+  </div>
+  <div class="quick-mod" onclick="openModule('achats')">
+    <div class="quick-mod-icon">🚚</div>
+    <div class="quick-mod-label">Livraisons</div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-block">
+  <div class="progress-top">
+    <div class="progress-label">Avancement global</div>
+    <div class="progress-pct">64%</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="app-content">
+
+  <!-- MODULE PANELS -->
+  <div class="module-panel active" id="panel-budget">
+    <div class="panel-header">
+      <div class="panel-title">💰 Mon Budget</div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="budget-summary">
+      <div class="budget-card">
+        <div class="budget-card-label">Budget total</div>
+        <div class="budget-card-amount">8 500 €</div>
+        <div class="budget-card-sub">Budget initial fixé</div>
+      </div>
+      <div class="budget-card">
+        <div class="budget-card-label">Dépensé</div>
+        <div class="budget-card-amount red">5 840 €</div>
+        <div class="budget-card-sub">68,7% du budget</div>
+      </div>
+      <div class="budget-card">
+        <div class="budget-card-label">Restant</div>
+        <div class="budget-card-amount green">2 660 €</div>
+        <div class="budget-card-sub">Disponible</div>
+      </div>
+    </div>
+    <div class="budget-bar-wrap">
+      <div class="budget-bar" style="width:68.7%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-light);margin-bottom:24px">
+      <span>0 €</span><span style="color:var(--terracotta);font-weight:400">⚠ 80% atteint</span><span>8 500 €</span>
+    </div>
+    <div class="budget-categories">
+      <div class="budget-cat">
+        <div class="budget-cat-left">
+          <div class="budget-cat-dot" style="background:#C4714A"></div>
+          <div class="budget-cat-name">Mobilier</div>
+        </div>
+        <div class="budget-cat-bar-wrap"><div class="budget-cat-bar" style="width:75%;background:#C4714A"></div></div>
+        <div class="budget-cat-amount">2 200 €</div>
+      </div>
+      <div class="budget-cat">
+        <div class="budget-cat-left">
+          <div class="budget-cat-dot" style="background:#B89A6A"></div>
+          <div class="budget-cat-name">Électroménager</div>
+        </div>
+        <div class="budget-cat-bar-wrap"><div class="budget-cat-bar" style="width:55%;background:#B89A6A"></div></div>
+        <div class="budget-cat-amount">1 640 €</div>
+      </div>
+      <div class="budget-cat">
+        <div class="budget-cat-left">
+          <div class="budget-cat-dot" style="background:#7A8C7E"></div>
+          <div class="budget-cat-name">Déménagement</div>
+        </div>
+        <div class="budget-cat-bar-wrap"><div class="budget-cat-bar" style="width:40%;background:#7A8C7E"></div></div>
+        <div class="budget-cat-amount">800 €</div>
+      </div>
+      <div class="budget-cat">
+        <div class="budget-cat-left">
+          <div class="budget-cat-dot" style="background:#C9BAA8"></div>
+          <div class="budget-cat-name">Déco & Textiles</div>
+        </div>
+        <div class="budget-cat-bar-wrap"><div class="budget-cat-bar" style="width:30%;background:#C9BAA8"></div></div>
+        <div class="budget-cat-amount">680 €</div>
+      </div>
+      <div class="budget-cat">
+        <div class="budget-cat-left">
+          <div class="budget-cat-dot" style="background:#8A7968"></div>
+          <div class="budget-cat-name">Divers</div>
+        </div>
+        <div class="budget-cat-bar-wrap"><div class="budget-cat-bar" style="width:20%;background:#8A7968"></div></div>
+        <div class="budget-cat-amount">520 €</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="module-panel" id="panel-demenagement">
+    <div class="panel-header">
+      <div class="panel-title">📦 Mon Déménagement</div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="checklist-phases">
+      <button class="phase-btn active" onclick="switchPhase(this,'prep')">📋 Préparation</button>
+      <button class="phase-btn" onclick="switchPhase(this,'demarches')">📄 Démarches</button>
+      <button class="phase-btn" onclick="switchPhase(this,'jourj')">📅 Jour J</button>
+      <button class="phase-btn" onclick="switchPhase(this,'install')">🏠 Installation</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
+  </div>
+
+  <div class="module-panel" id="panel-moodboard">
+    <div class="panel-header">
+      <div class="panel-title">🎨 Moodboard & Inspirations</div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px">Ma palette</div>
+    <div class="palette-row">
+      <div class="palette-swatch" style="background:#F5EFE6" title="Crème ivoire" onclick="toast('Crème ivoire — #F5EFE6')"></div>
+      <div class="palette-swatch" style="background:#C4714A" title="Terracotta" onclick="toast('Terracotta — #C4714A')"></div>
+      <div class="palette-swatch" style="background:#2C1F14" title="Espresso" onclick="toast('Espresso — #2C1F14')"></div>
+      <div class="palette-swatch" style="background:#7A8C7E" title="Sauge" onclick="toast('Sauge — #7A8C7E')"></div>
+      <div class="palette-swatch" style="background:#B89A6A" title="Or chaud" onclick="toast('Or chaud — #B89A6A')"></div>
+    </div>
+    <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px">Mes inspirations — Salon</div>
+    <div class="moodboard-grid">
+      <div class="inspo-card" onclick="toast('Inspiration sauvegardée ✓')">
+        <div class="inspo-img" style="background:linear-gradient(135deg,#F5EFE6,#E8E0D5)">🛋️</div>
+        <div class="inspo-label">Canapé velours vert sauge</div>
+      </div>
+      <div class="inspo-card" onclick="toast('Inspiration sauvegardée ✓')">
+        <div class="inspo-img" style="background:linear-gradient(135deg,#2C1F14,#3D2C1E)">🪴</div>
+        <div class="inspo-label">Table basse marbre noir</div>
+      </div>
+      <div class="inspo-card" onclick="toast('Inspiration sauvegardée ✓')">
+        <div class="inspo-img" style="background:linear-gradient(135deg,#B89A6A,#C9BAA8)">💡</div>
+        <div class="inspo-label">Lampe laiton vintage</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:linear-gradient(135deg,var(--terracotta),#A85A35);border-radius:12px;cursor:pointer" onclick="toast('Moodboard IA disponible en plan Premium ✨')">
+      <div style="font-size:20px">✨</div>
+      <div>
+        <div style="font-size:12px;font-weight:400;color:white">Générer mon moodboard IA</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7)">Plan Premium — génère ta palette sur-mesure en 30 secondes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="module-panel" id="panel-achats">
+    <div class="panel-header">
+      <div class="panel-title">🚚 Mes Achats & Livraisons</div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <span style="font-size:10px;padding:5px 14px;border-radius:20px;background:var(--espresso);color:var(--cream)">Tout</span>
+      <span style="font-size:10px;padding:5px 14px;border-radius:20px;background:var(--linen);color:var(--text-light);cursor:pointer" onclick="toast('Filtre : En route')">🟡 En route</span>
+      <span style="font-size:10px;padding:5px 14px;border-radius:20px;background:var(--linen);color:var(--text-light);cursor:pointer" onclick="toast('Filtre : Livré')">🟢 Livré</span>
+      <span style="font-size:10px;padding:5px 14px;border-radius:20px;background:var(--linen);color:var(--text-light);cursor:pointer" onclick="toast('Filtre : Commandé')">🔴 Commandé</span>
+    </div>
+    <div class="delivery-list">
+      <div class="delivery-card livre">
+        <div class="delivery-info">
+          <div class="delivery-name">Canapé 3 places Velvet</div>
+          <div class="delivery-shop">Maisons du Monde · 1 299 €</div>
+          <div class="delivery-date">Livré le 2 mai</div>
+        </div>
+        <div class="delivery-status livre">✓ Livré</div>
+      </div>
+      <div class="delivery-card en-route">
+        <div class="delivery-info">
+          <div class="delivery-name">Table basse marbre + métal</div>
+          <div class="delivery-shop">IKEA · 229 €</div>
+          <div class="delivery-date">Prévu le 12 mai</div>
+        </div>
+        <div class="delivery-status en-route">→ En route</div>
+      </div>
+      <div class="delivery-card commande">
+        <div class="delivery-info">
+          <div class="delivery-name">Suspension rotin naturel</div>
+          <div class="delivery-shop">Amara · 89 €</div>
+          <div class="delivery-date">Expédition prévue le 18 mai</div>
+        </div>
+        <div class="delivery-status commande">○ Commandé</div>
+      </div>
+      <div class="delivery-card livre">
+        <div class="delivery-info">
+          <div class="delivery-name">Parure de lit Lin lavé</div>
+          <div class="delivery-shop">Libeco · 185 €</div>
+          <div class="delivery-date">Livré le 28 avril</div>
+        </div>
+        <div class="delivery-status livre">✓ Livré</div>
+      </div>
+      <div class="delivery-card commande">
+        <div class="delivery-info">
+          <div class="delivery-name">Miroir arche 120 cm</div>
+          <div class="delivery-shop">Made.com · 340 €</div>
+          <div class="delivery-date">Expédition prévue le 22 mai</div>
+        </div>
+        <div class="delivery-status commande">○ Commandé</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULES GRID -->
+  <div class="section-label">Tes modules</div>
+  <div class="modules-grid" id="modulesGrid"></div>
+
+  <!-- UPGRADE -->
+  <div class="upgrade-card">
+    <div>
+      <div class="upgrade-label">Passe au niveau supérieur</div>
+      <div class="upgrade-title">Débloque le plan Premium.</div>
+      <div class="upgrade-desc">Moodboard IA, Espace Collaboratif, Annuaire Pro, Crémaillère.</div>
+    </div>
+    <a href="https://www.lemove.fr#tarifs" class="upgrade-btn" target="_blank">Voir les offres →</a>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="demo-toast" id="toast"></div>
+
+<script>
+const MODULES = [
+  { id:'budget', icon:'💰', title:'Mon Budget', desc:'Budget total, dépensé, restant. Catégories personnalisées avec jauges et alertes.', tags:['Finances','Planning'], plan:'essentiel' },
+  { id:'demenagement', icon:'📦', title:'Mon Déménagement', desc:'Checklist par phase : Signature, Préparation, Démarches, Jour J, Installation.', tags:['Organisation','Checklist'], plan:'essentiel' },
+  { id:'aides', icon:'💶', title:'Guide des Aides', desc:'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags:['Aides','Budget'], plan:'essentiel' },
+  { id:'achats', icon:'🚚', title:'Mes Achats & Livraisons', desc:'Suivi de toutes tes commandes — Commandé, Préparé, En route, Livré.', tags:['Achats','Suivi'], plan:'essentiel' },
+  { id:'calculateur', icon:'📐', title:'Calculateur Volume', desc:'Calcule le volume de tes meubles et trouve le bon camion.', tags:['Déménagement','Outil'], plan:'complet' },
+  { id:'admin', icon:'📋', title:'Checklist Administrative', desc:'Changements adresse, résiliations, démarches officielles — rien oublier.', tags:['Admin','Démarches'], plan:'complet' },
+  { id:'carnet', icon:'📓', title:'Carnet de Bord', desc:'Codes, mesures, contacts immeuble, notes pratiques au quotidien.', tags:['Notes','Pratique'], plan:'complet', featured:true },
+  { id:'avancement', icon:'✅', title:'Mon Avancement', desc:'Vue Kanban de toutes tes tâches — faites, en cours, countdown Jour J.', tags:['Gestion','Tâches'], plan:'complet' },
+  { id:'moodboard', icon:'🎨', title:'Moodboard & Inspirations', desc:'Palette de couleurs, inspirations sauvegardées, notes de style par pièce.', tags:['Déco','Inspiration'], plan:'complet' },
+  { id:'moodboard-ia', icon:'✨', title:'Moodboard IA', desc:"Questionnaire déco — l'IA génère ta palette, ton style et tes achats prioritaires.", tags:['IA','Déco'], plan:'premium', locked:true },
+  { id:'collab', icon:'🤝', title:'Espace Collaboratif', desc:"Invite un proche ou un pro à accéder à ton espace.", tags:['Partage','Premium'], plan:'premium', locked:true },
+  { id:'cremaillere', icon:'🎉', title:'Ma Crémaillère', desc:'Crée ta liste de cadeaux et partage-la avec tes proches.', tags:['Cadeaux','Partage'], plan:'premium', locked:true },
+];
+
+const TASKS = {
+  prep: [
+    { text:'Réserver le déménageur', done:true, tag:'Urgent' },
+    { text:'Acheter des cartons et matériel d\'emballage', done:true, tag:'Logistique' },
+    { text:'Faire l\'inventaire des meubles à garder', done:true, tag:'Organisation' },
+    { text:'Mesurer les pièces du nouveau logement', done:false, tag:'À faire' },
+    { text:'Commander l\'étiqueteuse pour les cartons', done:false, tag:'Matériel' },
+    { text:'Vider la cave et le grenier', done:false, tag:'À faire' },
+  ],
+  demarches: [
+    { text:'Déclarer le changement d\'adresse sur service-public.fr', done:true, tag:'Officiel' },
+    { text:'Prévenir la CAF', done:true, tag:'Allocations' },
+    { text:'Résilier le contrat EDF actuel', done:false, tag:'Énergie' },
+    { text:'Souscrire l\'assurance habitation', done:false, tag:'Urgent' },
+    { text:'Transférer le courrier à La Poste', done:false, tag:'Admin' },
+  ],
+  jourj: [
+    { text:'Accueillir le déménageur à 8h00', done:false, tag:'Jour J' },
+    { text:'Vérifier l\'inventaire au départ', done:false, tag:'Jour J' },
+    { text:'Remettre les clés à l\'ancien propriétaire', done:false, tag:'Urgent' },
+    { text:'Relever les compteurs dans le nouveau logement', done:false, tag:'Jour J' },
+  ],
+  install: [
+    { text:'Assembler les meubles IKEA', done:false, tag:'Installation' },
+    { text:'Accrocher les rideaux et stores', done:false, tag:'Déco' },
+    { text:'Installer les luminaires', done:false, tag:'Électricité' },
+    { text:'Ranger la cuisine et la salle de bain', done:false, tag:'Installation' },
+  ]
+};
+
+let activePanel = 'budget';
+let activePhase = 'prep';
+
+// Build modules grid
+function buildGrid() {
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = MODULES.map((m, i) => `
+    <div class="module-card ${m.featured?'featured':''} ${m.locked?'locked':''}"
+         onclick="${m.locked ? "toast('Module disponible en plan Premium ✨')" : `openModule('${m.id}')`}"
+         onmousemove="glowMove(event,this)" onmouseleave="this.classList.remove('glow')">
+      <div class="module-num">0${i+1}</div>
+      <div class="module-icon">${m.icon}</div>
+      <div class="module-title">${m.title}</div>
+      <div class="module-desc">${m.desc}</div>
+      <div class="module-tags">${m.tags.map(t=>`<span class="module-tag">${t}</span>`).join('')}</div>
+      ${!m.locked ? `<div class="module-arrow">→</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function glowMove(e, card) {
+  card.classList.add('glow');
+  const r = card.getBoundingClientRect();
+  card.style.setProperty('--gx', ((e.clientX-r.left)/r.width*100)+'%');
+  card.style.setProperty('--gy', ((e.clientY-r.top)/r.height*100)+'%');
+}
+
+function openModule(id) {
+  document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  if (panel) {
+    panel.classList.add('active');
+    panel.scrollIntoView({ behavior:'smooth', block:'start' });
+    activePanel = id;
+  } else {
+    toast('Module en cours de chargement...');
+  }
+  // Update quick modules
+  document.querySelectorAll('.quick-mod').forEach(q => q.classList.remove('active'));
+  const qm = document.querySelector(`.quick-mod[onclick*="${id}"]`);
+  if (qm) qm.classList.add('active');
+}
+
+function closePanel() {
+  document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+}
+
+// Tasks
+function buildTasks(phase) {
+  const list = document.getElementById('taskList');
+  if (!list) return;
+  list.innerHTML = (TASKS[phase]||[]).map((t,i) => `
+    <div class="task-row">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTask(this, ${i}, '${phase}')">
+        ${t.done ? '✓' : ''}
+      </div>
+      <div class="task-text ${t.done?'done':''}" id="task-text-${phase}-${i}">${t.text}</div>
+      <span class="task-tag">${t.tag}</span>
+    </div>
+  `).join('');
+}
+
+function switchPhase(btn, phase) {
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activePhase = phase;
+  buildTasks(phase);
+}
+
+function toggleTask(el, i, phase) {
+  TASKS[phase][i].done = !TASKS[phase][i].done;
+  el.className = 'task-check' + (TASKS[phase][i].done ? ' done' : '');
+  el.textContent = TASKS[phase][i].done ? '✓' : '';
+  const txt = document.getElementById(`task-text-${phase}-${i}`);
+  if (txt) txt.className = 'task-text' + (TASKS[phase][i].done ? ' done' : '');
+  if (TASKS[phase][i].done) toast('Tâche complétée ✓');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Init
+buildGrid();
+buildTasks('prep');
+setTimeout(() => { document.getElementById('progressBar').style.width = '64%'; }, 400);
+openModule('budget');
+</script>
+</body>
+</html>
