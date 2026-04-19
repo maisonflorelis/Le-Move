@@ -297,9 +297,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* ── PREVIEW ──────────────────────────────────────────────────────── */
   .preview-section { padding: 100px 120px; background: var(--cream); }
-  .preview-header { text-align: center; margin-bottom: 40px; }
+  .preview-header { text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
   .preview-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; margin-bottom: 12px; }
-  .preview-sub { font-size: 12px; font-weight: 200; color: var(--text-light); max-width: 260px; text-align: right; line-height: 1.7; font-style: italic; }
+  .preview-sub { font-size: 13px; font-weight: 200; color: var(--text-light); max-width: 420px; text-align: center; line-height: 1.7; font-style: italic; margin: 12px auto 0; }
   .preview-grid { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: auto auto; gap: 14px; }
   .preview-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--linen); background: var(--warm-white); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
   .preview-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(44,31,20,0.1); }
@@ -735,7 +735,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="nav-links">
     <a class="nav-link" href="#features">Fonctionnalités</a>
-    <a class="nav-link" href="#preview">Aperçu</a>
+    <a class="nav-link" href="apercu.html">Aperçu</a>
     <a class="nav-link" href="#pricing">Tarifs</a>
     <a class="nav-link" href="#faq">FAQ</a>
   </div>
@@ -762,7 +762,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="hero-actions">
       <a class="btn-primary-hero" href="https://buy.stripe.com/14AcN5f1C70zeO940r6EU07" target="_blank">Créer mon espace Le Move</a>
-      <a class="btn-secondary-hero" href="#preview">Voir l'aperçu complet</a>
+      <a class="btn-secondary-hero" href="apercu.html">Voir l'aperçu complet</a>
     </div>
     <div class="hero-trust">
       <div class="trust-item"><span class="trust-icon">🔐</span> Compte personnel sécurisé</div>
@@ -837,7 +837,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ── BANDEAU AGENCES ──────────────────────────────────────────────── -->
 <div class="agency-banner">
   <div class="agency-dot"></div>
-  <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos nouveaux locataires comme cadeau de bienvenue. Tarifs partenaires disponibles à partir de 50 licences.</div>
+  <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos clients comme cadeau de bienvenue à la remise des clés.</div>
   <a class="agency-banner-cta" href="/cdn-cgi/l/email-protection#9efcf1f0f4f1ebecdef2fbf3f1e8fbb0f8ec" style="text-decoration:none">Nous contacter →</a>
 </div>
 
@@ -985,6 +985,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="preview-header">
     <div class="preview-title">Beau par design.<br>Puissant par nature.</div>
     <div class="preview-sub">Un aperçu de ton espace. Ce que tu vois ici, c'est exactement ce que tu obtiens.</div>
+    <div style="margin-top:28px">
+      <a href="apercu.html" style="display:inline-block;padding:14px 32px;background:var(--espresso);color:var(--cream);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Voir l'aperçu complet →</a>
+    </div>
   </div>
   <div class="preview-tabs">
     <button class="preview-tab active" onclick="showPreview(0)">01 - Dashboard</button>
@@ -1134,7 +1137,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="faq-item">
       <div class="faq-q">C'est quoi le partenariat agences immobilières ? <span class="faq-arrow">→</span></div>
-      <div class="faq-a">Les agences peuvent offrir Le Move comme cadeau de bienvenue à leurs nouveaux locataires. Tarifs dégressifs à partir de 50 licences, avec possibilité de personnalisation aux couleurs de l'agence.</div>
+      <div class="faq-a">Les agences peuvent offrir Le Move à leurs clients comme cadeau de bienvenue à la remise des clés. Tarifs dégressifs selon le volume annuel, avec possibilité de personnalisation aux couleurs de l'agence. Contactez-nous sur <a href="mailto:bonjour@lemove.fr" style="color:var(--terracotta);text-decoration:none;">bonjour@lemove.fr</a> pour un devis.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Est-ce qu'il y a une politique de remboursement ? <span class="faq-arrow">→</span></div>
@@ -1314,7 +1317,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="cta-sub">Le Move est prêt. Il n'attend que toi.</div>
     <div class="cta-actions">
       <a class="cta-btn-main" href="https://buy.stripe.com/14AcN5f1C70zeO940r6EU07" target="_blank" onclick="window.open('https://buy.stripe.com/14AcN5f1C70zeO940r6EU07','_blank');return false;">Créer mon espace, 89€</a>
-      <a class="cta-btn-ghost" href="#preview">Voir l'aperçu complet</a>
+      <a class="cta-btn-ghost" href="apercu.html">Voir l'aperçu complet</a>
     </div>
     <div class="cta-note">Accès à vie · Compte personnel sécurisé · Satisfait ou remboursé*</div>
     <div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.15);margin-top:8px;font-style:italic">*En cas de dysfonctionnement persistant non résolu sous 7 jours</div>
