@@ -14,25 +14,25 @@
   --espresso:#2C1F14;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;
   --text-light:#8A7968;--green:#2D6A4F;
 }
-body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;font-size:14px}
 .nav{position:sticky;top:0;background:var(--espresso);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;z-index:100}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);text-decoration:none}
 .nav-back{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.4);text-decoration:none}
 .nav-back:hover{color:var(--cream)}
 .nav-badge{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;background:rgba(196,113,74,0.2);color:var(--terracotta);border-radius:20px;border:1px solid rgba(196,113,74,0.3)}
-.hero{background:var(--espresso);padding:48px 32px 0;position:relative;overflow:hidden}
+.hero{background:var(--espresso);padding:56px 48px 0;position:relative;overflow:hidden;text-align:center}
 .hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,186,168,0.04) 1px,transparent 1px);background-size:32px 32px}
-.hero-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(247,243,238,0.25);margin-bottom:10px;position:relative}
-.hero-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:48px;font-weight:300;color:var(--cream);line-height:1;position:relative}
+.hero-label{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:14px;position:relative}
+.hero-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:64px;font-weight:300;color:var(--cream);line-height:1;position:relative}
 .hero-title span{color:var(--terracotta)}
-.hero-sub{font-size:13px;font-weight:200;color:rgba(247,243,238,0.4);margin-top:10px;font-style:italic;position:relative;max-width:560px;padding-bottom:24px}
-.tabs{background:var(--espresso);border-top:1px solid rgba(255,255,255,0.06);overflow-x:auto;display:flex;scrollbar-width:none}
+.hero-sub{font-size:15px;font-weight:200;color:rgba(247,243,238,0.5);margin:14px auto 0;font-style:italic;position:relative;max-width:600px;padding-bottom:32px;line-height:1.7}
+.tabs{background:var(--espresso);border-top:1px solid rgba(255,255,255,0.06);overflow-x:auto;display:flex;justify-content:center;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tabs-inner{display:flex;padding:0 32px;min-width:max-content}
-.tab{padding:14px 20px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.35);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.tabs-inner{display:flex;padding:0 32px;min-width:max-content;justify-content:center}
+.tab{padding:16px 22px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.4);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
 .tab.active{color:var(--cream);border-bottom-color:var(--terracotta)}
 .tab:hover:not(.active){color:rgba(247,243,238,0.6)}
-.content{max-width:900px;margin:0 auto;padding:32px}
+.content{max-width:940px;margin:0 auto;padding:36px 40px}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
@@ -40,13 +40,13 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .card{background:var(--warm-white);border:1px solid var(--linen);border-radius:16px;padding:24px;margin-bottom:16px}
 .card-dark{background:var(--espresso);border-radius:16px;padding:24px;margin-bottom:16px}
 .card-label{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
-.card-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--espresso);margin-bottom:16px}
-.card-title-light{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);margin-bottom:16px}
+.card-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--espresso);margin-bottom:16px}
+.card-title-light{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--cream);margin-bottom:16px}
 
 /* Form */
 .field{display:flex;flex-direction:column;gap:5px}
-.field-label{font-size:10px;font-weight:300;color:var(--text-light)}
-.input{padding:11px 14px;border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--espresso);background:white;outline:none;transition:border-color 0.2s;width:100%}
+.field-label{font-size:11px;font-weight:300;color:var(--text-light);letter-spacing:0.02em}
+.input{padding:13px 16px;border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--espresso);background:white;outline:none;transition:border-color 0.2s;width:100%}
 .input:focus{border-color:var(--terracotta)}
 .select{padding:11px 14px;border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--espresso);background:white;outline:none;width:100%;cursor:pointer}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -68,15 +68,15 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .score-ring{width:100px;height:100px;position:relative;flex-shrink:0}
 .score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .score-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-big{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;font-weight:300;color:var(--cream);line-height:1}
-.score-sub-text{font-size:9px;color:rgba(247,243,238,0.3)}
+.score-big{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:44px;font-weight:300;color:var(--cream);line-height:1}
+.score-sub-text{font-size:11px;color:rgba(247,243,238,0.3)}
 
 /* Criteria */
 .crit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .crit-item{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:14px}
 .crit-icon{font-size:18px;margin-bottom:6px}
-.crit-lbl{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px}
-.crit-val{font-size:20px;font-weight:300;margin-bottom:4px}
+.crit-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.crit-val{font-size:24px;font-weight:300;margin-bottom:6px}
 .crit-bar{height:3px;background:var(--linen);border-radius:2px;overflow:hidden}
 .crit-fill{height:100%;border-radius:2px;transition:width 1s ease}
 
@@ -100,8 +100,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .doc-item.uploaded{border-color:var(--sage);background:rgba(122,140,126,0.04)}
 .doc-item.required::after{content:'*';color:var(--terracotta);font-size:10px;position:absolute;top:12px;right:14px}
 .doc-icon{font-size:20px;margin-bottom:6px}
-.doc-name{font-size:12px;font-weight:300;color:var(--espresso);margin-bottom:2px}
-.doc-status{font-size:9px;font-weight:200;color:var(--text-light)}
+.doc-name{font-size:13px;font-weight:300;color:var(--espresso);margin-bottom:4px}
+.doc-status{font-size:10px;font-weight:200;color:var(--text-light)}
 .doc-status.ok{color:var(--sage)}
 .doc-score{background:var(--espresso);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .doc-score-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;color:var(--cream)}
@@ -138,13 +138,13 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .compare-val.bad{color:var(--terracotta)}
 
 /* Vice results */
-.vice-item{padding:12px 14px;border-radius:10px;border:1px solid;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px}
+.vice-item{padding:14px 18px;border-radius:10px;border:1px solid;font-size:13px;font-weight:300;line-height:1.7;margin-bottom:8px}
 .vice-critical{background:rgba(192,57,43,0.06);border-color:rgba(192,57,43,0.2)}
 .vice-warning{background:rgba(196,113,74,0.06);border-color:rgba(196,113,74,0.2)}
 .vice-ok{background:rgba(45,106,79,0.06);border-color:rgba(45,106,79,0.2)}
 
 /* Nego */
-.nego-arg{background:var(--cream);border:1px solid var(--linen);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:300;color:var(--espresso);line-height:1.6;margin-bottom:6px}
+.nego-arg{background:var(--cream);border:1px solid var(--linen);border-radius:10px;padding:14px 18px;font-size:13px;font-weight:300;color:var(--espresso);line-height:1.7;margin-bottom:8px}
 .nego-arg::before{content:'→ ';color:var(--terracotta);font-weight:400}
 
 /* Histiry */
@@ -152,8 +152,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .hist-item:hover{border-color:var(--terracotta)}
 .hist-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:white;flex-shrink:0}
 .hist-info{flex:1}
-.hist-addr{font-size:12px;font-weight:300;color:var(--espresso)}
-.hist-date{font-size:10px;font-weight:200;color:var(--text-light);margin-top:2px}
+.hist-addr{font-size:14px;font-weight:300;color:var(--espresso)}
+.hist-date{font-size:11px;font-weight:200;color:var(--text-light);margin-top:3px}
 
 /* Empty */
 .empty{text-align:center;padding:56px 32px}
@@ -180,9 +180,12 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .fade-up{animation:fadeUp 0.35s ease both}
 
 @media(max-width:768px){
-  .nav,.hero,.content{padding-left:16px;padding-right:16px}
-  .tabs-inner{padding:0 16px}
-  .hero-title{font-size:36px}
+  .nav{padding-left:16px;padding-right:16px}
+  .hero{padding:36px 20px 0;text-align:left}
+  .content{padding:20px 16px}
+  .tabs-inner{padding:0 12px}
+  .hero-title{font-size:40px}
+  .hero-sub{font-size:13px;max-width:100%}
   .grid-2,.grid-3,.grid-4,.crit-grid,.afford-grid,.doc-grid{grid-template-columns:1fr}
   .score-hero{grid-template-columns:1fr;text-align:center}
   .photo-grid{grid-template-columns:repeat(3,1fr)}
@@ -465,7 +468,9 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
       <div style="text-align:right">
         <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:6px">Statut</div>
         <div id="dossierStatus" style="font-size:12px;font-weight:200;color:rgba(247,243,238,0.5)">Dossier incomplet</div>
-        <button class="btn-secondary" style="margin-top:10px;border-color:rgba(247,243,238,0.2);color:rgba(247,243,238,0.5)" onclick="generateLetter()">✦ Lettre de motivation IA</button>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn-secondary" style="border-color:rgba(247,243,238,0.2);color:rgba(247,243,238,0.5)" onclick="showLetterOptions()">✦ Lettre de motivation IA</button>
+        </div>
       </div>
     </div>
 
@@ -496,6 +501,51 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         <button class="btn-primary" onclick="addQuittance()">Ajouter</button>
       </div>
       <input type="file" id="quittanceFile" style="display:none" accept="application/pdf,image/*" onchange="uploadQuittance(this)">
+    </div>
+
+    <!-- Letter options -->
+    <div id="letter-options" style="display:none">
+      <div class="card" style="border:1px solid var(--terracotta)">
+        <div class="card-label">Lettre de motivation</div>
+        <div class="card-title" style="font-size:22px">Personnalisez votre lettre</div>
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="field"><div class="field-label">Votre prénom et nom</div><input type="text" class="input" id="letterName" placeholder="Marie Dupont"></div>
+          <div class="field"><div class="field-label">Votre situation professionnelle</div><input type="text" class="input" id="letterSituation" placeholder="Ingénieure en CDI depuis 3 ans"></div>
+          <div class="field"><div class="field-label">Pourquoi ce logement ?</div><input type="text" class="input" id="letterWhy" placeholder="Proche de mon lieu de travail, quartier calme..."></div>
+          <div class="field"><div class="field-label">Ton souhaité</div>
+            <select class="select" id="letterTone">
+              <option value="professionnel">Professionnel et rassurant</option>
+              <option value="chaleureux">Chaleureux et humain</option>
+              <option value="concis">Concis et direct</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="field-label" style="margin-bottom:8px">Trame / Structure</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div id="trame-standard" class="trame-option" onclick="selectTrame('standard')" style="border:1px solid var(--terracotta);border-radius:10px;padding:14px;cursor:pointer;background:rgba(196,113,74,0.04)">
+              <div style="font-size:11px;font-weight:400;color:var(--espresso);margin-bottom:4px">✦ Standard</div>
+              <div style="font-size:10px;font-weight:200;color:var(--text-light);line-height:1.5">Présentation → Situation pro → Motivation → Garanties → Conclusion</div>
+            </div>
+            <div id="trame-courte" class="trame-option" onclick="selectTrame('courte')" style="border:1px solid var(--linen);border-radius:10px;padding:14px;cursor:pointer">
+              <div style="font-size:11px;font-weight:400;color:var(--espresso);margin-bottom:4px">Courte & percutante</div>
+              <div style="font-size:10px;font-weight:200;color:var(--text-light);line-height:1.5">3 paragraphes max — situation, motivation, disponibilité</div>
+            </div>
+            <div id="trame-narrative" class="trame-option" onclick="selectTrame('narrative')" style="border:1px solid var(--linen);border-radius:10px;padding:14px;cursor:pointer">
+              <div style="font-size:11px;font-weight:400;color:var(--espresso);margin-bottom:4px">Narrative & personnelle</div>
+              <div style="font-size:10px;font-weight:200;color:var(--text-light);line-height:1.5">Histoire personnelle, lien émotionnel avec le logement</div>
+            </div>
+            <div id="trame-formelle" class="trame-option" onclick="selectTrame('formelle')" style="border:1px solid var(--linen);border-radius:10px;padding:14px;cursor:pointer">
+              <div style="font-size:11px;font-weight:400;color:var(--espresso);margin-bottom:4px">Formelle & administrative</div>
+              <div style="font-size:10px;font-weight:200;color:var(--text-light);line-height:1.5">Ton très formel, style courrier officiel</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary" onclick="generateLetter()">Générer ma lettre →</button>
+          <button class="btn-secondary" onclick="document.getElementById('letter-options').style.display='none'">Annuler</button>
+        </div>
+      </div>
     </div>
 
     <div id="letter-section" style="display:none">
@@ -662,6 +712,19 @@ async function startAnalysis() {
     }
     analysis._meta = { address, loyer, surface, type, dpe:dpeData, coords, city, postcode };
     currentAnalysis = analysis;
+
+    // Auto-populate other tabs
+    if (analysis._meta) {
+      var m = analysis._meta;
+      // Affordability tab
+      if (m.loyer) document.getElementById('affordLoyerInput').value = m.loyer;
+      if (m.address) document.getElementById('affordAddrInput').value = m.address;
+      // Nego tab
+      if (m.address) document.getElementById('negoAddr').value = m.address;
+      if (m.loyer) document.getElementById('negoLoyer').value = m.loyer;
+      if (m.surface) document.getElementById('negoSurface').value = m.surface;
+      if (analysis.points_faibles) document.getElementById('negoDefauts').value = analysis.points_faibles.join(', ');
+    }
 
     var histItem = { id:Date.now(), address, score:analysis.score_global, verdict:analysis.verdict, date:new Date().toLocaleDateString('fr-FR'), analysis };
     analysisHistory.unshift(histItem);
@@ -1105,6 +1168,28 @@ document.getElementById('quittanceFile').addEventListener('change', async functi
 });
 
 // Lettre de motivation
+var selectedTrame = 'standard';
+
+function showLetterOptions() {
+  document.getElementById('letter-options').style.display = 'block';
+  document.getElementById('letter-section').style.display = 'none';
+  // Prefill name from profile if available
+  if (currentAnalysis?._meta?.address) {
+    document.getElementById('letterWhy').value = 'Proche de ' + (currentAnalysis._meta.city || 'votre ville') + ', situation ideale';
+  }
+}
+
+function selectTrame(trame) {
+  selectedTrame = trame;
+  ['standard','courte','narrative','formelle'].forEach(function(t) {
+    var el = document.getElementById('trame-' + t);
+    if (el) {
+      el.style.borderColor = t === trame ? 'var(--terracotta)' : 'var(--linen)';
+      el.style.background = t === trame ? 'rgba(196,113,74,0.04)' : 'transparent';
+    }
+  });
+}
+
 async function generateLetter() {
   document.getElementById('letter-section').style.display = 'block';
   document.getElementById('letter-loading').style.display = 'block';
