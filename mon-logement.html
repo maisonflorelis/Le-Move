@@ -187,6 +187,113 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   .score-hero{grid-template-columns:1fr;text-align:center}
   .photo-grid{grid-template-columns:repeat(3,1fr)}
 }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ringDraw{from{stroke-dashoffset:276.5}to{stroke-dashoffset:var(--ring-offset)}}
+@keyframes barFill{from{width:0}to{width:var(--bar-width)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* Hero animations */
+.hero-label{animation:fadeIn 0.4s ease 0.1s both}
+.hero-title{animation:fadeUp 0.5s ease 0.15s both}
+.hero-sub{animation:fadeUp 0.5s ease 0.25s both}
+
+/* Tab content entrance */
+.tab-panel.active .card:nth-child(1){animation:fadeUp 0.35s ease 0.05s both}
+.tab-panel.active .card:nth-child(2){animation:fadeUp 0.35s ease 0.1s both}
+.tab-panel.active .card:nth-child(3){animation:fadeUp 0.35s ease 0.15s both}
+.tab-panel.active .card-dark{animation:fadeUp 0.4s ease 0.05s both}
+
+/* Score ring animation */
+.score-ring circle:last-child{animation:ringDraw 1.2s ease 0.3s both}
+
+/* Criteria bars */
+.crit-fill{animation:barFill 1s ease 0.5s both}
+.doc-score-fill{animation:barFill 1s ease 0.3s both}
+
+/* Cards hover */
+.card{transition:border-color 0.2s, box-shadow 0.2s, transform 0.2s}
+.card:hover{box-shadow:0 4px 20px rgba(44,31,20,0.06);transform:translateY(-1px)}
+.crit-item{transition:all 0.2s}
+.crit-item:hover{border-color:var(--terracotta);transform:translateY(-2px);box-shadow:0 4px 16px rgba(44,31,20,0.08)}
+
+/* Tab hover */
+.tab{transition:all 0.2s}
+.tabs-inner{position:relative}
+.tabs-inner::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--terracotta);transition:all 0.3s}
+
+/* Doc items */
+.doc-item{transition:all 0.2s}
+.doc-item:hover:not(.uploaded){border-color:var(--terracotta);background:rgba(196,113,74,0.02);transform:translateY(-1px)}
+.doc-item.uploaded{animation:fadeIn 0.3s ease both}
+
+/* History items */
+.hist-item{transition:all 0.25s}
+.hist-item:hover{transform:translateX(4px);border-color:var(--terracotta)}
+
+/* Compare cards */
+.compare-card{transition:all 0.25s}
+.compare-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(44,31,20,0.1)}
+
+/* Upload zone */
+.upload-zone{transition:all 0.25s}
+
+/* Score number highlight */
+.score-big{animation:countUp 0.5s ease 0.4s both}
+.afford-num{animation:countUp 0.4s ease 0.3s both}
+
+/* Fade-up utility */
+.fade-up{animation:fadeUp 0.35s ease both}
+.fade-up-1{animation:fadeUp 0.35s ease 0.08s both}
+.fade-up-2{animation:fadeUp 0.35s ease 0.16s both}
+.fade-up-3{animation:fadeUp 0.35s ease 0.24s both}
+
+/* Highlight badges */
+.highlight-new{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(196,113,74,0.12);color:var(--terracotta);border-radius:20px;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(196,113,74,0.2);animation:pulse 2s ease infinite}
+.highlight-ai{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(122,140,126,0.12);color:var(--sage);border-radius:20px;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(122,140,126,0.2)}
+.highlight-premium{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(184,154,106,0.12);color:var(--gold);border-radius:20px;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;border:1px solid rgba(184,154,106,0.2)}
+
+/* Loading shimmer */
+.shimmer{background:linear-gradient(90deg,var(--linen) 25%,rgba(232,224,213,0.5) 50%,var(--linen) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+
+/* Score ring glow */
+.score-ring svg circle:last-child{filter:drop-shadow(0 0 4px currentColor)}
+
+/* Affordability meter bar fill animation */
+.afford-fill{transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+
+/* Button animations */
+.btn-primary{transition:all 0.2s;position:relative;overflow:hidden}
+.btn-primary::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.1);opacity:0;transition:opacity 0.2s}
+.btn-primary:hover::after{opacity:1}
+.btn-primary:active{transform:scale(0.98)}
+.btn-secondary{transition:all 0.2s}
+.btn-secondary:active{transform:scale(0.98)}
+
+/* Nego arg entrance */
+.nego-arg{animation:slideRight 0.3s ease both}
+.nego-arg:nth-child(2){animation-delay:0.06s}
+.nego-arg:nth-child(3){animation-delay:0.12s}
+.nego-arg:nth-child(4){animation-delay:0.18s}
+
+/* Vice items entrance */
+.vice-item{animation:fadeUp 0.3s ease both}
+.vice-item:nth-child(2){animation-delay:0.06s}
+.vice-item:nth-child(3){animation-delay:0.12s}
+.vice-item:nth-child(4){animation-delay:0.18s}
+
+/* Alert entrance */
+.alert{animation:fadeIn 0.4s ease 0.2s both}
+
+/* Floating icon in hero */
+.hero-icon-float{animation:float 3s ease-in-out infinite}
+
 </style>
 </head>
 <body>
@@ -220,7 +327,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="content">
     <div class="card">
       <div class="card-label">Nouvelle analyse</div>
-      <div class="card-title">Analysez un logement avant de le visiter</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Analysez un logement avant de le visiter</div>
+        <span class="highlight-ai">✦ IA</span>
+        <span class="highlight-new">Nouveau</span>
+      </div>
       <div class="field" style="margin-bottom:12px">
         <div class="field-label">Adresse complète</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px">
@@ -238,7 +349,20 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </div>
-    <div id="analyse-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">Analyse en cours — DPE, transports, prix du marché...</div></div></div>
+    <div id="analyse-loading" style="display:none">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Analyse en cours...</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px;text-align:left;max-width:260px;margin-left:auto;margin-right:auto" id="loadingSteps">
+        <div class="loading-step" id="lstep1" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">📍 Géolocalisation de l'adresse</div>
+        <div class="loading-step" id="lstep2" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">🏠 Récupération du DPE</div>
+        <div class="loading-step" id="lstep3" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">🚇 Analyse des transports</div>
+        <div class="loading-step" id="lstep4" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">🛒 Services & commerces</div>
+        <div class="loading-step" id="lstep5" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">💰 Prix du marché</div>
+        <div class="loading-step" id="lstep6" style="font-size:11px;color:var(--sand);display:flex;align-items:center;gap:8px">🤖 Score IA en cours...</div>
+      </div>
+    </div>
+  </div>
     <div id="analyse-results" style="display:none"></div>
     <div id="analyse-empty" class="empty"><div class="empty-icon">🏠</div><div class="empty-title">Analysez votre prochain logement</div><div class="empty-sub">Entrez l'adresse d'un logement que vous envisagez de visiter.<br>Le Move analyse DPE, transports, prix du marché et commodités en temps réel.</div></div>
   </div>
@@ -249,7 +373,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="content">
     <div class="card">
       <div class="card-label">Simulateur d'affordabilité</div>
-      <div class="card-title">Ce logement est-il fait pour vous ?</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Ce logement est-il fait pour vous ?</div>
+        <span class="highlight-premium">✦ Exclusif</span>
+      </div>
       <div class="grid-2" style="margin-bottom:12px">
         <div class="field"><div class="field-label">Vos revenus nets mensuels (€)</div><input type="number" class="input" id="revenusInput" placeholder="2500"></div>
         <div class="field"><div class="field-label">Loyer demandé (€/mois)</div><input type="number" class="input" id="affordLoyerInput" placeholder="900"></div>
@@ -283,7 +410,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="content">
     <div class="card">
       <div class="card-label">Détecteur de vices cachés</div>
-      <div class="card-title">Photographiez, l'IA analyse</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Photographiez, l'IA analyse</div>
+        <span class="highlight-ai">✦ IA Vision</span>
+      </div>
       <p style="font-size:12px;font-weight:200;color:var(--text-light);margin-bottom:16px;line-height:1.7">Prenez en photo les zones à risque : murs, plafonds, salle de bain, cuisine, installation électrique, fenêtres. Claude détecte les problèmes potentiels.</p>
       <div class="upload-zone" onclick="document.getElementById('photosInput').click()">
         <div style="font-size:28px;margin-bottom:8px">📸</div>
@@ -304,7 +434,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="content">
     <div class="card">
       <div class="card-label">Négociateur de loyer</div>
-      <div class="card-title">Votre argumentaire sur-mesure</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Votre argumentaire sur-mesure</div>
+        <span class="highlight-ai">✦ IA</span>
+      </div>
       <div class="grid-2" style="margin-bottom:12px">
         <div class="field"><div class="field-label">Adresse du logement</div><input type="text" class="input" id="negoAddr" placeholder="12 rue de la Paix, Paris"></div>
         <div class="field"><div class="field-label">Loyer demandé (€)</div><input type="number" class="input" id="negoLoyer" placeholder="1200"></div>
@@ -338,7 +471,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
     <div class="card">
       <div class="card-label">Mes pièces justificatives</div>
-      <div class="card-title">Documents locataire</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div class="card-title" style="margin-bottom:0">Documents locataire</div>
+        <span class="highlight-new">Stockage sécurisé</span>
+      </div>
       <div class="doc-grid" id="docGrid"></div>
       <input type="file" id="docFileInput" style="display:none" onchange="uploadDoc(this)">
     </div>
@@ -467,6 +603,14 @@ async function startAnalysis() {
   document.getElementById('analyse-loading').style.display = 'block';
   document.getElementById('analyzeBtn').disabled = true;
 
+  // Animate loading steps
+  var stepInterval = setInterval(function() {
+    var steps = ['lstep1','lstep2','lstep3','lstep4','lstep5','lstep6'];
+    var active = steps.find(function(s) { var el = document.getElementById(s); return el && el.style.color !== 'rgb(122, 140, 126)'; });
+    if (active) { var el = document.getElementById(active); if(el) { el.style.color = 'var(--espresso)'; el.style.fontWeight = '400'; setTimeout(function(){if(el){el.style.color='var(--sage)';el.style.fontWeight='200';}},600); } }
+    else clearInterval(stepInterval);
+  }, 800);
+
   try {
     var geoRes = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(address) + '&limit=1');
     var geoData = await geoRes.json();
@@ -499,9 +643,12 @@ async function startAnalysis() {
 
     var prixM2 = loyer && surface ? Math.round(loyer / surface) : 0;
 
-    var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+    var aiRes = await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/claude-proxy', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM'
+        },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 1200,
         messages: [{ role: 'user', content: 'Expert immobilier français. Analyse ce logement. Réponds UNIQUEMENT en JSON valide sans markdown.\nAdresse: ' + address + '\nVille: ' + city + ' (' + postcode + ')\nType: ' + type + '\nSurface: ' + (surface||'?') + 'm²\nLoyer: ' + (loyer||'?') + '€\nPrix/m²: ' + (prixM2||'?') + '€\nDPE: ' + (dpeData?.etiquette_dpe||'?') + '\nScore transports: ' + transportScore + '/100\nScore commodités: ' + amenScore + '/100\n\nJSON: {"score_global":75,"verdict":"Verdict court","score_detail":{"transport":' + transportScore + ',"commodites":' + amenScore + ',"dpe":65,"prix":60,"environnement":55},"points_forts":["Fort 1","Fort 2","Fort 3"],"points_faibles":["Faible 1","Faible 2"],"prix_marche":{"estimation_m2":25,"evaluation":"dans la moyenne","ecart_pct":5},"encadrement":{"s_applique":true,"loyer_reference":900,"loyer_max_majore":990,"commentaire":"Commentaire encadrement"},"recommandation":"Recommandation 2-3 phrases."}' }]
@@ -638,7 +785,7 @@ async function calcAfford() {
       'Revenus nets: ' + revenus + '€/mois\nLoyer: ' + loyer + '€/mois\nCharges: ' + charges + '€/mois\nTransport: ' + transportCost + '€/mois\nSorties/restaurant: ' + sorties + '€/mois\nAdresse logement: ' + (logAddr||'non renseignée') + '\nAdresse travail: ' + (workAddr||'non renseignée') + '\n\n' +
       'Réponds UNIQUEMENT en JSON valide sans markdown:\n{"score_afford":72,"loyer_recommande":850,"loyer_max_absolu":950,"ratio_loyer_revenus":36,"cout_reel_mensuel":1350,"reste_a_vivre":1150,"evaluation":"au-dessus du raisonnable","alimentation_quartier":320,"restaurants_quartier":25,"indice_cout_vie":78,"detail":{"loyer":' + loyer + ',"charges":' + charges + ',"transport":' + transportCost + ',"alimentation":320,"sorties":' + sorties + ',"divers":100},"conseils":["Conseil 1","Conseil 2","Conseil 3"],"verdict":"Verdict sur l\'affordabilité en 2 phrases."}';
 
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/claude-proxy', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] })
     });
@@ -744,7 +891,7 @@ async function analyzePhotos() {
         r.readAsDataURL(f);
       });
     }));
-    var apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+    var apiRes = await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/claude-proxy', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500,
         messages:[{ role:'user', content:[...imgs, {type:'text', text:'Expert diagnostic immobilier. Analyse ces photos. JSON uniquement sans markdown: {"problemes":[{"niveau":"critique|attention|ok","titre":"Titre","description":"Description","conseil":"Conseil"}],"bilan":"Résumé global","score_etat":75}'}] }]
@@ -801,7 +948,7 @@ async function generateNego() {
       'Logement: ' + addr + '\nLoyer: ' + loyer + '€\nSurface: ' + (surface||'?') + 'm²' + (prixM2?'\nPrix/m²: ' + prixM2 + '€':'') + '\nDéfauts: ' + (defauts||'aucun') + '\nProfil: ' + (profil||'non renseigné') + '\n' +
       '{"potentiel_reduction":80,"loyer_cible":1120,"arguments":["Arg 1","Arg 2","Arg 3","Arg 4"],"strategie":"Stratégie en 2 phrases","moment_ideal":"Conseil timing","a_eviter":"À éviter"}';
 
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/claude-proxy', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:900, messages:[{role:'user',content:prompt}] })
     });
@@ -839,7 +986,8 @@ function renderNegoResults(r, loyer) {
 // ── DOSSIER ──
 function renderDocGrid() {
   var html = '';
-  DOCS.forEach(function(d) {
+  DOCS.forEach(function(d, i) {
+    var delay = (i * 0.05).toFixed(2);
     var uploaded = docsState[d.key];
     html += '<div class="doc-item' + (uploaded?' uploaded':'') + (d.required?' required':'') + '" onclick="openDocUpload(\'' + d.key + '\')">' +
       '<div class="doc-icon">' + d.icon + '</div>' +
@@ -973,7 +1121,7 @@ async function generateLetter() {
       'Quittances: ' + (quittances.length ? quittances.map(function(q){return q.address;}).join(', ') : 'aucune') + '\n\n' +
       'La lettre doit être chaleureuse, concise (250-350 mots), rassurante pour le propriétaire. Inclus [Prénom Nom], [Date], [Adresse logement] comme placeholders. Retourne UNIQUEMENT le texte de la lettre, sans titre ni explication.';
 
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/claude-proxy', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:800, messages:[{role:'user',content:prompt}] })
     });
