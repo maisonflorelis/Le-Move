@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Analytics GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-67D8PZDFEF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-67D8PZDFEF');
-</script>
-<!-- End Google Analytics GA4 -->
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -535,6 +526,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
 
 const ALL_MODULES = [
+  { id: 'mon-logement', icon: '🏠', title: 'Mon Logement', desc: 'Analyse avant visite, score logement, vices cachés, dossier locataire, négociation de loyer.', tags: ['Recherche', 'Logement', 'IA'], plans: ['premium'] },
   { id: 'budget', icon: '💰', title: 'Mon Budget', desc: 'Budget total, dépensé, restant. Catégories personnalisées avec alertes.', tags: ['Finances', 'Planning'], plans: ['essentiel', 'complet', 'premium'] },
   { id: 'demenagement', icon: '📦', title: 'Mon Déménagement', desc: 'Checklist par phase : Signature, Préparation, Démarches, Jour J, Installation.', tags: ['Organisation', 'Checklist'], plans: ['essentiel', 'complet', 'premium'] },
   { id: 'aides', icon: '💶', title: 'Guide des Aides', desc: 'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags: ['Aides', 'Budget'], plans: ['essentiel', 'complet', 'premium'] },
@@ -554,8 +546,9 @@ const ALL_MODULES = [
 ];
 
 const TUTORIAL_STEPS = [
-  { icon: '🎉', title: 'Bienvenue dans Le Move !', text: "Ton espace digital pour organiser ton premier emménagement de A à Z. Budget, déco, démarches, livraisons — 16 modules centralisés en un seul endroit." },
-  { icon: '📦', title: '16 modules t\'attendent.', text: "4 grandes familles : Emménagement (budget, déménagement, achats, aides), Déco & Style (moodboard, IA), Pratique (carnet, contacts, avancement) et Social & Pro (crémaillère, annuaire, collab)." },
+  { icon: '🎉', title: 'Bienvenue dans Le Move !', text: "Ton espace digital pour organiser ton emménagement de A à Z — de la recherche du logement jusqu'à ta crémaillère. 17 modules centralisés en un seul endroit." },
+  { icon: '🏠', title: 'Commence par Mon Logement.', text: "Avant même de signer, Le Move t'aide à analyser ton futur logement : score sur 100, DPE, transports, prix du marché, vices cachés par IA, et dossier locataire complet. Exclusif Premium." },
+  { icon: '📦', title: '17 modules t\'attendent.', text: "5 grandes familles : Recherche (Mon Logement), Emménagement (budget, déménagement, achats, aides), Déco & Style (moodboard, IA), Pratique (carnet, contacts, avancement) et Social & Pro (crémaillère, annuaire, collab)." },
   { icon: '💶', title: 'Tes aides financières.', text: "Le module Guide des Aides te présente toutes les aides auxquelles tu as peut-être droit — APL, Visale, Mobili-Pass, Loca-Pass. À consulter en priorité !" },
   { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires sur-mesure." },
   { icon: '🎉', title: 'Ta liste de crémaillère (Premium)', text: "Crée ta liste de cadeaux et partage-la avec tes proches via un lien. Ils peuvent réserver sans créer de compte !" },
@@ -625,6 +618,7 @@ async function loadApp(user) {
   currentPlan = (profilePlan?.Plan || planFromUsers || 'essentiel').toLowerCase();
   if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
   localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
+  localStorage.setItem('lm_user_email', user.email);
   console.log('Plan loaded from Profiles:', profilePlan?.Plan, '| from Users:', planFromUsers, '| final:', currentPlan);
 
   const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).maybeSingle();
@@ -794,6 +788,7 @@ function renderSidebarNav() {
 
 function openModule(id) {
   const pages = {
+    'mon-logement': 'mon-logement.html',
     'budget': 'budget.html',
     'demenagement': 'demenagement.html',
     'moodboard': 'moodboard.html',
