@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Le Move — Mon Logement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;
+  --espresso:#2C1F14;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;
+  --text-light:#8A7968;--green:#2D6A4F;
+}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh}
+.nav{position:sticky;top:0;background:var(--espresso);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;z-index:100}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);text-decoration:none}
+.nav-back{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.4);text-decoration:none}
+.nav-back:hover{color:var(--cream)}
+.nav-badge{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;background:rgba(196,113,74,0.2);color:var(--terracotta);border-radius:20px;border:1px solid rgba(196,113,74,0.3)}
+.hero{background:var(--espresso);padding:48px 32px 0;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,186,168,0.04) 1px,transparent 1px);background-size:32px 32px}
+.hero-label{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(247,243,238,0.25);margin-bottom:10px;position:relative}
+.hero-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:48px;font-weight:300;color:var(--cream);line-height:1;position:relative}
+.hero-title span{color:var(--terracotta)}
+.hero-sub{font-size:13px;font-weight:200;color:rgba(247,243,238,0.4);margin-top:10px;font-style:italic;position:relative;max-width:560px;padding-bottom:24px}
+.tabs{background:var(--espresso);border-top:1px solid rgba(255,255,255,0.06);overflow-x:auto;display:flex;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs-inner{display:flex;padding:0 32px;min-width:max-content}
+.tab{padding:14px 20px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.35);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.tab.active{color:var(--cream);border-bottom-color:var(--terracotta)}
+.tab:hover:not(.active){color:rgba(247,243,238,0.6)}
+.content{max-width:900px;margin:0 auto;padding:32px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Cards */
+.card{background:var(--warm-white);border:1px solid var(--linen);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-dark{background:var(--espresso);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-label{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.card-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--espresso);margin-bottom:16px}
+.card-title-light{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);margin-bottom:16px}
+
+/* Form */
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:10px;font-weight:300;color:var(--text-light)}
+.input{padding:11px 14px;border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--espresso);background:white;outline:none;transition:border-color 0.2s;width:100%}
+.input:focus{border-color:var(--terracotta)}
+.select{padding:11px 14px;border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--espresso);background:white;outline:none;width:100%;cursor:pointer}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+.btn-primary{padding:11px 24px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.btn-primary:hover{opacity:0.85}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.btn-secondary{padding:10px 20px;background:transparent;color:var(--espresso);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-secondary:hover{border-color:var(--terracotta);color:var(--terracotta)}
+
+/* Loading */
+.loading{text-align:center;padding:40px}
+.spinner{width:36px;height:36px;border:2px solid var(--linen);border-top-color:var(--terracotta);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+.loading-text{font-size:12px;font-weight:200;color:var(--text-light);font-style:italic}
+
+/* Score */
+.score-hero{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+.score-ring{width:100px;height:100px;position:relative;flex-shrink:0}
+.score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.score-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-big{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;font-weight:300;color:var(--cream);line-height:1}
+.score-sub-text{font-size:9px;color:rgba(247,243,238,0.3)}
+
+/* Criteria */
+.crit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.crit-item{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:14px}
+.crit-icon{font-size:18px;margin-bottom:6px}
+.crit-lbl{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:4px}
+.crit-val{font-size:20px;font-weight:300;margin-bottom:4px}
+.crit-bar{height:3px;background:var(--linen);border-radius:2px;overflow:hidden}
+.crit-fill{height:100%;border-radius:2px;transition:width 1s ease}
+
+/* Affordability */
+.afford-meter{background:var(--espresso);border-radius:16px;padding:24px;margin-bottom:14px}
+.afford-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.afford-item{text-align:center}
+.afford-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;color:var(--cream)}
+.afford-lbl{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-top:2px}
+.loyer-check{border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.loyer-legal{background:rgba(45,106,79,0.08);border:1px solid rgba(45,106,79,0.2)}
+.loyer-illegal{background:rgba(196,113,74,0.08);border:1px solid rgba(196,113,74,0.2)}
+.loyer-check-icon{font-size:20px;flex-shrink:0}
+.loyer-check-text{font-size:12px;font-weight:300;color:var(--espresso);line-height:1.6}
+.loyer-check-text strong{font-weight:400}
+
+/* Document upload */
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.doc-item{background:white;border:1px solid var(--linen);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;position:relative}
+.doc-item:hover{border-color:var(--terracotta)}
+.doc-item.uploaded{border-color:var(--sage);background:rgba(122,140,126,0.04)}
+.doc-item.required::after{content:'*';color:var(--terracotta);font-size:10px;position:absolute;top:12px;right:14px}
+.doc-icon{font-size:20px;margin-bottom:6px}
+.doc-name{font-size:12px;font-weight:300;color:var(--espresso);margin-bottom:2px}
+.doc-status{font-size:9px;font-weight:200;color:var(--text-light)}
+.doc-status.ok{color:var(--sage)}
+.doc-score{background:var(--espresso);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.doc-score-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:36px;color:var(--cream)}
+.doc-score-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:4px}
+.doc-score-bar{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;width:200px;overflow:hidden;margin-top:6px}
+.doc-score-fill{height:100%;background:var(--sage);border-radius:2px;transition:width 1s ease}
+
+/* Motivation letter */
+.letter-box{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:20px;font-size:13px;font-weight:300;color:var(--espresso);line-height:2;white-space:pre-wrap;margin-bottom:12px;min-height:200px}
+
+/* Quittances */
+.quittance-item{background:white;border:1px solid var(--linen);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.quittance-icon{font-size:20px;flex-shrink:0}
+.quittance-info{flex:1}
+.quittance-name{font-size:12px;font-weight:300;color:var(--espresso)}
+.quittance-date{font-size:10px;font-weight:200;color:var(--text-light);margin-top:2px}
+.quittance-actions{display:flex;gap:6px}
+.btn-tiny{padding:5px 12px;border:1px solid var(--linen);border-radius:6px;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;background:transparent;color:var(--text-light);font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.btn-tiny:hover{border-color:var(--terracotta);color:var(--terracotta)}
+
+/* Compare */
+.compare-grid{display:grid;gap:12px}
+.compare-row{display:grid;gap:10px;align-items:start}
+.compare-card{background:var(--warm-white);border:1px solid var(--linen);border-radius:14px;padding:18px;position:relative;transition:all 0.2s}
+.compare-card.best{border-color:var(--sage);background:rgba(122,140,126,0.04)}
+.compare-card.best::before{content:'★ Recommandé';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--sage);color:white;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 12px;border-radius:20px;white-space:nowrap}
+.compare-score{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:32px;font-weight:300;margin-bottom:4px}
+.compare-addr{font-size:11px;font-weight:200;color:var(--text-light);margin-bottom:10px}
+.compare-row-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--linen);font-size:11px}
+.compare-row-item:last-child{border-bottom:none}
+.compare-key{color:var(--text-light)}
+.compare-val{font-weight:400;color:var(--espresso)}
+.compare-val.good{color:var(--sage)}
+.compare-val.bad{color:var(--terracotta)}
+
+/* Vice results */
+.vice-item{padding:12px 14px;border-radius:10px;border:1px solid;font-size:12px;font-weight:300;line-height:1.6;margin-bottom:6px}
+.vice-critical{background:rgba(192,57,43,0.06);border-color:rgba(192,57,43,0.2)}
+.vice-warning{background:rgba(196,113,74,0.06);border-color:rgba(196,113,74,0.2)}
+.vice-ok{background:rgba(45,106,79,0.06);border-color:rgba(45,106,79,0.2)}
+
+/* Nego */
+.nego-arg{background:var(--cream);border:1px solid var(--linen);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:300;color:var(--espresso);line-height:1.6;margin-bottom:6px}
+.nego-arg::before{content:'→ ';color:var(--terracotta);font-weight:400}
+
+/* Histiry */
+.hist-item{background:var(--warm-white);border:1px solid var(--linen);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s;margin-bottom:8px}
+.hist-item:hover{border-color:var(--terracotta)}
+.hist-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:white;flex-shrink:0}
+.hist-info{flex:1}
+.hist-addr{font-size:12px;font-weight:300;color:var(--espresso)}
+.hist-date{font-size:10px;font-weight:200;color:var(--text-light);margin-top:2px}
+
+/* Empty */
+.empty{text-align:center;padding:56px 32px}
+.empty-icon{font-size:40px;margin-bottom:14px}
+.empty-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--espresso);margin-bottom:8px}
+.empty-sub{font-size:12px;font-weight:200;color:var(--text-light);line-height:1.7}
+
+/* Upload zone */
+.upload-zone{border:2px dashed var(--linen);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;background:white}
+.upload-zone:hover{border-color:var(--terracotta);background:rgba(196,113,74,0.02)}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.photo-thumb{aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-rm{position:absolute;top:4px;right:4px;background:rgba(44,31,20,0.7);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Alert */
+.alert{border-radius:12px;padding:14px 18px;margin-bottom:12px;font-size:12px;font-weight:300;line-height:1.6}
+.alert-warn{background:rgba(196,113,74,0.08);border:1px solid rgba(196,113,74,0.2);color:var(--espresso)}
+.alert-ok{background:rgba(45,106,79,0.08);border:1px solid rgba(45,106,79,0.2);color:var(--espresso)}
+.alert-info{background:rgba(44,90,138,0.06);border:1px solid rgba(44,90,138,0.15);color:var(--espresso)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp 0.35s ease both}
+
+@media(max-width:768px){
+  .nav,.hero,.content{padding-left:16px;padding-right:16px}
+  .tabs-inner{padding:0 16px}
+  .hero-title{font-size:36px}
+  .grid-2,.grid-3,.grid-4,.crit-grid,.afford-grid,.doc-grid{grid-template-columns:1fr}
+  .score-hero{grid-template-columns:1fr;text-align:center}
+  .photo-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="app.html" class="nav-logo">Le Move</a>
+  <span class="nav-badge">Premium ✦</span>
+  <a href="app.html" class="nav-back">← Dashboard</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Module Premium · Analyse Logement</div>
+  <div class="hero-title">Mon <span>Logement</span></div>
+  <div class="hero-sub">Score avant visite, affordabilité, vices cachés, dossier locataire, négociation — tout pour prendre la bonne décision.</div>
+</div>
+
+<div class="tabs">
+  <div class="tabs-inner">
+    <div class="tab active" onclick="showTab('analyse')">Analyse & Score</div>
+    <div class="tab" onclick="showTab('afford')">Affordabilité</div>
+    <div class="tab" onclick="showTab('vices')">Vices cachés</div>
+    <div class="tab" onclick="showTab('nego')">Négociation</div>
+    <div class="tab" onclick="showTab('dossier')">Mon Dossier</div>
+    <div class="tab" onclick="showTab('comparer')">Comparer</div>
+    <div class="tab" onclick="showTab('historique')">Historique</div>
+  </div>
+</div>
+
+<!-- ═══ ANALYSE ═══ -->
+<div id="panel-analyse" class="tab-panel active">
+  <div class="content">
+    <div class="card">
+      <div class="card-label">Nouvelle analyse</div>
+      <div class="card-title">Analysez un logement avant de le visiter</div>
+      <div class="field" style="margin-bottom:12px">
+        <div class="field-label">Adresse complète</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px">
+          <input type="text" class="input" id="addressInput" placeholder="12 rue de la Paix, 75001 Paris">
+          <button class="btn-primary" onclick="startAnalysis()" id="analyzeBtn">Analyser →</button>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="field"><div class="field-label">Loyer (€/mois)</div><input type="number" class="input" id="loyerInput" placeholder="1200"></div>
+        <div class="field"><div class="field-label">Surface (m²)</div><input type="number" class="input" id="surfaceInput" placeholder="45"></div>
+        <div class="field"><div class="field-label">Type de bien</div>
+          <select class="select" id="typeInput">
+            <option>Appartement</option><option>Studio</option><option>Maison</option><option>Colocation</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="analyse-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">Analyse en cours — DPE, transports, prix du marché...</div></div></div>
+    <div id="analyse-results" style="display:none"></div>
+    <div id="analyse-empty" class="empty"><div class="empty-icon">🏠</div><div class="empty-title">Analysez votre prochain logement</div><div class="empty-sub">Entrez l'adresse d'un logement que vous envisagez de visiter.<br>Le Move analyse DPE, transports, prix du marché et commodités en temps réel.</div></div>
+  </div>
+</div>
+
+<!-- ═══ AFFORDABILITÉ ═══ -->
+<div id="panel-afford" class="tab-panel">
+  <div class="content">
+    <div class="card">
+      <div class="card-label">Simulateur d'affordabilité</div>
+      <div class="card-title">Ce logement est-il fait pour vous ?</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="field"><div class="field-label">Vos revenus nets mensuels (€)</div><input type="number" class="input" id="revenusInput" placeholder="2500"></div>
+        <div class="field"><div class="field-label">Loyer demandé (€/mois)</div><input type="number" class="input" id="affordLoyerInput" placeholder="900"></div>
+      </div>
+      <div class="grid-3" style="margin-bottom:12px">
+        <div class="field"><div class="field-label">Adresse lieu de travail</div><input type="text" class="input" id="workInput" placeholder="75009 Paris"></div>
+        <div class="field"><div class="field-label">Mode de transport</div>
+          <select class="select" id="transportMode">
+            <option value="metro">Métro / RER (Navigo 86€)</option>
+            <option value="voiture">Voiture (carburant estimé)</option>
+            <option value="velo">Vélo (0€)</option>
+            <option value="pied">À pied (0€)</option>
+          </select>
+        </div>
+        <div class="field"><div class="field-label">Adresse logement analysé</div><input type="text" class="input" id="affordAddrInput" placeholder="75001 Paris"></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="field"><div class="field-label">Charges estimées (€/mois)</div><input type="number" class="input" id="chargesInput" placeholder="150"></div>
+        <div class="field"><div class="field-label">Budget sorties/restaurant (€/mois)</div><input type="number" class="input" id="sortiesInput" placeholder="200"></div>
+      </div>
+      <button class="btn-primary" onclick="calcAfford()">Calculer mon affordabilité →</button>
+    </div>
+    <div id="afford-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">Calcul en cours...</div></div></div>
+    <div id="afford-results" style="display:none"></div>
+    <div id="afford-empty" class="empty"><div class="empty-icon">💰</div><div class="empty-title">Simulez votre budget réel</div><div class="empty-sub">Loyer + charges + transport + vie quotidienne = coût réel du logement.<br>Le Move calcule si ce logement est adapté à vos revenus.</div></div>
+  </div>
+</div>
+
+<!-- ═══ VICES CACHÉS ═══ -->
+<div id="panel-vices" class="tab-panel">
+  <div class="content">
+    <div class="card">
+      <div class="card-label">Détecteur de vices cachés</div>
+      <div class="card-title">Photographiez, l'IA analyse</div>
+      <p style="font-size:12px;font-weight:200;color:var(--text-light);margin-bottom:16px;line-height:1.7">Prenez en photo les zones à risque : murs, plafonds, salle de bain, cuisine, installation électrique, fenêtres. Claude détecte les problèmes potentiels.</p>
+      <div class="upload-zone" onclick="document.getElementById('photosInput').click()">
+        <div style="font-size:28px;margin-bottom:8px">📸</div>
+        <div style="font-size:12px;font-weight:300;color:var(--text-light)">Ajouter des photos</div>
+        <div style="font-size:10px;font-weight:200;color:var(--sand);margin-top:4px">JPG, PNG — jusqu'à 10 photos</div>
+      </div>
+      <input type="file" id="photosInput" multiple accept="image/*" style="display:none" onchange="handlePhotos(this)">
+      <div class="photo-grid" id="photoGrid"></div>
+      <button class="btn-primary" id="analyzePhotosBtn" onclick="analyzePhotos()" style="display:none;margin-top:14px;width:100%">Analyser les photos →</button>
+    </div>
+    <div id="vices-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">L'IA analyse vos photos...</div></div></div>
+    <div id="vices-results" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══ NÉGOCIATION ═══ -->
+<div id="panel-nego" class="tab-panel">
+  <div class="content">
+    <div class="card">
+      <div class="card-label">Négociateur de loyer</div>
+      <div class="card-title">Votre argumentaire sur-mesure</div>
+      <div class="grid-2" style="margin-bottom:12px">
+        <div class="field"><div class="field-label">Adresse du logement</div><input type="text" class="input" id="negoAddr" placeholder="12 rue de la Paix, Paris"></div>
+        <div class="field"><div class="field-label">Loyer demandé (€)</div><input type="number" class="input" id="negoLoyer" placeholder="1200"></div>
+        <div class="field"><div class="field-label">Surface (m²)</div><input type="number" class="input" id="negoSurface" placeholder="45"></div>
+        <div class="field"><div class="field-label">Points faibles observés</div><input type="text" class="input" id="negoDefauts" placeholder="Humidité, bruit, vieux électro..."></div>
+      </div>
+      <div class="field" style="margin-bottom:16px"><div class="field-label">Votre profil (renforce l'argumentaire)</div><input type="text" class="input" id="negoProfil" placeholder="CDI, revenus 3x le loyer, garant solide..."></div>
+      <button class="btn-primary" onclick="generateNego()">Générer mon argumentaire →</button>
+    </div>
+    <div id="nego-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">Génération de votre argumentaire...</div></div></div>
+    <div id="nego-results" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══ MON DOSSIER ═══ -->
+<div id="panel-dossier" class="tab-panel">
+  <div class="content">
+
+    <div id="dossier-score-bar" class="doc-score">
+      <div>
+        <div class="doc-score-label">Score de dossier</div>
+        <div class="doc-score-num" id="dossierScoreNum">0/100</div>
+        <div class="doc-score-bar"><div class="doc-score-fill" id="dossierScoreFill" style="width:0%"></div></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:6px">Statut</div>
+        <div id="dossierStatus" style="font-size:12px;font-weight:200;color:rgba(247,243,238,0.5)">Dossier incomplet</div>
+        <button class="btn-secondary" style="margin-top:10px;border-color:rgba(247,243,238,0.2);color:rgba(247,243,238,0.5)" onclick="generateLetter()">✦ Lettre de motivation IA</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Mes pièces justificatives</div>
+      <div class="card-title">Documents locataire</div>
+      <div class="doc-grid" id="docGrid"></div>
+      <input type="file" id="docFileInput" style="display:none" onchange="uploadDoc(this)">
+    </div>
+
+    <div class="card">
+      <div class="card-label">Documents garant</div>
+      <div class="card-title" style="font-size:18px">Pièces du garant</div>
+      <div class="doc-grid" id="garantGrid"></div>
+      <input type="file" id="garantFileInput" style="display:none" onchange="uploadGarant(this)">
+    </div>
+
+    <div class="card">
+      <div class="card-label">Anciens logements</div>
+      <div class="card-title" style="font-size:18px">Quittances de loyer</div>
+      <div id="quittancesList"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+        <input type="text" class="input" id="quittanceAddr" placeholder="Adresse ancienne location" style="flex:1">
+        <input type="text" class="input" id="quittancePeriode" placeholder="Jan 2023 — Déc 2024" style="width:160px">
+        <button class="btn-primary" onclick="addQuittance()">Ajouter</button>
+      </div>
+      <input type="file" id="quittanceFile" style="display:none" accept="application/pdf,image/*" onchange="uploadQuittance(this)">
+    </div>
+
+    <div id="letter-section" style="display:none">
+      <div class="card">
+        <div class="card-label">Lettre de motivation</div>
+        <div class="card-title">Générée par Le Move</div>
+        <div id="letter-loading" style="display:none"><div class="loading"><div class="spinner"></div><div class="loading-text">Génération de votre lettre...</div></div></div>
+        <div class="letter-box" id="letterBox" style="display:none"></div>
+        <div style="display:flex;gap:10px;margin-top:8px" id="letter-actions" style="display:none">
+          <button class="btn-secondary" onclick="copyLetter()">📋 Copier</button>
+          <button class="btn-secondary" onclick="generateLetter()">↺ Régénérer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ COMPARER ═══ -->
+<div id="panel-comparer" class="tab-panel">
+  <div class="content">
+    <div id="compare-empty" class="empty"><div class="empty-icon">⚖️</div><div class="empty-title">Aucun logement à comparer</div><div class="empty-sub">Analysez au moins 2 logements dans l'onglet "Analyse & Score"<br>pour les comparer côte à côte.</div></div>
+    <div id="compare-results" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══ HISTORIQUE ═══ -->
+<div id="panel-historique" class="tab-panel">
+  <div class="content">
+    <div id="hist-empty" class="empty"><div class="empty-icon">📋</div><div class="empty-title">Aucune analyse enregistrée</div><div class="empty-sub">Vos analyses de logements apparaîtront ici.</div></div>
+    <div id="hist-list" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+var sb = supabase.createClient(
+  'https://xnmlpxteslwmimmdqjye.supabase.co',
+  'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM'
+);
+
+var currentUser = null;
+var currentAnalysis = null;
+var photosToAnalyze = [];
+var analysisHistory = JSON.parse(localStorage.getItem('lm_logement_history') || '[]');
+var docsState = JSON.parse(localStorage.getItem('lm_docs_state') || '{}');
+var quittances = JSON.parse(localStorage.getItem('lm_quittances') || '[]');
+var currentDocKey = null;
+var currentGarantKey = null;
+var currentQuittanceIdx = null;
+
+var DOCS = [
+  {key:'cni',name:"Pièce d'identité",icon:'🪪',required:true},
+  {key:'salaire1',name:"Bulletin salaire M-1",icon:'💼',required:true},
+  {key:'salaire2',name:"Bulletin salaire M-2",icon:'💼',required:true},
+  {key:'salaire3',name:"Bulletin salaire M-3",icon:'💼',required:true},
+  {key:'impots',name:"Avis d'imposition",icon:'📄',required:true},
+  {key:'domicile',name:"Justificatif domicile",icon:'🏠',required:true},
+  {key:'contrat',name:"Contrat de travail",icon:'📝',required:false},
+  {key:'rib',name:"RIB bancaire",icon:'🏦',required:false},
+];
+
+var GARANT_DOCS = [
+  {key:'g_cni',name:"CNI garant",icon:'🪪',required:false},
+  {key:'g_salaire',name:"Bulletin salaire garant",icon:'💼',required:false},
+  {key:'g_impots',name:"Avis imposition garant",icon:'📄',required:false},
+  {key:'g_attestation',name:"Attestation employeur",icon:'📝',required:false},
+];
+
+// Auth check
+(async function() {
+  var sess = await sb.auth.getSession();
+  if (!sess.data.session) { window.location.href = 'app.html'; return; }
+  currentUser = sess.data.session.user;
+  renderDocGrid();
+  renderGarantGrid();
+  renderQuittances();
+  renderHistory();
+})();
+
+// ── TABS ──
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t,i) {
+    var names = ['analyse','afford','vices','nego','dossier','comparer','historique'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'comparer') renderCompare();
+  if (name === 'historique') renderHistory();
+}
+
+// ── SCORE HELPER ──
+function scoreColor(s) { return s >= 70 ? '#7A8C7E' : s >= 45 ? '#B89A6A' : '#C4714A'; }
+
+// ── ANALYSE ──
+async function startAnalysis() {
+  var address = document.getElementById('addressInput').value.trim();
+  var loyer = parseFloat(document.getElementById('loyerInput').value) || 0;
+  var surface = parseFloat(document.getElementById('surfaceInput').value) || 0;
+  var type = document.getElementById('typeInput').value;
+  if (!address) { alert('Veuillez entrer une adresse.'); return; }
+
+  document.getElementById('analyse-empty').style.display = 'none';
+  document.getElementById('analyse-results').style.display = 'none';
+  document.getElementById('analyse-loading').style.display = 'block';
+  document.getElementById('analyzeBtn').disabled = true;
+
+  try {
+    var geoRes = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(address) + '&limit=1');
+    var geoData = await geoRes.json();
+    var feat = geoData.features?.[0];
+    var coords = feat?.geometry?.coordinates;
+    var city = feat?.properties?.city || '';
+    var postcode = feat?.properties?.postcode || '';
+
+    var dpeData = null;
+    try {
+      var dpeRes = await fetch('https://data.ademe.fr/data-fair/api/v1/datasets/dpe-v2-logements-existants/lines?q=' + encodeURIComponent(address) + '&size=1&select=etiquette_dpe,etiquette_ges');
+      var dpeJson = await dpeRes.json();
+      dpeData = dpeJson.results?.[0] || null;
+    } catch(e) {}
+
+    var transportScore = 55, amenScore = 55;
+    if (coords) {
+      var lat = coords[1], lon = coords[0];
+      try {
+        var tRes = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data=' + encodeURIComponent('[out:json][timeout:8];(node["public_transport"="stop_position"](around:500,' + lat + ',' + lon + ');node["highway"="bus_stop"](around:500,' + lat + ',' + lon + '););out count;') });
+        var tData = await tRes.json();
+        transportScore = Math.min(100, (tData.elements?.[0]?.tags?.total || 0) * 8 + 30);
+      } catch(e) {}
+      try {
+        var aRes = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data=' + encodeURIComponent('[out:json][timeout:8];(node["amenity"~"supermarket|bakery|pharmacy|school|cafe|restaurant"](around:800,' + lat + ',' + lon + '););out count;') });
+        var aData = await aRes.json();
+        amenScore = Math.min(100, (aData.elements?.[0]?.tags?.total || 0) * 5 + 20);
+      } catch(e) {}
+    }
+
+    var prixM2 = loyer && surface ? Math.round(loyer / surface) : 0;
+
+    var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1200,
+        messages: [{ role: 'user', content: 'Expert immobilier français. Analyse ce logement. Réponds UNIQUEMENT en JSON valide sans markdown.\nAdresse: ' + address + '\nVille: ' + city + ' (' + postcode + ')\nType: ' + type + '\nSurface: ' + (surface||'?') + 'm²\nLoyer: ' + (loyer||'?') + '€\nPrix/m²: ' + (prixM2||'?') + '€\nDPE: ' + (dpeData?.etiquette_dpe||'?') + '\nScore transports: ' + transportScore + '/100\nScore commodités: ' + amenScore + '/100\n\nJSON: {"score_global":75,"verdict":"Verdict court","score_detail":{"transport":' + transportScore + ',"commodites":' + amenScore + ',"dpe":65,"prix":60,"environnement":55},"points_forts":["Fort 1","Fort 2","Fort 3"],"points_faibles":["Faible 1","Faible 2"],"prix_marche":{"estimation_m2":25,"evaluation":"dans la moyenne","ecart_pct":5},"encadrement":{"s_applique":true,"loyer_reference":900,"loyer_max_majore":990,"commentaire":"Commentaire encadrement"},"recommandation":"Recommandation 2-3 phrases."}' }]
+      })
+    });
+    var aiData = await aiRes.json();
+    var clean = (aiData.content?.[0]?.text || '{}').replace(/```json|```/g,'').trim();
+    var analysis = {};
+    try { analysis = JSON.parse(clean); } catch(e) {
+      analysis = { score_global: Math.round((transportScore+amenScore)/2), verdict:'Analyse disponible', score_detail:{transport:transportScore,commodites:amenScore,dpe:60,prix:55,environnement:55}, points_forts:['Localisation analysée'], points_faibles:['Données limitées'], recommandation:'Visite recommandée.' };
+    }
+    analysis._meta = { address, loyer, surface, type, dpe:dpeData, coords, city, postcode };
+    currentAnalysis = analysis;
+
+    var histItem = { id:Date.now(), address, score:analysis.score_global, verdict:analysis.verdict, date:new Date().toLocaleDateString('fr-FR'), analysis };
+    analysisHistory.unshift(histItem);
+    if (analysisHistory.length > 10) analysisHistory.pop();
+    localStorage.setItem('lm_logement_history', JSON.stringify(analysisHistory));
+
+    document.getElementById('analyse-loading').style.display = 'none';
+    renderAnalysisResults(analysis, address, loyer, surface, dpeData);
+
+  } catch(err) {
+    document.getElementById('analyse-loading').style.display = 'none';
+    document.getElementById('analyse-empty').style.display = 'block';
+    alert('Erreur : ' + err.message);
+  }
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+function renderAnalysisResults(a, address, loyer, surface, dpe) {
+  var s = a.score_detail || {};
+  var color = scoreColor(a.score_global);
+  var circ = 2*Math.PI*44;
+  var offset = circ - (a.score_global/100)*circ;
+
+  var html = '<div class="card-dark fade-up"><div class="score-hero">' +
+    '<div class="score-ring">' +
+      '<svg viewBox="0 0 100 100" width="100" height="100">' +
+        '<circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>' +
+        '<circle cx="50" cy="50" r="44" fill="none" stroke="' + color + '" stroke-width="5" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '" stroke-linecap="round"/>' +
+      '</svg>' +
+      '<div class="score-ring-inner"><div class="score-big">' + a.score_global + '</div><div class="score-sub-text">/100</div></div>' +
+    '</div>' +
+    '<div><div style="font-size:9px;color:rgba(247,243,238,0.3);margin-bottom:4px">📍 ' + address + '</div>' +
+    '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:22px;color:#F7F3EE;margin-bottom:6px">' + (a.verdict||'') + '</div>' +
+    '<div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.4);line-height:1.6">' + (a.recommandation||'') + '</div></div>' +
+  '</div></div>';
+
+  html += '<div class="crit-grid fade-up">';
+  [{key:'transport',icon:'🚇',lbl:'Transports'},{key:'commodites',icon:'🛒',lbl:'Commodités'},{key:'dpe',icon:'⚡',lbl:'Énergie'},{key:'prix',icon:'💰',lbl:'Prix marché'},{key:'environnement',icon:'🌿',lbl:'Environnement'}].forEach(function(c) {
+    var v = s[c.key]||50;
+    var fc = v>=70?'#7A8C7E':v>=45?'#B89A6A':'#C4714A';
+    html += '<div class="crit-item"><div class="crit-icon">' + c.icon + '</div><div class="crit-lbl">' + c.lbl + '</div><div class="crit-val" style="color:' + fc + '">' + v + '<span style="font-size:10px;color:var(--text-light)">/100</span></div><div class="crit-bar"><div class="crit-fill" style="width:' + v + '%;background:' + fc + '"></div></div></div>';
+  });
+  html += '</div>';
+
+  // DPE
+  if (dpe?.etiquette_dpe) {
+    var dpeColors = {A:'#00A651',B:'#51B747',C:'#BACD4E',D:'#E8D000',E:'#F4A336',F:'#ED1C24',G:'#8B0000'};
+    var dpeWidths = {A:15,B:25,C:38,D:52,E:66,F:80,G:95};
+    html += '<div class="card fade-up" style="padding:16px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)">DPE</div><div style="padding:3px 12px;border-radius:10px;background:' + (dpeColors[dpe.etiquette_dpe]||'#888') + ';color:white;font-size:12px;font-weight:400">' + dpe.etiquette_dpe + '</div></div>';
+    ['A','B','C','D','E','F','G'].forEach(function(l) {
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div style="width:16px;text-align:center;font-size:9px;font-weight:400;color:white;background:' + dpeColors[l] + ';border-radius:2px;padding:1px 3px">' + l + '</div><div style="flex:1;height:6px;background:var(--linen);border-radius:3px;overflow:hidden"><div style="width:' + dpeWidths[l] + '%;height:100%;background:' + dpeColors[l] + ';border-radius:3px' + (l===dpe.etiquette_dpe?';box-shadow:0 0 0 2px var(--espresso)':'') + '"></div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Encadrement des loyers
+  if (a.encadrement) {
+    var enc = a.encadrement;
+    var isOver = loyer && enc.loyer_max_majore && loyer > enc.loyer_max_majore;
+    html += '<div class="alert fade-up ' + (enc.s_applique ? (isOver ? 'alert-warn' : 'alert-ok') : 'alert-info') + '">';
+    if (enc.s_applique) {
+      if (isOver) {
+        html += '⚠️ <strong>Loyer potentiellement illégal</strong> — Le loyer demandé (' + loyer + '€) dépasse le plafond majoré estimé (' + enc.loyer_max_majore + '€) dans cette zone d\'encadrement. ' + enc.commentaire;
+      } else {
+        html += '✅ <strong>Loyer conforme</strong> — Le loyer demandé est dans les limites de l\'encadrement des loyers de cette zone. ' + enc.commentaire;
+      }
+    } else {
+      html += 'ℹ️ ' + enc.commentaire;
+    }
+    html += '</div>';
+  }
+
+  // Points forts/faibles
+  html += '<div class="grid-2 fade-up">';
+  html += '<div class="card" style="padding:16px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Points forts</div>';
+  (a.points_forts||[]).forEach(function(p) { html += '<div class="vice-item vice-ok">' + p + '</div>'; });
+  html += '</div>';
+  html += '<div class="card" style="padding:16px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Points faibles</div>';
+  (a.points_faibles||[]).forEach(function(p) { html += '<div class="vice-item vice-warning">' + p + '</div>'; });
+  html += '</div></div>';
+
+  html += '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+    '<button class="btn-secondary" onclick="prefillAfford()">💰 Simuler l\'affordabilité</button>' +
+    '<button class="btn-secondary" onclick="showTab(\'vices\')">📸 Analyser les photos</button>' +
+    '<button class="btn-secondary" onclick="prefillNego()">💬 Générer argumentaire</button>' +
+  '</div>';
+
+  document.getElementById('analyse-results').innerHTML = html;
+  document.getElementById('analyse-results').style.display = 'block';
+}
+
+// ── AFFORDABILITÉ ──
+function prefillAfford() {
+  if (currentAnalysis?._meta) {
+    document.getElementById('affordLoyerInput').value = currentAnalysis._meta.loyer || '';
+    document.getElementById('affordAddrInput').value = currentAnalysis._meta.address || '';
+  }
+  showTab('afford');
+}
+
+async function calcAfford() {
+  var revenus = parseFloat(document.getElementById('revenusInput').value) || 0;
+  var loyer = parseFloat(document.getElementById('affordLoyerInput').value) || 0;
+  var charges = parseFloat(document.getElementById('chargesInput').value) || 100;
+  var sorties = parseFloat(document.getElementById('sortiesInput').value) || 200;
+  var transportMode = document.getElementById('transportMode').value;
+  var workAddr = document.getElementById('workInput').value.trim();
+  var logAddr = document.getElementById('affordAddrInput').value.trim();
+
+  if (!revenus || !loyer) { alert('Veuillez renseigner vos revenus et le loyer.'); return; }
+
+  document.getElementById('afford-empty').style.display = 'none';
+  document.getElementById('afford-results').style.display = 'none';
+  document.getElementById('afford-loading').style.display = 'block';
+
+  var transportCost = transportMode === 'metro' ? 86 : transportMode === 'voiture' ? 150 : 0;
+  var alimentaire = 300;
+
+  try {
+    var prompt = 'Expert en finances personnelles et immobilier français. Analyse l\'affordabilité de ce logement.\n' +
+      'Revenus nets: ' + revenus + '€/mois\nLoyer: ' + loyer + '€/mois\nCharges: ' + charges + '€/mois\nTransport: ' + transportCost + '€/mois\nSorties/restaurant: ' + sorties + '€/mois\nAdresse logement: ' + (logAddr||'non renseignée') + '\nAdresse travail: ' + (workAddr||'non renseignée') + '\n\n' +
+      'Réponds UNIQUEMENT en JSON valide sans markdown:\n{"score_afford":72,"loyer_recommande":850,"loyer_max_absolu":950,"ratio_loyer_revenus":36,"cout_reel_mensuel":1350,"reste_a_vivre":1150,"evaluation":"au-dessus du raisonnable","alimentation_quartier":320,"restaurants_quartier":25,"indice_cout_vie":78,"detail":{"loyer":' + loyer + ',"charges":' + charges + ',"transport":' + transportCost + ',"alimentation":320,"sorties":' + sorties + ',"divers":100},"conseils":["Conseil 1","Conseil 2","Conseil 3"],"verdict":"Verdict sur l\'affordabilité en 2 phrases."}';
+
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] })
+    });
+    var data = await res.json();
+    var clean = (data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();
+    var result = {};
+    try { result = JSON.parse(clean); } catch(e) {
+      result = { score_afford:65, loyer_recommande:Math.round(revenus*0.33), loyer_max_absolu:Math.round(revenus*0.35), ratio_loyer_revenus:Math.round(loyer/revenus*100), cout_reel_mensuel:loyer+charges+transportCost+sorties, reste_a_vivre:revenus-(loyer+charges+transportCost+sorties), evaluation:'à évaluer', conseils:['Respectez la règle des 33%'], verdict:'Analyse basée sur vos données.' };
+    }
+    renderAffordResults(result, revenus, loyer);
+  } catch(e) { alert('Erreur : ' + e.message); }
+
+  document.getElementById('afford-loading').style.display = 'none';
+}
+
+function renderAffordResults(r, revenus, loyer) {
+  var color = scoreColor(r.score_afford||50);
+  var overBudget = loyer > (r.loyer_max_absolu||revenus*0.35);
+
+  var html = '<div class="card-dark fade-up">' +
+    '<div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin-bottom:16px">' +
+    '<div class="score-ring" style="width:90px;height:90px">' +
+      '<svg viewBox="0 0 100 100" width="90" height="90">' +
+        '<circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>' +
+        '<circle cx="50" cy="50" r="44" fill="none" stroke="' + color + '" stroke-width="5" stroke-dasharray="276.5" stroke-dashoffset="' + (276.5-(r.score_afford||50)/100*276.5).toFixed(1) + '" stroke-linecap="round"/>' +
+      '</svg>' +
+      '<div class="score-ring-inner"><div class="score-big" style="font-size:28px">' + (r.score_afford||50) + '</div><div class="score-sub-text">/100</div></div>' +
+    '</div>' +
+    '<div><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:4px">Score d\'affordabilité</div>' +
+    '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:20px;color:#F7F3EE;margin-bottom:6px">' + (r.verdict||'') + '</div></div>' +
+    '</div>' +
+    '<div class="afford-grid">' +
+    '<div class="afford-item"><div class="afford-num">' + (r.loyer_recommande||'—') + '€</div><div class="afford-lbl">Loyer recommandé</div></div>' +
+    '<div class="afford-item"><div class="afford-num">' + (r.cout_reel_mensuel||'—') + '€</div><div class="afford-lbl">Coût réel/mois</div></div>' +
+    '<div class="afford-item"><div class="afford-num" style="color:' + (r.reste_a_vivre>500?'#7A8C7E':'#C4714A') + '">' + (r.reste_a_vivre||'—') + '€</div><div class="afford-lbl">Reste à vivre</div></div>' +
+    '<div class="afford-item"><div class="afford-num">' + (r.ratio_loyer_revenus||'—') + '%</div><div class="afford-lbl">Ratio loyer/revenus</div></div>' +
+    '</div></div>';
+
+  // Alert
+  html += '<div class="alert fade-up ' + (overBudget?'alert-warn':'alert-ok') + '">';
+  if (overBudget) {
+    html += '⚠️ Ce loyer (' + loyer + '€) dépasse votre maximum recommandé de ' + (r.loyer_max_absolu||Math.round(revenus*0.35)) + '€. Votre reste à vivre sera serré.';
+  } else {
+    html += '✅ Ce loyer est compatible avec vos revenus. Vous respectez la règle des 33%.';
+  }
+  html += '</div>';
+
+  // Breakdown
+  html += '<div class="card fade-up" style="padding:18px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px">Détail des dépenses mensuelles</div>';
+  var detail = r.detail || {};
+  var items = [
+    {lbl:'Loyer', val:detail.loyer||loyer},
+    {lbl:'Charges', val:detail.charges||100},
+    {lbl:'Transport', val:detail.transport||0},
+    {lbl:'Alimentation (estimée quartier)', val:detail.alimentation||300},
+    {lbl:'Sorties / restaurants', val:detail.sorties||200},
+    {lbl:'Divers', val:detail.divers||100}
+  ];
+  var total = items.reduce(function(s,i){return s+(i.val||0);},0);
+  items.forEach(function(item) {
+    var pct = Math.round((item.val/total)*100);
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--linen);font-size:12px">' +
+      '<div style="color:var(--text-light)">' + item.lbl + '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px">' +
+        '<div style="width:80px;height:4px;background:var(--linen);border-radius:2px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:var(--terracotta);border-radius:2px"></div></div>' +
+        '<div style="font-weight:300;color:var(--espresso);min-width:50px;text-align:right">' + (item.val||0) + '€</div>' +
+      '</div></div>';
+  });
+  html += '<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:13px;font-weight:400"><div>Total mensuel estimé</div><div>' + total + '€</div></div></div>';
+
+  if (r.conseils && r.conseils.length) {
+    html += '<div class="card fade-up" style="padding:16px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Conseils personnalisés</div>';
+    r.conseils.forEach(function(c) { html += '<div class="nego-arg">' + c + '</div>'; });
+    html += '</div>';
+  }
+
+  document.getElementById('afford-results').innerHTML = html;
+  document.getElementById('afford-results').style.display = 'block';
+}
+
+// ── VICES ──
+function handlePhotos(input) {
+  Array.from(input.files).forEach(function(f) { if(photosToAnalyze.length<10) photosToAnalyze.push(f); });
+  renderPhotoGrid();
+  document.getElementById('analyzePhotosBtn').style.display = photosToAnalyze.length > 0 ? 'block' : 'none';
+}
+function renderPhotoGrid() {
+  document.getElementById('photoGrid').innerHTML = photosToAnalyze.map(function(f,i) {
+    return '<div class="photo-thumb"><img src="' + URL.createObjectURL(f) + '"><button class="photo-rm" onclick="removePhoto(' + i + ')">✕</button></div>';
+  }).join('');
+}
+function removePhoto(i) { photosToAnalyze.splice(i,1); renderPhotoGrid(); document.getElementById('analyzePhotosBtn').style.display = photosToAnalyze.length>0?'block':'none'; }
+
+async function analyzePhotos() {
+  if (!photosToAnalyze.length) return;
+  document.getElementById('vices-loading').style.display = 'block';
+  document.getElementById('vices-results').style.display = 'none';
+  try {
+    var imgs = await Promise.all(photosToAnalyze.map(function(f) {
+      return new Promise(function(res) {
+        var r = new FileReader();
+        r.onload = function(e) { res({ type:'image', source:{ type:'base64', media_type:f.type, data:e.target.result.split(',')[1] } }); };
+        r.readAsDataURL(f);
+      });
+    }));
+    var apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500,
+        messages:[{ role:'user', content:[...imgs, {type:'text', text:'Expert diagnostic immobilier. Analyse ces photos. JSON uniquement sans markdown: {"problemes":[{"niveau":"critique|attention|ok","titre":"Titre","description":"Description","conseil":"Conseil"}],"bilan":"Résumé global","score_etat":75}'}] }]
+      })
+    });
+    var d = await apiRes.json();
+    var clean = (d.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();
+    renderVicesResults(JSON.parse(clean));
+  } catch(e) { alert('Erreur : ' + e.message); }
+  document.getElementById('vices-loading').style.display = 'none';
+}
+
+function renderVicesResults(r) {
+  var html = '<div class="card fade-up" style="padding:18px">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
+    '<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light)">Bilan</div>' +
+    '<div style="font-size:13px;font-weight:300;color:var(--espresso)">' + (r.bilan||'') + '</div>' +
+    '</div>';
+  (r.problemes||[]).forEach(function(p) {
+    var cls = p.niveau==='critique'?'vice-critical':p.niveau==='attention'?'vice-warning':'vice-ok';
+    var icon = p.niveau==='critique'?'🚨':p.niveau==='attention'?'⚠️':'✅';
+    html += '<div class="vice-item ' + cls + '"><strong>' + icon + ' ' + p.titre + '</strong><br>' + p.description + (p.conseil?'<br><em style="color:var(--text-light);font-style:normal">💡 ' + p.conseil + '</em>':'') + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('vices-results').innerHTML = html;
+  document.getElementById('vices-results').style.display = 'block';
+}
+
+// ── NÉGOCIATION ──
+function prefillNego() {
+  if (currentAnalysis?._meta) {
+    document.getElementById('negoAddr').value = currentAnalysis._meta.address || '';
+    document.getElementById('negoLoyer').value = currentAnalysis._meta.loyer || '';
+    document.getElementById('negoSurface').value = currentAnalysis._meta.surface || '';
+    if (currentAnalysis.points_faibles) document.getElementById('negoDefauts').value = currentAnalysis.points_faibles.join(', ');
+  }
+  showTab('nego');
+}
+
+async function generateNego() {
+  var addr = document.getElementById('negoAddr').value.trim();
+  var loyer = document.getElementById('negoLoyer').value;
+  var surface = document.getElementById('negoSurface').value;
+  var defauts = document.getElementById('negoDefauts').value;
+  var profil = document.getElementById('negoProfil').value;
+  if (!addr || !loyer) { alert('Adresse et loyer requis.'); return; }
+
+  document.getElementById('nego-loading').style.display = 'block';
+  document.getElementById('nego-results').style.display = 'none';
+
+  try {
+    var prixM2 = surface ? Math.round(loyer/surface) : 0;
+    var prompt = 'Expert négociation immobilière France. Génère un argumentaire. JSON uniquement sans markdown.\n' +
+      'Logement: ' + addr + '\nLoyer: ' + loyer + '€\nSurface: ' + (surface||'?') + 'm²' + (prixM2?'\nPrix/m²: ' + prixM2 + '€':'') + '\nDéfauts: ' + (defauts||'aucun') + '\nProfil: ' + (profil||'non renseigné') + '\n' +
+      '{"potentiel_reduction":80,"loyer_cible":1120,"arguments":["Arg 1","Arg 2","Arg 3","Arg 4"],"strategie":"Stratégie en 2 phrases","moment_ideal":"Conseil timing","a_eviter":"À éviter"}';
+
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:900, messages:[{role:'user',content:prompt}] })
+    });
+    var d = await res.json();
+    var clean = (d.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();
+    renderNegoResults(JSON.parse(clean), parseInt(loyer));
+  } catch(e) { alert('Erreur : ' + e.message); }
+  document.getElementById('nego-loading').style.display = 'none';
+}
+
+function renderNegoResults(r, loyer) {
+  var html = '<div class="card-dark fade-up" style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center">' +
+    '<div style="text-align:center;flex-shrink:0">' +
+      '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:44px;color:#F7F3EE;line-height:1">' + (r.potentiel_reduction||0) + '€</div>' +
+      '<div style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(247,243,238,0.3)">économie/mois</div>' +
+    '</div>' +
+    '<div><div style="font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(247,243,238,0.3);margin-bottom:4px">Loyer cible</div>' +
+    '<div style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:26px;color:#F7F3EE;margin-bottom:6px">' + (r.loyer_cible||loyer) + '€/mois</div>' +
+    '<div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.4)">' + (r.strategie||'') + '</div></div>' +
+  '</div>';
+
+  html += '<div class="card fade-up" style="padding:18px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px">Vos arguments — dans cet ordre</div>';
+  (r.arguments||[]).forEach(function(a) { html += '<div class="nego-arg">' + a + '</div>'; });
+  html += '</div>';
+
+  html += '<div class="grid-2 fade-up">';
+  if (r.moment_ideal) html += '<div class="card" style="padding:16px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px">⏰ Moment idéal</div><div style="font-size:12px;font-weight:200;color:var(--text-light);line-height:1.7">' + r.moment_ideal + '</div></div>';
+  if (r.a_eviter) html += '<div class="card" style="padding:16px"><div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px">🚫 À éviter</div><div style="font-size:12px;font-weight:200;color:var(--text-light);line-height:1.7">' + r.a_eviter + '</div></div>';
+  html += '</div>';
+
+  document.getElementById('nego-results').innerHTML = html;
+  document.getElementById('nego-results').style.display = 'block';
+}
+
+// ── DOSSIER ──
+function renderDocGrid() {
+  var html = '';
+  DOCS.forEach(function(d) {
+    var uploaded = docsState[d.key];
+    html += '<div class="doc-item' + (uploaded?' uploaded':'') + (d.required?' required':'') + '" onclick="openDocUpload(\'' + d.key + '\')">' +
+      '<div class="doc-icon">' + d.icon + '</div>' +
+      '<div class="doc-name">' + d.name + '</div>' +
+      '<div class="doc-status' + (uploaded?' ok':'') + '">' + (uploaded ? '✓ Uploadé' : 'Ajouter') + '</div>' +
+    '</div>';
+  });
+  document.getElementById('docGrid').innerHTML = html;
+  updateDossierScore();
+}
+
+function renderGarantGrid() {
+  var html = '';
+  GARANT_DOCS.forEach(function(d) {
+    var uploaded = docsState[d.key];
+    html += '<div class="doc-item' + (uploaded?' uploaded':'') + '" onclick="openGarantUpload(\'' + d.key + '\')">' +
+      '<div class="doc-icon">' + d.icon + '</div>' +
+      '<div class="doc-name">' + d.name + '</div>' +
+      '<div class="doc-status' + (uploaded?' ok':'') + '">' + (uploaded ? '✓ Uploadé' : 'Optionnel') + '</div>' +
+    '</div>';
+  });
+  document.getElementById('garantGrid').innerHTML = html;
+}
+
+function updateDossierScore() {
+  var required = DOCS.filter(function(d) { return d.required; });
+  var uploaded = required.filter(function(d) { return docsState[d.key]; });
+  var score = Math.round((uploaded.length / required.length) * 100);
+  document.getElementById('dossierScoreNum').textContent = score + '/100';
+  document.getElementById('dossierScoreFill').style.width = score + '%';
+  document.getElementById('dossierStatus').textContent = score === 100 ? 'Dossier complet ✓' : score >= 60 ? 'Dossier presque complet' : 'Dossier incomplet (' + uploaded.length + '/' + required.length + ')';
+}
+
+function openDocUpload(key) { currentDocKey = key; document.getElementById('docFileInput').click(); }
+function openGarantUpload(key) { currentGarantKey = key; document.getElementById('garantFileInput').click(); }
+
+async function uploadDoc(input) {
+  if (!input.files[0] || !currentDocKey) return;
+  var file = input.files[0];
+  try {
+    var path = currentUser.id + '/dossier/' + currentDocKey + '_' + Date.now();
+    var { error } = await sb.storage.from('user-docs').upload(path, file, { upsert:true });
+    if (error) throw error;
+    docsState[currentDocKey] = { path, name:file.name, date:new Date().toLocaleDateString('fr-FR') };
+    localStorage.setItem('lm_docs_state', JSON.stringify(docsState));
+    renderDocGrid();
+  } catch(e) {
+    // Fallback: save locally if storage fails
+    docsState[currentDocKey] = { name:file.name, date:new Date().toLocaleDateString('fr-FR'), local:true };
+    localStorage.setItem('lm_docs_state', JSON.stringify(docsState));
+    renderDocGrid();
+  }
+  input.value = '';
+}
+
+async function uploadGarant(input) {
+  if (!input.files[0] || !currentGarantKey) return;
+  var file = input.files[0];
+  try {
+    var path = currentUser.id + '/garant/' + currentGarantKey + '_' + Date.now();
+    await sb.storage.from('user-docs').upload(path, file, { upsert:true });
+    docsState[currentGarantKey] = { path, name:file.name, date:new Date().toLocaleDateString('fr-FR') };
+  } catch(e) {
+    docsState[currentGarantKey] = { name:file.name, date:new Date().toLocaleDateString('fr-FR'), local:true };
+  }
+  localStorage.setItem('lm_docs_state', JSON.stringify(docsState));
+  renderGarantGrid();
+  input.value = '';
+}
+
+// Quittances
+function renderQuittances() {
+  var html = '';
+  quittances.forEach(function(q,i) {
+    html += '<div class="quittance-item">' +
+      '<div class="quittance-icon">🧾</div>' +
+      '<div class="quittance-info"><div class="quittance-name">' + q.address + '</div><div class="quittance-date">' + q.periode + (q.fileName?' · ' + q.fileName:'') + '</div></div>' +
+      '<div class="quittance-actions">' +
+        (q.fileName ? '<button class="btn-tiny">Voir</button>' : '<button class="btn-tiny" onclick="attachQuittance(' + i + ')">Joindre PDF</button>') +
+        '<button class="btn-tiny" onclick="removeQuittance(' + i + ')">Suppr.</button>' +
+      '</div>' +
+    '</div>';
+  });
+  if (!quittances.length) html = '<div style="font-size:12px;font-weight:200;color:var(--text-light);padding:12px 0">Aucune quittance ajoutée.</div>';
+  document.getElementById('quittancesList').innerHTML = html;
+}
+
+function addQuittance() {
+  var addr = document.getElementById('quittanceAddr').value.trim();
+  var periode = document.getElementById('quittancePeriode').value.trim();
+  if (!addr) { alert('Renseignez l\'adresse.'); return; }
+  quittances.push({ address:addr, periode:periode, fileName:null });
+  localStorage.setItem('lm_quittances', JSON.stringify(quittances));
+  document.getElementById('quittanceAddr').value = '';
+  document.getElementById('quittancePeriode').value = '';
+  renderQuittances();
+}
+
+function attachQuittance(idx) { currentQuittanceIdx = idx; document.getElementById('quittanceFile').click(); }
+
+function removeQuittance(idx) { quittances.splice(idx,1); localStorage.setItem('lm_quittances',JSON.stringify(quittances)); renderQuittances(); }
+
+document.getElementById('quittanceFile').addEventListener('change', async function() {
+  if (!this.files[0] || currentQuittanceIdx === null) return;
+  var file = this.files[0];
+  try {
+    var path = currentUser.id + '/quittances/' + Date.now() + '_' + file.name;
+    await sb.storage.from('user-docs').upload(path, file, {upsert:true});
+    quittances[currentQuittanceIdx].path = path;
+  } catch(e) {}
+  quittances[currentQuittanceIdx].fileName = file.name;
+  localStorage.setItem('lm_quittances', JSON.stringify(quittances));
+  renderQuittances();
+  this.value = '';
+});
+
+// Lettre de motivation
+async function generateLetter() {
+  document.getElementById('letter-section').style.display = 'block';
+  document.getElementById('letter-loading').style.display = 'block';
+  document.getElementById('letterBox').style.display = 'none';
+
+  var uploadedDocs = DOCS.filter(function(d) { return docsState[d.key]; }).map(function(d){return d.name;});
+  var addr = currentAnalysis?._meta?.address || '[adresse du logement]';
+  var loyer = currentAnalysis?._meta?.loyer || '';
+
+  try {
+    var prompt = 'Rédige une lettre de motivation locataire professionnelle et sincère pour un logement en France.\n' +
+      'Logement: ' + addr + (loyer?' - Loyer: ' + loyer + '€':'') + '\n' +
+      'Documents fournis: ' + (uploadedDocs.join(', ')||'dossier en cours de constitution') + '\n' +
+      'Quittances: ' + (quittances.length ? quittances.map(function(q){return q.address;}).join(', ') : 'aucune') + '\n\n' +
+      'La lettre doit être chaleureuse, concise (250-350 mots), rassurante pour le propriétaire. Inclus [Prénom Nom], [Date], [Adresse logement] comme placeholders. Retourne UNIQUEMENT le texte de la lettre, sans titre ni explication.';
+
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:800, messages:[{role:'user',content:prompt}] })
+    });
+    var d = await res.json();
+    var letter = d.content?.[0]?.text || '';
+    document.getElementById('letterBox').textContent = letter;
+    document.getElementById('letterBox').style.display = 'block';
+    document.getElementById('letter-actions').style.display = 'flex';
+  } catch(e) { alert('Erreur : ' + e.message); }
+  document.getElementById('letter-loading').style.display = 'none';
+}
+
+function copyLetter() {
+  var text = document.getElementById('letterBox').textContent;
+  navigator.clipboard.writeText(text).then(function() { alert('Lettre copiée !'); });
+}
+
+// ── COMPARER ──
+function renderCompare() {
+  if (analysisHistory.length < 2) {
+    document.getElementById('compare-empty').style.display = 'block';
+    document.getElementById('compare-results').style.display = 'none';
+    return;
+  }
+  document.getElementById('compare-empty').style.display = 'none';
+
+  var items = analysisHistory.slice(0, 4);
+  var best = items.reduce(function(a,b) { return a.score > b.score ? a : b; });
+
+  var cols = items.length <= 2 ? '1fr 1fr' : items.length === 3 ? '1fr 1fr 1fr' : 'repeat(4,1fr)';
+  var html = '<div style="display:grid;grid-template-columns:' + cols + ';gap:12px" class="fade-up">';
+
+  items.forEach(function(item) {
+    var a = item.analysis;
+    var isBest = item.id === best.id;
+    var color = scoreColor(item.score);
+    var s = a.score_detail || {};
+    html += '<div class="compare-card' + (isBest?' best':'') + '">' +
+      '<div class="compare-score" style="color:' + color + '">' + item.score + '<span style="font-size:14px;color:var(--text-light)">/100</span></div>' +
+      '<div class="compare-addr">' + item.address + '</div>';
+    var rows = [
+      {k:'Transports', v:s.transport},
+      {k:'Commodités', v:s.commodites},
+      {k:'Énergie', v:s.dpe},
+      {k:'Prix marché', v:s.prix},
+      {k:'Loyer', v:a._meta?.loyer ? a._meta.loyer + '€' : '—'},
+      {k:'Surface', v:a._meta?.surface ? a._meta.surface + 'm²' : '—'},
+      {k:'DPE', v:a._meta?.dpe?.etiquette_dpe || '—'},
+    ];
+    rows.forEach(function(r) {
+      var valClass = typeof r.v === 'number' ? (r.v>=70?' good':r.v<45?' bad':'') : '';
+      html += '<div class="compare-row-item"><div class="compare-key">' + r.k + '</div><div class="compare-val' + valClass + '">' + (typeof r.v === 'number' ? r.v+'/100' : r.v) + '</div></div>';
+    });
+    html += '</div>';
+  });
+
+  html += '</div>';
+
+  // AI recommendation
+  var recHtml = '<div class="card fade-up" style="margin-top:14px;padding:18px">' +
+    '<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px">Recommandation Le Move</div>' +
+    '<div style="font-size:13px;font-weight:300;color:var(--espresso);line-height:1.7">★ <strong>' + best.address + '</strong> obtient le meilleur score global (' + best.score + '/100). ' + (best.analysis.recommandation||'Ce logement présente le meilleur rapport qualité/prix de votre sélection.') + '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:12px">' +
+      '<button class="btn-secondary" onclick="restoreAnalysis(' + best.id + ')">Voir l\'analyse complète →</button>' +
+    '</div></div>';
+
+  document.getElementById('compare-results').innerHTML = html + recHtml;
+  document.getElementById('compare-results').style.display = 'block';
+}
+
+// ── HISTORIQUE ──
+function renderHistory() {
+  if (!analysisHistory.length) {
+    document.getElementById('hist-empty').style.display = 'block';
+    document.getElementById('hist-list').style.display = 'none';
+    return;
+  }
+  document.getElementById('hist-empty').style.display = 'none';
+  var html = analysisHistory.map(function(item) {
+    var color = scoreColor(item.score);
+    return '<div class="hist-item" onclick="restoreAnalysis(' + item.id + ')">' +
+      '<div class="hist-badge" style="background:' + color + '">' + item.score + '</div>' +
+      '<div class="hist-info"><div class="hist-addr">' + item.address + '</div><div class="hist-date">' + item.date + ' · ' + item.verdict + '</div></div>' +
+      '<div style="color:var(--sand)">→</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('hist-list').innerHTML = html;
+  document.getElementById('hist-list').style.display = 'block';
+}
+
+function restoreAnalysis(id) {
+  var item = analysisHistory.find(function(h) { return h.id === id; });
+  if (!item) return;
+  currentAnalysis = item.analysis;
+  document.getElementById('addressInput').value = item.address;
+  if (item.analysis._meta) {
+    document.getElementById('loyerInput').value = item.analysis._meta.loyer || '';
+    document.getElementById('surfaceInput').value = item.analysis._meta.surface || '';
+  }
+  document.getElementById('analyse-empty').style.display = 'none';
+  renderAnalysisResults(item.analysis, item.address, item.analysis._meta?.loyer, item.analysis._meta?.surface, item.analysis._meta?.dpe);
+  showTab('analyse');
+}
+</script>
+</body>
+</html>
