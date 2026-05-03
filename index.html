@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- Google Analytics GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-67D8PZDFEF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-67D8PZDFEF');
-</script>
-<!-- End Google Analytics GA4 -->
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -20,7 +11,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="UTF-8">
 <!-- SEO -->
 <title>Le Move — L'art de bien s'installer | Maison Florélis</title>
-<meta name="description" content="Le Move organise votre emménagement de A à Z. Budget, moodboard, checklist déménagement, démarches administratives — 16 modules en un seul espace. Dès 39€, accès à vie.">
+<meta name="description" content="Le Move organise votre emménagement de A à Z. Budget, moodboard, checklist déménagement, démarches administratives — 17 modules en un seul espace. Dès 39€, accès à vie.">
 <meta name="keywords" content="organiser déménagement, checklist emménagement, budget premier appartement, moodboard décoration, aide déménagement, premier chez soi">
 <meta name="author" content="Maison Florélis">
 <meta name="robots" content="index, follow">
@@ -297,9 +288,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* ── PREVIEW ──────────────────────────────────────────────────────── */
   .preview-section { padding: 100px 120px; background: var(--cream); }
-  .preview-header { text-align: center; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; }
+  .preview-header { text-align: center; margin-bottom: 40px; }
   .preview-title { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; font-style: italic; color: var(--espresso); line-height: 1.1; margin-bottom: 12px; }
-  .preview-sub { font-size: 13px; font-weight: 200; color: var(--text-light); max-width: 420px; text-align: center; line-height: 1.7; font-style: italic; margin: 12px auto 0; }
+  .preview-sub { font-size: 12px; font-weight: 200; color: var(--text-light); max-width: 260px; text-align: right; line-height: 1.7; font-style: italic; }
   .preview-grid { display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: auto auto; gap: 14px; }
   .preview-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--linen); background: var(--warm-white); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
   .preview-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(44,31,20,0.1); }
@@ -488,6 +479,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   @media (max-width: 768px) {
 
     body { overflow-x: hidden !important; }
+    #nouveaute { padding: 48px 20px !important; }
+    #nouveaute > div > div > div:last-child { grid-template-columns: 1fr !important; gap: 32px !important; }
+    #nouveaute h2, #nouveaute [style*="font-size:52px"] { font-size: 36px !important; }
 
     /* ── NAV ── */
     nav { padding: 14px 20px; }
@@ -667,7 +661,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   "name": "Le Move",
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Web",
-  "description": "Application web pour organiser son emménagement. Budget, moodboard, checklist déménagement, démarches administratives — 16 modules en un seul espace.",
+  "description": "Application web pour organiser son emménagement. Budget, moodboard, checklist déménagement, démarches administratives — 17 modules en un seul espace.",
   "url": "https://lemove.fr",
   "author": {
     "@type": "Organization",
@@ -735,9 +729,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="nav-links">
     <a class="nav-link" href="#features">Fonctionnalités</a>
-    <a class="nav-link" href="apercu.html">Aperçu</a>
+    <a class="nav-link" href="#preview">Aperçu</a>
     <a class="nav-link" href="#pricing">Tarifs</a>
+    <a class="nav-link" href="#nouveaute">Nouveauté</a>
     <a class="nav-link" href="#faq">FAQ</a>
+    <a class="nav-link" href="blog.html">Blog</a>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <a class="nav-link" href="app.html" style="font-size:11px;">Me connecter</a>
@@ -762,7 +758,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="hero-actions">
       <a class="btn-primary-hero" href="https://buy.stripe.com/14AcN5f1C70zeO940r6EU07" target="_blank">Créer mon espace Le Move</a>
-      <a class="btn-secondary-hero" href="apercu.html">Voir l'aperçu complet</a>
+      <a class="btn-secondary-hero" href="#preview">Voir l'aperçu complet</a>
     </div>
     <div class="hero-trust">
       <div class="trust-item"><span class="trust-icon">🔐</span> Compte personnel sécurisé</div>
@@ -837,11 +833,93 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ── BANDEAU AGENCES ──────────────────────────────────────────────── -->
 <div class="agency-banner">
   <div class="agency-dot"></div>
-  <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos clients comme cadeau de bienvenue à la remise des clés.</div>
+  <div class="agency-banner-text"><strong>Vous êtes une agence immobilière ?</strong> Offrez Le Move à vos nouveaux locataires comme cadeau de bienvenue. Tarifs partenaires disponibles à partir de 50 licences.</div>
   <a class="agency-banner-cta" href="/cdn-cgi/l/email-protection#9efcf1f0f4f1ebecdef2fbf3f1e8fbb0f8ec" style="text-decoration:none">Nous contacter →</a>
 </div>
 
 <!-- ── COMMENT ÇA MARCHE ────────────────────────────────────────────── -->
+
+<!-- NOUVEAUTE EXCLUSIVE -->
+<div id="nouveaute" style="background:#2C1F14;padding:72px 80px;position:relative;overflow:hidden">
+  <style>
+    @keyframes lm-fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes lm-slideRight{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes lm-lineGrow{from{width:0}to{width:100%}}
+    @keyframes lm-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @keyframes lm-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    @keyframes lm-fadeIn{from{opacity:0}to{opacity:1}}
+    .lm-pill-dot{width:5px;height:5px;border-radius:50%;background:#C4714A;animation:lm-pulse 2s ease infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+    .lm-sep::after{content:'';position:absolute;inset:0;background:rgba(196,113,74,0.3);animation:lm-lineGrow 1.2s ease 0.6s both}
+    .lm-feat{display:flex;align-items:flex-start;gap:14px;animation:lm-slideRight 0.5s ease both}
+    .lm-feat:nth-child(1){animation-delay:0.4s}.lm-feat:nth-child(2){animation-delay:0.52s}.lm-feat:nth-child(3){animation-delay:0.64s}.lm-feat:nth-child(4){animation-delay:0.76s}
+    .lm-float-card{animation:lm-float 4s ease-in-out 1.2s infinite}
+    .lm-bar{height:100%;border-radius:1px;width:0%;transition:width 1.2s ease}
+    .lm-cta-btn{transition:opacity 0.2s !important}.lm-cta-btn:hover{opacity:0.85 !important}
+    .lm-cta-link{transition:color 0.2s !important;color:rgba(247,243,238,0.25) !important}.lm-cta-link:hover{color:rgba(247,243,238,0.6) !important}
+    @media(max-width:768px){#nouveaute{padding:48px 20px !important}.lm-grid{grid-template-columns:1fr !important;gap:36px !important}.lm-t1,.lm-t2{font-size:36px !important}}
+  </style>
+  <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,186,168,0.03) 1px,transparent 1px);background-size:36px 36px"></div>
+  <div style="position:absolute;top:-120px;right:-80px;width:400px;height:400px;border-radius:50%;border:1px solid rgba(196,113,74,0.06);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-80px;left:-60px;width:280px;height:280px;border-radius:50%;border:1px solid rgba(196,113,74,0.04);pointer-events:none"></div>
+  <div style="max-width:1100px;margin:0 auto;position:relative">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:48px;animation:lm-fadeUp 0.6s ease 0.1s both">
+      <div style="display:flex;align-items:center"><div class="lm-pill-dot"></div><div style="font-size:8px;letter-spacing:0.25em;text-transform:uppercase;padding:5px 14px;background:rgba(196,113,74,0.1);color:#C4714A;border-radius:20px;border:1px solid rgba(196,113,74,0.2)">Nouveaut&#233; exclusive</div></div>
+      <div class="lm-sep" style="height:1px;flex:1;background:rgba(247,243,238,0.06);position:relative;overflow:hidden"></div>
+      <div style="font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.15);white-space:nowrap">Module Premium</div>
+    </div>
+    <div class="lm-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+      <div>
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(247,243,238,0.2);margin-bottom:16px;animation:lm-fadeUp 0.6s ease 0.2s both">Mon Logement</div>
+        <div class="lm-t1" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:48px;font-weight:300;color:#F7F3EE;line-height:1.05;margin-bottom:4px;animation:lm-fadeUp 0.7s ease 0.25s both">Avant de signer,</div>
+        <div class="lm-t2" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:48px;font-weight:300;color:#C4714A;line-height:1.05;margin-bottom:20px;animation:lm-fadeUp 0.7s ease 0.3s both">analysez tout.</div>
+        <div style="width:32px;height:1px;background:#C4714A;margin-bottom:20px;animation:lm-fadeIn 0.8s ease 0.5s both"></div>
+        <div style="font-size:13px;font-weight:200;color:rgba(247,243,238,0.4);line-height:1.9;margin-bottom:32px;animation:lm-fadeUp 0.6s ease 0.35s both">Le premier outil qui analyse votre futur appartement avant la visite &#8212; score IA, vices cach&#233;s, dossier locataire et n&#233;gociation du loyer en un seul endroit.</div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:36px">
+          <div class="lm-feat"><div style="width:1px;height:36px;background:rgba(196,113,74,0.25);flex-shrink:0;margin-top:4px"></div><div><div style="font-size:12px;font-weight:400;color:#F7F3EE;margin-bottom:3px">Score logement sur 100</div><div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.35);line-height:1.5">DPE officiel, transports, prix du march&#233;, encadrement des loyers</div></div></div>
+          <div class="lm-feat"><div style="width:1px;height:36px;background:rgba(196,113,74,0.25);flex-shrink:0;margin-top:4px"></div><div><div style="font-size:12px;font-weight:400;color:#F7F3EE;margin-bottom:3px">D&#233;tection de vices cach&#233;s</div><div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.35);line-height:1.5">Photographiez &#8212; Claude Vision analyse et g&#233;n&#232;re le rapport</div></div></div>
+          <div class="lm-feat"><div style="width:1px;height:36px;background:rgba(196,113,74,0.25);flex-shrink:0;margin-top:4px"></div><div><div style="font-size:12px;font-weight:400;color:#F7F3EE;margin-bottom:3px">Dossier locataire complet</div><div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.35);line-height:1.5">Pi&#232;ces upload&#233;es, lettre de motivation IA, score dossier sur 100</div></div></div>
+          <div class="lm-feat"><div style="width:1px;height:36px;background:rgba(196,113,74,0.25);flex-shrink:0;margin-top:4px"></div><div><div style="font-size:12px;font-weight:400;color:#F7F3EE;margin-bottom:3px">N&#233;gociateur de loyer IA</div><div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.35);line-height:1.5">Argumentaire personnalis&#233;, loyer cible, strat&#233;gie sur-mesure</div></div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;animation:lm-fadeUp 0.6s ease 0.75s both;flex-wrap:wrap">
+          <a href="https://buy.stripe.com/7sYeVdf1C4Sr9tPdB16EU08" class="lm-cta-btn" style="display:inline-block;padding:12px 28px;background:#C4714A;color:#F7F3EE;border-radius:8px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none">Inclus dans Premium &middot; 150&#8364; &#8594;</a>
+          <a href="#pricing" class="lm-cta-link" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none">Voir les offres</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="lm-float-card" style="background:rgba(247,243,238,0.03);border:1px solid rgba(247,243,238,0.07);border-radius:16px;padding:24px;animation:lm-fadeUp 0.7s ease 0.3s both">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+            <div style="font-size:9px;letter-spacing:0.08em;color:rgba(247,243,238,0.2)">12 rue de la Paix, 75001 Paris</div>
+            <div style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(122,140,126,0.15);color:#7A8C7E;border:1px solid rgba(122,140,126,0.2)">Bon logement</div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:64px;font-weight:300;color:#F7F3EE;line-height:1;margin-bottom:4px">78</div>
+          <div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.3);margin-bottom:20px">Loyer l&#233;g&#232;rement au-dessus du march&#233; &#8212; n&#233;gociation possible</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px"><div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.25);width:68px;flex-shrink:0">Transports</div><div style="flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px;overflow:hidden"><div class="lm-bar" data-w="88" style="background:#7A8C7E"></div></div><div style="font-size:9px;color:rgba(247,243,238,0.2);min-width:20px;text-align:right">88</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.25);width:68px;flex-shrink:0">Commodit&#233;s</div><div style="flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px;overflow:hidden"><div class="lm-bar" data-w="82" style="background:#7A8C7E"></div></div><div style="font-size:9px;color:rgba(247,243,238,0.2);min-width:20px;text-align:right">82</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.25);width:68px;flex-shrink:0">&#201;nergie DPE</div><div style="flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px;overflow:hidden"><div class="lm-bar" data-w="62" style="background:#B89A6A"></div></div><div style="font-size:9px;color:rgba(247,243,238,0.2);min-width:20px;text-align:right">62</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.25);width:68px;flex-shrink:0">Prix march&#233;</div><div style="flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px;overflow:hidden"><div class="lm-bar" data-w="55" style="background:#C4714A"></div></div><div style="font-size:9px;color:rgba(247,243,238,0.2);min-width:20px;text-align:right">55</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(247,243,238,0.03);border:1px solid rgba(247,243,238,0.07);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:20px;animation:lm-fadeUp 0.7s ease 0.5s both">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:40px;font-weight:300;color:#C4714A;line-height:1;flex-shrink:0">80&#8364;</div>
+          <div style="width:1px;height:40px;background:rgba(247,243,238,0.06);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:11px;font-weight:300;color:#F7F3EE;margin-bottom:4px">&#201;conomie potentielle / mois</div>
+            <div style="font-size:10px;font-weight:200;color:rgba(247,243,238,0.3);line-height:1.5">Loyer cible 1&#160;120&#8364; vs 1&#160;200&#8364; demand&#233;s &#8212; 8% au-dessus du march&#233;, argument identifi&#233; par l'IA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function animLmBars(){document.querySelectorAll('.lm-bar').forEach(function(el){var w=el.getAttribute('data-w');if(w)el.style.width=w+'%';});}
+  if(document.readyState==='complete'){setTimeout(animLmBars,800);}
+  else{window.addEventListener('load',function(){setTimeout(animLmBars,800);});}
+})();
+</script>
+
 <section class="how-it-works">
   <div>
     <div class="hiw-label">Simple comme bonjour</div>
@@ -985,9 +1063,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="preview-header">
     <div class="preview-title">Beau par design.<br>Puissant par nature.</div>
     <div class="preview-sub">Un aperçu de ton espace. Ce que tu vois ici, c'est exactement ce que tu obtiens.</div>
-    <div style="margin-top:28px">
-      <a href="apercu.html" style="display:inline-block;padding:14px 32px;background:var(--espresso);color:var(--cream);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Voir l'aperçu complet →</a>
-    </div>
   </div>
   <div class="preview-tabs">
     <button class="preview-tab active" onclick="showPreview(0)">01 - Dashboard</button>
@@ -1032,9 +1107,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="whats-inside" id="inside">
   <div class="wi-header">
     <div class="wi-label">Le contenu complet</div>
-    <div class="wi-title">16 modules.<br>1 système.</div>
+    <div class="wi-title">17 modules.<br>1 système.</div>
   </div>
   <div class="wi-grid">
+    <div class="wi-item" style="border-left:3px solid var(--terracotta);background:rgba(196,113,74,0.02)"><div class="wi-number" style="color:var(--terracotta)">✦</div><div class="wi-content"><div class="wi-name" style="color:var(--terracotta)">Mon Logement <span style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;background:rgba(196,113,74,0.12);color:var(--terracotta);padding:2px 8px;border-radius:10px;margin-left:8px">Nouveau · Premium</span></div><div class="wi-desc">Analyse IA avant visite, score sur 100, DPE, transports, vices cachés par photo, dossier locataire complet, négociation de loyer.</div><div class="wi-features"><div class="wi-feat">Score logement IA</div><div class="wi-feat">Détection vices cachés</div><div class="wi-feat">Dossier locataire</div><div class="wi-feat">Négociateur de loyer</div></div></div></div>
     <div class="wi-item"><div class="wi-number">01</div><div class="wi-content"><div class="wi-name">Mon Budget</div><div class="wi-desc">Budget total, dépensé, restant. Catégories personnalisées avec jauges et alertes.</div><div class="wi-features"><div class="wi-feat">Catégories + plafonds</div><div class="wi-feat">Jauges visuelles</div><div class="wi-feat">Tableau des achats</div><div class="wi-feat">Vue globale en temps réel</div></div></div></div>
     <div class="wi-item"><div class="wi-number">02</div><div class="wi-content"><div class="wi-name">Mon Déménagement</div><div class="wi-desc">5 phases avec checklists, contacts utiles et countdown jusqu'au Jour J.</div><div class="wi-features"><div class="wi-feat">Checklist par phase</div><div class="wi-feat">Countdown Jour J</div><div class="wi-feat">Contacts utiles</div><div class="wi-feat">Tâches personnalisables</div></div></div></div>
     <div class="wi-item"><div class="wi-number">03</div><div class="wi-content"><div class="wi-name">Calculateur Volume</div><div class="wi-desc">Calcule le volume exact de tes meubles et trouve le bon camion.</div><div class="wi-features"><div class="wi-feat">Base de meubles complète</div><div class="wi-feat">Compteur par pièce</div><div class="wi-feat">Recommandation camion</div><div class="wi-feat">Prix indicatifs</div></div></div></div>
@@ -1137,7 +1213,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="faq-item">
       <div class="faq-q">C'est quoi le partenariat agences immobilières ? <span class="faq-arrow">→</span></div>
-      <div class="faq-a">Les agences peuvent offrir Le Move à leurs clients comme cadeau de bienvenue à la remise des clés. Tarifs dégressifs selon le volume annuel, avec possibilité de personnalisation aux couleurs de l'agence. Contactez-nous sur <a href="mailto:bonjour@lemove.fr" style="color:var(--terracotta);text-decoration:none;">bonjour@lemove.fr</a> pour un devis.</div>
+      <div class="faq-a">Les agences peuvent offrir Le Move comme cadeau de bienvenue à leurs nouveaux locataires. Tarifs dégressifs à partir de 50 licences, avec possibilité de personnalisation aux couleurs de l'agence.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Est-ce qu'il y a une politique de remboursement ? <span class="faq-arrow">→</span></div>
@@ -1317,7 +1393,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="cta-sub">Le Move est prêt. Il n'attend que toi.</div>
     <div class="cta-actions">
       <a class="cta-btn-main" href="https://buy.stripe.com/14AcN5f1C70zeO940r6EU07" target="_blank" onclick="window.open('https://buy.stripe.com/14AcN5f1C70zeO940r6EU07','_blank');return false;">Créer mon espace, 89€</a>
-      <a class="cta-btn-ghost" href="apercu.html">Voir l'aperçu complet</a>
+      <a class="cta-btn-ghost" href="#preview">Voir l'aperçu complet</a>
     </div>
     <div class="cta-note">Accès à vie · Compte personnel sécurisé · Satisfait ou remboursé*</div>
     <div style="font-size:9px;font-weight:200;color:rgba(247,243,238,0.15);margin-top:8px;font-style:italic">*En cas de dysfonctionnement persistant non résolu sous 7 jours</div>
@@ -1352,6 +1428,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="footer-link" href="/cdn-cgi/l/email-protection#b2d0dddcd8ddc7c0f2ded7dfddc4d79cd4c0">Contact</a>
     <a class="footer-link" href="partenaires.html">Partenaires →</a>
     <a class="footer-link" href="avis.html">Avis ★</a>
+    <a class="footer-link" href="blog.html">Blog</a>
   </div>
 </footer>
 
@@ -1410,18 +1487,4 @@ async function submitPartner() {
         to: ['bonjour@lemove.fr'],
         reply_to: email,
         subject: `[Partenaire] ${nom} — ${entreprise} (${categorie})`,
-        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville || '—'}</p><p><b>Message :</b><br>${message || '—'}</p></div>`
-      })
-    });
-    const partnerForm = document.getElementById('partnerForm');
-    if (partnerForm) partnerForm.style.display = 'none';
-    const partnerSuccess = document.getElementById('partnerSuccess');
-    if (partnerSuccess) partnerSuccess.style.display = 'block';
-  } catch(e) {
-    console.error('Erreur envoi:', e);
-    alert('Une erreur est survenue. Veuillez réessayer ou contacter bonjour@lemove.fr');
-  }
-}
-</script>
-</body>
-</html>
+        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville ||
