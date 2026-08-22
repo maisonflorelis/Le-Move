@@ -419,12 +419,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   /* Push content right when sidebar visible */
   @media (min-width: 769px) {
     .prem-sidebar { display: flex; }
-    .app-nav,
-    .welcome-banner,
-    .welcome-progress-block,
-    .app-content,
-    .modal-overlay,
-    .notif-overlay { margin-left: 240px; }
+    #appMain { margin-left: 240px; }
     .app-nav { padding-left: 24px; background: var(--warm-black); border-bottom: 1px solid rgba(255,255,255,0.04); }
     .nav-brand { display: none; }
     .notif-panel { right: 16px; }
@@ -505,6 +500,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 
+  <div id="appMain" style="min-height:100vh">
   <nav class="app-nav">
     <div class="nav-brand">
       <div class="nav-logo">Le Move</div>
@@ -572,6 +568,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </div>
+</div><!-- /appMain -->
 
 <!-- TUTORIAL -->
 <div class="overlay" id="tutorialOverlay" style="display:none;">
