@@ -379,6 +379,45 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="upgrade-btn" onclick="openPricing()">Voir les offres →</button>
     </div>
   </div>
+
+  <!-- ELEMENTS REQUIS PAR LE JS -->
+  <div id="welcomeMeta" style="display:none"></div>
+  <div id="progressPips" style="display:none"></div>
+  <div id="quickModules" style="display:none"></div>
+  <div id="reviewNudge" style="display:none"></div>
+  <div id="sidebarScroll" style="display:none"></div>
+  <div id="sidebarUser" style="display:none"></div>
+  <div id="mobileUser" style="display:none"></div>
+  <div id="mobileNotifBadge" style="display:none"></div>
+  <div id="onbStep1" style="display:none"></div>
+  <div id="onbStep2" style="display:none"></div>
+  <div id="onbPlanBadge" style="display:none"></div>
+  <div id="onbPlanFeatures" style="display:none"></div>
+  <div id="onbSuggestions" style="display:none"></div>
+  <div id="smsVerifyOverlay" style="display:none"><div id="smsPhoneInput"></div><div id="smsOTPInput"></div><div id="smsError"></div></div>
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-logo">Le Move</div>
+    <div class="mobile-nav-right">
+      <div class="notif-bell" onclick="toggleNotifPanel()">
+        <div class="notif-bell-icon">🔔</div>
+        <div class="notif-badge" id="mobileNotifBadge" style="display:none">0</div>
+      </div>
+      <div class="nav-avatar" id="mobileUser" onclick="openProfile()">?</div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div id="sidebarScroll"></div>
+    <div class="mobile-drawer-footer">
+      <div class="mobile-drawer-user" id="sidebarUser"></div>
+      <button class="mobile-drawer-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- TUTORIAL -->
