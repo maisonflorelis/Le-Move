@@ -301,132 +301,46 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   .onb-plan-feat::before { content: "✓"; color: var(--sage); font-size: 10px; flex-shrink: 0; }
 
 
-  /* ── PREMIUM SIDEBAR ── */
+
+  /* ═══ SIDEBAR PREMIUM ═══ */
   .prem-sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
-    background: var(--warm-black); z-index: 150;
-    display: none; flex-direction: column; overflow: hidden;
+    position: fixed; top: 0; left: 0; bottom: 0; width: 240px;
+    background: #1A1410; z-index: 150; overflow: hidden;
+    display: none; flex-direction: column;
     border-right: 1px solid rgba(255,255,255,0.04);
   }
-  .prem-sb-top {
-    padding: 28px 24px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    flex-shrink: 0;
-  }
-  .prem-sb-logo {
-    font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 22px; color: var(--cream); line-height: 1; margin-bottom: 3px;
-  }
-  .prem-sb-tagline {
-    font-size: 7px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: rgba(247,243,238,0.2); margin-bottom: 20px;
-  }
-  .prem-sb-user {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 0; margin-bottom: 0;
-  }
-  .prem-sb-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(196,113,74,0.2); border: 1px solid rgba(196,113,74,0.3);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 14px; color: var(--terracotta); flex-shrink: 0;
-  }
-  .prem-sb-user-info { flex: 1; min-width: 0; }
-  .prem-sb-name {
-    font-size: 12px; font-weight: 300; color: var(--cream);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .prem-sb-plan {
-    font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--terracotta); margin-top: 2px;
-  }
-  .prem-sb-scroll {
-    flex: 1; overflow-y: auto; padding: 16px 12px;
-    scrollbar-width: none;
-  }
-  .prem-sb-scroll::-webkit-scrollbar { display: none; }
-  .prem-sb-section {
-    font-size: 7px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: rgba(201,186,168,0.25); padding: 14px 12px 6px;
-  }
-  .prem-sb-section:first-child { padding-top: 4px; }
-  .prem-sb-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px; border-radius: 8px;
-    font-size: 12px; font-weight: 300; color: rgba(201,186,168,0.55);
-    cursor: pointer; transition: all 0.15s; margin-bottom: 1px;
-    text-decoration: none;
-  }
-  .prem-sb-item:hover { background: rgba(255,255,255,0.05); color: var(--cream); }
-  .prem-sb-item.active {
-    background: rgba(196,113,74,0.12); color: var(--cream);
-    border-left: 2px solid var(--terracotta); padding-left: 10px;
-  }
-  .prem-sb-item.locked {
-    opacity: 0.3; cursor: not-allowed; pointer-events: none;
-  }
-  .prem-sb-icon { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
-  .prem-sb-label { flex: 1; }
-  .prem-sb-lock { font-size: 9px; color: rgba(201,186,168,0.3); }
-  .prem-sb-bottom {
-    padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05);
-    flex-shrink: 0;
-  }
-  .prem-sb-countdown {
-    margin-bottom: 14px;
-  }
-  .prem-sb-countdown-num {
-    font-family: 'Cormorant Garamond', serif; font-style: italic;
-    font-size: 36px; font-weight: 300; color: var(--cream); line-height: 1;
-  }
-  .prem-sb-countdown-label {
-    font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: rgba(247,243,238,0.25); margin-top: 3px;
-  }
-  .prem-sb-progress-bar {
-    height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px;
-    overflow: hidden; margin-bottom: 5px;
-  }
-  .prem-sb-progress-fill {
-    height: 100%; background: var(--terracotta); border-radius: 1px;
-    transition: width 1s ease;
-  }
-  .prem-sb-progress-label {
-    display: flex; justify-content: space-between;
-    font-size: 9px; color: rgba(247,243,238,0.25);
-  }
-  .prem-sb-actions {
-    display: flex; gap: 8px; margin-top: 14px;
-  }
-  .prem-sb-notif-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border-radius: 8px;
-    background: rgba(255,255,255,0.05); cursor: pointer;
-    transition: background 0.2s; font-size: 14px; position: relative;
-    border: none; color: var(--sand);
-  }
-  .prem-sb-notif-btn:hover { background: rgba(255,255,255,0.1); }
-  .prem-sb-logout-btn {
-    flex: 1; padding: 8px 12px; border-radius: 8px;
-    background: rgba(255,255,255,0.04); border: none;
-    font-family: 'DM Sans', sans-serif; font-size: 10px;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: rgba(201,186,168,0.4); cursor: pointer; transition: all 0.2s;
-  }
-  .prem-sb-logout-btn:hover { background: rgba(255,255,255,0.08); color: var(--cream); }
-
-  /* Push content right when sidebar visible */
-  @media (min-width: 769px) {
+  @media (min-width: 900px) {
     .prem-sidebar { display: flex; }
-    #appMain { margin-left: 240px; }
-    .app-nav { padding-left: 24px; background: var(--warm-black); border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .nav-brand { display: none; }
-    .notif-panel { right: 16px; }
+    .app-nav { margin-left: 240px; }
+    .welcome-banner { margin-left: 240px; }
+    .welcome-progress-block { margin-left: 240px; }
+    .app-content { margin-left: 240px; }
+    .nav-brand { display: none !important; }
   }
-  @media (max-width: 768px) {
-    }
-
+  .prem-sb-head { padding: 24px 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+  .prem-sb-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; color: #F7F3EE; }
+  .prem-sb-sub { font-size: 7px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(247,243,238,0.18); margin-bottom: 14px; }
+  .prem-sb-user { display: flex; align-items: center; gap: 9px; padding: 12px 0; }
+  .prem-sb-av { width: 28px; height: 28px; border-radius: 50%; background: rgba(196,113,74,0.2); border: 1px solid rgba(196,113,74,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #C4714A; flex-shrink: 0; }
+  .prem-sb-uname { font-size: 12px; font-weight: 300; color: #F7F3EE; }
+  .prem-sb-plan { font-size: 7px; letter-spacing: 0.15em; text-transform: uppercase; color: #C4714A; margin-top: 2px; }
+  .prem-sb-body { flex: 1; overflow-y: auto; padding: 8px 10px; scrollbar-width: none; }
+  .prem-sb-body::-webkit-scrollbar { display: none; }
+  .prem-sb-sec { font-size: 7px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(201,186,168,0.22); padding: 12px 10px 5px; }
+  .prem-sb-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 11px; font-weight: 300; color: rgba(201,186,168,0.5); cursor: pointer; transition: all 0.15s; margin-bottom: 1px; }
+  .prem-sb-item:hover { background: rgba(255,255,255,0.05); color: #F7F3EE; }
+  .prem-sb-item.sb-active { background: rgba(196,113,74,0.11); color: #F7F3EE; border-left: 2px solid #C4714A; padding-left: 8px; }
+  .prem-sb-item.sb-locked { opacity: 0.28; cursor: not-allowed; }
+  .prem-sb-ico { font-size: 12px; width: 16px; text-align: center; flex-shrink: 0; }
+  .prem-sb-lbl { flex: 1; }
+  .prem-sb-foot { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+  .prem-sb-prog-bar { height: 2px; background: rgba(255,255,255,0.07); border-radius: 1px; overflow: hidden; margin-bottom: 4px; }
+  .prem-sb-prog-fill { height: 100%; background: #C4714A; border-radius: 1px; transition: width 0.6s ease; width: 0%; }
+  .prem-sb-prog-lbl { display: flex; justify-content: space-between; font-size: 8px; color: rgba(247,243,238,0.22); }
+  .prem-sb-acts { display: flex; gap: 7px; margin-top: 12px; }
+  .prem-sb-btn-notif { width: 30px; height: 30px; border-radius: 7px; background: rgba(255,255,255,0.04); border: none; font-size: 13px; cursor: pointer; color: rgba(201,186,168,0.5); flex-shrink: 0; }
+  .prem-sb-btn-out { flex: 1; padding: 7px; border-radius: 7px; background: rgba(255,255,255,0.03); border: none; font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(201,186,168,0.35); cursor: pointer; transition: all 0.2s; }
+  .prem-sb-btn-out:hover { background: rgba(255,255,255,0.07); color: #F7F3EE; }
 </style>
 </head>
 <body>
@@ -462,11 +376,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- APP -->
 <div class="app-screen" id="appScreen">
-
-  <!-- PREMIUM SIDEBAR -->
+  <!-- SIDEBAR PREMIUM -->
   <div class="prem-sidebar" id="premSidebar">
-    <div class="prem-sb-top">
+    <div class="prem-sb-head">
       <div class="prem-sb-logo">Le Move</div>
+      <div class="prem-sb-sub">L'art de bien s'installer</div>
+      <div class="prem-sb-user">
+        <div class="prem-sb-av" id="sbAv">?</div>
+        <div>
+          <div class="prem-sb-uname" id="sbNom">—</div>
+          <div class="prem-sb-plan" id="sbPlanLabel">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="prem-sb-body" id="sbBody"></div>
+    <div class="prem-sb-foot">
+      <div class="prem-sb-prog-bar"><div class="prem-sb-prog-fill" id="sbFill"></div></div>
+      <div class="prem-sb-prog-lbl"><span>Avancement</span><span id="sbPct">0%</span></div>
+      <div class="prem-sb-acts">
+        <button class="prem-sb-btn-notif" onclick="toggleNotifPanel()">🔔</button>
+        <button class="prem-sb-btn-out" onclick="logout()">Déconnexion</button>
+      </div>
+    </div>
+  </div>
+
       <div class="prem-sb-tagline">L'art de bien s'installer</div>
       <div class="prem-sb-user">
         <div class="prem-sb-avatar" id="sbAvatar">?</div>
@@ -499,7 +432,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 
-  <div id="appMain" style="min-height:100vh">
   <nav class="app-nav">
     <div class="nav-brand">
       <div class="nav-logo">Le Move</div>
@@ -567,7 +499,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </div>
-</div><!-- /appMain -->
 
 <!-- TUTORIAL -->
 <div class="overlay" id="tutorialOverlay" style="display:none;">
@@ -928,35 +859,56 @@ function renderSidebarNav() {
   var scroll = document.getElementById('sidebarScroll');
   if (!scroll) return;
   var html = '';
-  var ICONS = {
+  sections.forEach(function(section) {
+    html += '<div class="nav-section">' + section.label + '</div>';
+    section.items.forEach(function(item) {
+      var hasAccess = allowed.indexOf(item.id) >= 0;
+      if (hasAccess) {
+        var el = document.createElement('div');
+        el.className = 'nav-item';
+        el.onclick = (function(id){ return function(){ window.location.href = id + '.html'; }; })(item.id);
+        el.innerHTML = '<div class="nav-dot"></div>' + item.label;
+        scroll.appendChild(el);
+        return;
+      } else {
+        var planNeeded = ['moodboard-ia','collab','annuaire','cremaillere','support'].indexOf(item.id) >= 0 ? 'Premium' : 'Complet';
+        html += '<div class="nav-item" style="opacity:0.35;cursor:default;pointer-events:none" title="Plan ' + planNeeded + ' requis">' +
+          '<div class="nav-dot"></div><span style="flex:1">' + item.label + '</span>' +
+          '<span style="font-size:10px">🔒</span></div>';
+      }
+    });
+  });
+  scroll.insertAdjacentHTML('beforeend', html);
+
+  // Build premium sidebar
+  var ICONS2 = {
     'mon-logement':'🏠','budget':'💰','demenagement':'📦','calculateur':'📐',
     'achats':'🛒','avancement':'📊','moodboard':'🎨','moodboard-ia':'✨',
     'medias':'📸','admin':'📋','aides':'🎁','carnet':'📔','mes-contacts':'👥',
     'cremaillere':'🥂','annuaire':'🏢','collab':'🤝','support':'💬'
   };
-  var currentPage = window.location.pathname.split('/').pop().replace('.html','');
-  sections.forEach(function(section) {
-    html += '<div class="prem-sb-section">' + section.label + '</div>';
-    section.items.forEach(function(item) {
-      var hasAccess = allowed.indexOf(item.id) >= 0;
-      var icon = ICONS[item.id] || '·';
-      var isActive = currentPage === item.id ? ' active' : '';
-      if (hasAccess) {
-        html += '<div class="prem-sb-item' + isActive + '" onclick="window.location.href=\'' + item.id + '.html\'">' +
-          '<span class="prem-sb-icon">' + icon + '</span>' +
-          '<span class="prem-sb-label">' + item.label + '</span>' +
-        '</div>';
-      } else {
-        var planNeeded = ['moodboard-ia','collab','annuaire','cremaillere','support','mon-logement'].indexOf(item.id) >= 0 ? 'Premium' : 'Complet';
-        html += '<div class="prem-sb-item locked" title="Plan ' + planNeeded + ' requis">' +
-          '<span class="prem-sb-icon">' + icon + '</span>' +
-          '<span class="prem-sb-label">' + item.label + '</span>' +
-          '<span class="prem-sb-lock">🔒</span>' +
-        '</div>';
-      }
+  var sbBody = document.getElementById('sbBody');
+  if (sbBody) {
+    var sbHtml = '';
+    var curPage = window.location.pathname.split('/').pop().replace('.html','');
+    sections.forEach(function(sec) {
+      sbHtml += '<div class="prem-sb-sec">' + sec.label + '</div>';
+      sec.items.forEach(function(it) {
+        var ok = allowed.indexOf(it.id) >= 0;
+        var ico = ICONS2[it.id] || '·';
+        var active = curPage === it.id ? ' sb-active' : '';
+        if (ok) {
+          sbHtml += '<div class="prem-sb-item' + active + '" onclick="location.href=\'' + it.id + '.html\'">' +
+            '<span class="prem-sb-ico">' + ico + '</span><span class="prem-sb-lbl">' + it.label + '</span></div>';
+        } else {
+          sbHtml += '<div class="prem-sb-item sb-locked">' +
+            '<span class="prem-sb-ico">' + ico + '</span><span class="prem-sb-lbl">' + it.label + '</span>' +
+            '<span style="font-size:9px;color:rgba(201,186,168,0.25)">🔒</span></div>';
+        }
+      });
     });
-  });
-  scroll.innerHTML = html;
+    sbBody.innerHTML = sbHtml;
+  }
 }
 
 
