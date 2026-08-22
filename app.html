@@ -418,8 +418,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   /* Push content right when sidebar visible */
   @media (min-width: 769px) {
-    .app-screen { padding-left: 240px; }
-    .app-nav { padding-left: 16px; background: var(--warm-black); border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .app-screen > *:not(.prem-sidebar) { margin-left: 240px; }
+    .app-nav { padding-left: 24px; background: var(--warm-black); border-bottom: 1px solid rgba(255,255,255,0.04); }
     .nav-brand { display: none; }
     .notif-panel { right: 16px; }
   }
