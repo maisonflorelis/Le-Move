@@ -720,3 +720,1160 @@ const TUTORIAL_STEPS = [
 
 let tutStep = 0;
 let currentUser = null;
+let currentPlan = 'essentiel';
+let currentProfile = {};
+let pendingPhotoFile = null;
+let pendingPhotoTarget = null;
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await loadApp(session.user);
+  } else {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+  }
+}
+
+// ── AUTH ──
+async function login() {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.style.display = 'none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { errEl.textContent = 'Email ou mot de passe incorrect.'; errEl.style.display = 'block'; return; }
+  await loadApp(data.user);
+}
+
+async function resetPassword() {
+  const email = document.getElementById('authEmail').value;
+  const errEl = document.getElementById('authError');
+  if (!email) { errEl.textContent = "Entre ton email d'abord."; errEl.style.display = 'block'; return; }
+  const redirectTo = window.location.origin + '/reset-password.html';
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.style.display = 'block'; return; }
+  errEl.style.background = '#F0FDF4'; errEl.style.borderColor = '#86EFAC'; errEl.style.color = '#16A34A';
+  errEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+  errEl.style.display = 'block';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+// ── LOAD APP ──
+async function loadApp(user) {
+  currentUser = user;
+
+  // Read plan from Profiles (uses uuid = auth.uid() — no RLS issue)
+  const { data: profilePlan } = await sb.from('Profiles').select('Plan').eq('id', user.id).maybeSingle();
+  
+  // Fallback: read from Users by email if Profiles.Plan not set
+  let planFromUsers = null;
+  if (!profilePlan?.Plan || profilePlan.Plan === 'essentiel') {
+    const { data: userData } = await sb.from('Users').select('Plan').ilike('Email', user.email).maybeSingle();
+    planFromUsers = userData?.Plan;
+  }
+  
+  currentPlan = (profilePlan?.Plan || planFromUsers || 'essentiel').toLowerCase();
+  if (user.email === ADMIN_EMAIL) currentPlan = 'premium';
+  localStorage.setItem('lm_plan', JSON.stringify(currentPlan));
+  localStorage.setItem('lm_user_email', user.email);
+  console.log('Plan loaded from Profiles:', profilePlan?.Plan, '| from Users:', planFromUsers, '| final:', currentPlan);
+
+  const { data: profileData } = await sb.from('Profiles').select('*, budget_total, moodboard_result').eq('id', user.id).maybeSingle();
+  if (!profileData) {
+    await sb.from('Profiles').upsert({ id: user.id, Plan: currentPlan, created_at: new Date().toISOString() });
+  } else if (!profileData.Plan || profileData.Plan !== currentPlan) {
+    // Sync plan to Profiles for faster future reads
+    await sb.from('Profiles').update({ Plan: currentPlan }).eq('id', user.id);
+  }
+  currentProfile = profileData || {};
+
+  const fallbackName = user.email.split('@')[0].split('.')[0];
+  const displayName = currentProfile.prenom || (fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1));
+
+  document.getElementById('navPlanBadge').textContent = user.email === ADMIN_EMAIL ? 'Admin ✦' : 'Plan ' + currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  refreshAvatarUI(displayName, currentProfile.photo_url);
+  document.getElementById('userName').textContent = displayName;
+  refreshWelcomeMeta();
+  renderModules();
+  if (currentPlan !== 'premium' && user.email !== ADMIN_EMAIL) document.getElementById('upgradeCard').style.display = 'flex';
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+
+  const seen = localStorage.getItem('lemove_tutorial_' + user.id);
+  if (!seen) setTimeout(() => showTutorial(), 600);
+  else if (!currentProfile?.prenom || !currentProfile?.date_emmenagement) setTimeout(() => showOnboarding(), 600);
+  setTimeout(() => updateProgress(), 800);
+  setTimeout(() => loadNotifications(), 1000);
+  // Anti-fraud checks
+  setTimeout(() => {
+    if (typeof runAntiFraudCheck === 'function') runAntiFraudCheck(user.id);
+  }, 2000);
+  // Review nudge
+  setTimeout(function() {
+    if (typeof checkReviewNudge === 'function') checkReviewNudge(user.id);
+  }, 4000);
+}
+
+// ── WELCOME META ──
+function refreshWelcomeMeta() {
+  const el = document.getElementById('welcomeMeta');
+  if (!currentProfile.date_emmenagement) { el.textContent = ''; return; }
+  const date = new Date(currentProfile.date_emmenagement);
+  const diff = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
+  const log = currentProfile.type_logement ? ` · ${currentProfile.type_logement}` : '';
+  if (diff > 0) el.textContent = `📅 Jour J dans ${diff} jours${log}`;
+  else if (diff === 0) el.textContent = `📅 C'est aujourd'hui !${log}`;
+  else el.textContent = `📅 Emménagement effectué${log}`;
+}
+
+// ── AVATAR ──
+function refreshAvatarUI(name, photoUrl) {
+  const initial = name ? name[0].toUpperCase() : '?';
+  const navAv = document.getElementById('navAvatar');
+  const profAv = document.getElementById('profileAvatar');
+
+  if (photoUrl) {
+    navAv.innerHTML = `<img src="${photoUrl}" alt="">`;
+    profAv.innerHTML = `<img src="${photoUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  } else {
+    navAv.textContent = initial;
+    profAv.innerHTML = `${initial}<input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+  }
+
+  document.getElementById('profileName').textContent = name || '—';
+  document.getElementById('profileEmailTxt').textContent = currentUser?.email || '—';
+  document.getElementById('profilePrenom').value = currentProfile.prenom || '';
+  document.getElementById('profileDate').value = currentProfile.date_emmenagement || '';
+  document.getElementById('profileType').value = currentProfile.type_logement || '';
+}
+
+// ── MODULES ──
+function openPricing(){window.open('https://lemove.fr#pricing','_blank');}
+
+function renderModules() {
+  var grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  ALL_MODULES.forEach(function(mod, i) {
+    var hasAccess = mod.plans.includes(currentPlan);
+    var planRequired = mod.plans[0]; // lowest plan that gives access
+    var card = document.createElement('div');
+    card.className = 'module-card' + (!hasAccess ? ' locked' : '');
+    card.style.cssText = !hasAccess ? 'position:relative;overflow:hidden;opacity:0.7;cursor:default' : 'position:relative';
+
+    if (hasAccess) {
+      card.onclick = function() { window.location.href = mod.id + '.html'; };
+      card.innerHTML =
+        '<div class="module-num">Module ' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="module-icon">' + mod.icon + '</div>' +
+        '<div class="module-title">' + mod.title + '</div>' +
+        '<div class="module-desc">' + mod.desc + '</div>' +
+        '<div class="module-tags">' + mod.tags.map(function(t){return '<span class="module-tag">'+t+'</span>';}).join('') + '</div>';
+    } else {
+      // Plan label
+      var planLabel = planRequired === 'complet' ? 'Complet 89€' : 'Premium 150€';
+      var planColor = planRequired === 'complet' ? 'var(--gold)' : 'var(--terracotta)';
+      card.innerHTML =
+        '<div style="position:absolute;inset:0;background:rgba(26,20,16,0.55);border-radius:14px;z-index:1;backdrop-filter:blur(2px)"></div>' +
+        '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;gap:8px">' +
+          '<div style="font-size:28px">🔒</div>' +
+          '<div style="font-size:11px;font-weight:300;color:white;text-align:center">' + mod.title + '</div>' +
+          '<div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:' + planColor + ';text-align:center">' + planLabel + '</div>' +
+          '<button onclick="openPricing()" style="margin-top:4px;padding:7px 16px;background:' + planColor + ';color:white;border:none;border-radius:6px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:inherit">Débloquer →</button>' +
+        '</div>' +
+        '<div class="module-num" style="opacity:0.15">Module ' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="module-icon" style="opacity:0.15">' + mod.icon + '</div>' +
+        '<div class="module-title" style="opacity:0.15">' + mod.title + '</div>' +
+        '<div class="module-desc" style="opacity:0.15">' + mod.desc + '</div>';
+    }
+    grid.appendChild(card);
+  });
+}
+
+function renderSidebarNav() {
+  var planModules = {
+    essentiel: ['budget','demenagement','aides','achats'],
+    complet: ['budget','demenagement','aides','achats','calculateur','admin','carnet','avancement','mes-contacts','moodboard','medias'],
+    premium: ['budget','demenagement','aides','achats','calculateur','admin','carnet','avancement','mes-contacts','moodboard','medias','moodboard-ia','collab','annuaire','cremaillere','support']
+  };
+  var allowed = planModules[currentPlan] || planModules['essentiel'];
+  var sections = [
+    { label: 'Emménagement', items: [
+      {id:'budget',label:'Mon Budget'},{id:'demenagement',label:'Mon Déménagement'},
+      {id:'calculateur',label:'Calculateur'},{id:'achats',label:'Mes Achats'},
+      {id:'avancement',label:'Mon Avancement'}
+    ]},
+    { label: 'Déco & Style', items: [
+      {id:'moodboard',label:'Mon Moodboard'},{id:'moodboard-ia',label:'Moodboard IA'},
+      {id:'medias',label:'Mes Médias'}
+    ]},
+    { label: 'Pratique', items: [
+      {id:'admin',label:'Checklist Admin'},{id:'aides',label:'Guide des Aides'},
+      {id:'carnet',label:'Carnet de Bord'},{id:'mes-contacts',label:'Mes Contacts'}
+    ]},
+    { label: 'Social & Pro', items: [
+      {id:'cremaillere',label:'Crémaillère'},{id:'annuaire',label:'Annuaire Pro'},
+      {id:'collab',label:'Espace Collab'},{id:'support',label:'Support'}
+    ]}
+  ];
+  var scroll = document.getElementById('sidebarScroll');
+  if (!scroll) return;
+  var html = '';
+  var ICONS = {
+    'mon-logement':'🏠','budget':'💰','demenagement':'📦','calculateur':'📐',
+    'achats':'🛒','avancement':'📊','moodboard':'🎨','moodboard-ia':'✨',
+    'medias':'📸','admin':'📋','aides':'🎁','carnet':'📔','mes-contacts':'👥',
+    'cremaillere':'🥂','annuaire':'🏢','collab':'🤝','support':'💬'
+  };
+  var currentPage = window.location.pathname.split('/').pop().replace('.html','');
+  sections.forEach(function(section) {
+    html += '<div class="prem-sb-section">' + section.label + '</div>';
+    section.items.forEach(function(item) {
+      var hasAccess = allowed.indexOf(item.id) >= 0;
+      var icon = ICONS[item.id] || '·';
+      var isActive = currentPage === item.id ? ' active' : '';
+      if (hasAccess) {
+        html += '<div class="prem-sb-item' + isActive + '" onclick="window.location.href=\'' + item.id + '.html\'">' +
+          '<span class="prem-sb-icon">' + icon + '</span>' +
+          '<span class="prem-sb-label">' + item.label + '</span>' +
+        '</div>';
+      } else {
+        var planNeeded = ['moodboard-ia','collab','annuaire','cremaillere','support','mon-logement'].indexOf(item.id) >= 0 ? 'Premium' : 'Complet';
+        html += '<div class="prem-sb-item locked" title="Plan ' + planNeeded + ' requis">' +
+          '<span class="prem-sb-icon">' + icon + '</span>' +
+          '<span class="prem-sb-label">' + item.label + '</span>' +
+          '<span class="prem-sb-lock">🔒</span>' +
+        '</div>';
+      }
+    });
+  });
+  scroll.innerHTML = html;
+}
+
+
+function openModule(id) {
+  const pages = {
+    'mon-logement': 'mon-logement.html',
+    'budget': 'budget.html',
+    'demenagement': 'demenagement.html',
+    'moodboard': 'moodboard.html',
+    'achats': 'achats.html',
+    'avancement': 'avancement.html',
+    'calculateur': 'calculateur.html',
+    'mes-contacts': 'mes-contacts.html',
+    'moodboard-ia': 'moodboard-ia.html',
+    'collab': 'collab.html',
+    'annuaire': 'annuaire.html',
+    'support': 'support.html',
+    'medias': 'medias.html',
+    'admin': 'admin.html',
+    'aides': 'aides.html',
+    'carnet': 'carnet.html',
+    'cremaillere': 'cremaillere.html',
+  };
+  if (pages[id]) window.location.href = pages[id];
+}
+
+async function updateProgress() {
+  if (!currentUser) return;
+  var uid = currentUser.id;
+  Promise.all([
+    sb.from('Profiles').select('budget_total').eq('id', uid).single(),
+    sb.from('budget_achats').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('demenagement_taches').select('fait').eq('user_id', uid),
+    sb.from('achats_commandes').select('statut').eq('user_id', uid),
+    sb.from('avancement_taches').select('statut').eq('user_id', uid),
+    Promise.resolve({data:[]}), // admin_taches - table optionnelle
+    sb.from('carnet_notes').select('id', { count: 'exact', head: true }).eq('user_id', uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('moodboard_items').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('mes_contacts').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+    sb.from('medias').select('id',{count:'exact',head:true}).eq('user_id',uid).then(r=>({count:r.count||0})).catch(()=>({count:0})),
+  ]).then(function(r) {
+    var scores = [];
+    var ps = 0;
+    if (currentProfile) {
+      if (currentProfile.prenom) ps += 34;
+      if (currentProfile.date_emmenagement) ps += 33;
+      if (currentProfile.photo_url) ps += 33;
+    }
+    scores.push({ name: 'Profil', score: ps, weight: 1 });
+    scores.push({ name: 'Budget', score: ((r[0].data && r[0].data.budget_total > 0) ? 50 : 0) + ((r[1].count || 0) > 0 ? 50 : 0), weight: 1 });
+    var dem = r[2].data || [];
+    scores.push({ name: 'Demenagement', score: dem.length ? Math.round(dem.filter(function(t){return t.fait;}).length/dem.length*100) : 0, weight: 2 });
+    var ach = r[3].data || [];
+    scores.push({ name: 'Achats', score: ach.length ? Math.round(ach.filter(function(t){return t.statut==='livré';}).length/ach.length*100) : 0, weight: 1 });
+    var av = r[4].data || [];
+    scores.push({ name: 'Avancement', score: av.length ? Math.round(av.filter(function(t){return t.statut==='done';}).length/av.length*100) : 0, weight: 2 });
+    var adm = r[5].data || [];
+    scores.push({ name: 'Admin', score: adm.length ? Math.round(adm.filter(function(t){return t.fait;}).length/adm.length*100) : 0, weight: 1.5 });
+    scores.push({ name: 'Carnet', score: Math.min(100, Math.round(((r[6].count||0)/3)*100)), weight: 0.5 });
+    scores.push({ name: 'Moodboard', score: Math.min(100, Math.round(((r[7].count||0)/3)*100)), weight: 0.5 });
+    scores.push({ name: 'Contacts', score: Math.min(100, Math.round(((r[8].count||0)/3)*100)), weight: 0.5 });
+    scores.push({ name: 'Medias', score: Math.min(100, Math.round(((r[9].count||0)/3)*100)), weight: 0.5 });
+
+    var tw = scores.reduce(function(s,m){return s+m.weight;},0);
+    var ws = scores.reduce(function(s,m){return s+(m.score*m.weight);},0);
+    var pct = Math.round(ws/tw);
+
+    var bar = document.getElementById('progressBar');
+    var pctEl = document.getElementById('progressPct');
+    if (bar) bar.style.width = pct + '%';
+    var cur = 0;
+    var iv = setInterval(function(){cur=Math.min(cur+2,pct);if(pctEl)pctEl.textContent=cur+'%';if(cur>=pct)clearInterval(iv);},18);
+
+    var pips = document.getElementById('progressPips');
+    if (pips) {
+      pips.innerHTML = '';
+      scores.forEach(function(m) {
+        var pip = document.createElement('div');
+        var bg = m.score>=100 ? 'rgba(122,140,126,0.8)' : m.score>0 ? '#C4714A' : 'rgba(255,255,255,0.08)';
+        pip.style.cssText = 'flex:1;height:3px;border-radius:2px;background:' + bg;
+        pip.title = m.name + ' ' + m.score + '%';
+        pips.appendChild(pip);
+      });
+    }
+
+    var meta = document.getElementById('welcomeMeta');
+    if (meta) {
+      var done = scores.filter(function(m){return m.score>=100;}).length;
+      var prog = scores.filter(function(m){return m.score>0&&m.score<100;}).length;
+      meta.innerHTML = '<div style="font-size:10px;color:rgba(247,243,238,0.3)"><span style="color:rgba(122,140,126,0.9)">' + done + '</span> complétés</div>' +
+        '<div style="font-size:10px;color:rgba(247,243,238,0.3)"><span style="color:#C4714A">' + prog + '</span> en cours</div>';
+    }
+
+    var qm = document.getElementById('quickModules');
+    if (qm) {
+      var mods = [
+        {n:'Budget',i:'💰',s:scores[1].score,h:'budget.html'},
+        {n:'Déménagement',i:'📦',s:scores[2].score,h:'demenagement.html'},
+        {n:'Achats',i:'🚚',s:scores[3].score,h:'achats.html'},
+        {n:'Admin',i:'📋',s:scores[5].score,h:'admin.html'}
+      ];
+      qm.innerHTML = mods.map(function(m) {
+        var c2 = m.s>=100 ? '#7A8C7E' : '#C4714A';
+        var d = document.createElement('div');
+        d.setAttribute('onclick', "window.location.href='" + m.h + "'");
+        d.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s';
+        d.onmouseover = function(){this.style.background='rgba(255,255,255,0.08)';};
+        d.onmouseout = function(){this.style.background='rgba(255,255,255,0.04)';};
+        d.innerHTML = '<div style="font-size:16px;margin-bottom:6px">' + m.i + '</div>' +
+          '<div style="font-size:11px;font-weight:300;color:rgba(247,243,238,0.7);margin-bottom:6px">' + m.n + '</div>' +
+          '<div style="height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">' +
+            '<div style="height:100%;background:' + c2 + ';width:' + m.s + '%;border-radius:2px;transition:width 1s ease"></div></div>' +
+          '<div style="font-size:9px;color:rgba(247,243,238,0.3);margin-top:4px">' + m.s + '%</div>';
+        return d.outerHTML;
+      }).join('');
+    }
+
+    if (currentProfile && currentProfile.date_emmenagement) {
+      var diff = Math.ceil((new Date(currentProfile.date_emmenagement) - new Date()) / (1000*60*60*24));
+      var cdEl = document.getElementById('countdownNum');
+      var dtEl = document.getElementById('countdownDate');
+      if (cdEl) cdEl.textContent = diff > 0 ? 'J — ' + diff : diff === 0 ? "Aujourd'hui !" : "C'est fait !";
+      if (dtEl) {
+        var dv = new Date(currentProfile.date_emmenagement);
+        dtEl.textContent = dv.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+      }
+    }
+    var cits = ["Chaque grande maison commence par un premier carton.",
+      "Un chez-soi, ca se merite. Tu y es presque.",
+      "Organiser, c'est deja s'installer.",
+      "Ton espace t'attend. Fais-le tien.",
+      "Le debut de quelque chose de beau.",
+      "Bien s'installer, c'est bien commencer.",
+      "Ton futur chez-toi se construit ici."];
+    var citEl = document.getElementById('dailyCitation');
+    if (citEl) citEl.textContent = cits[new Date().getDay() % cits.length];
+  }).catch(function(e){ console.warn('Progress:', e); });
+}
+
+// ── TUTORIAL ──
+function showTutorial() {
+  tutStep = 0;
+  renderTutStep();
+  document.getElementById('tutorialOverlay').style.display = 'flex';
+}
+
+function renderTutStep() {
+  const s = TUTORIAL_STEPS[tutStep];
+  document.getElementById('tutIcon').textContent = s.icon;
+  document.getElementById('tutTitle').textContent = s.title;
+  document.getElementById('tutText').textContent = s.text;
+  const isLast = tutStep === TUTORIAL_STEPS.length - 1;
+  document.getElementById('tutNextBtn').textContent = isLast ? 'Personnaliser mon espace →' : 'Suivant →';
+  document.getElementById('tutDots').innerHTML = TUTORIAL_STEPS.map((_, i) =>
+    `<div class="tut-dot ${i < tutStep ? 'done' : i === tutStep ? 'active' : ''}"></div>`
+  ).join('');
+}
+
+function nextTutorial() {
+  if (tutStep < TUTORIAL_STEPS.length - 1) { tutStep++; renderTutStep(); }
+  else endTutorial();
+}
+
+function endTutorial() {
+  document.getElementById('tutorialOverlay').style.display = 'none';
+  localStorage.setItem('lemove_tutorial_' + currentUser.id, 'seen');
+  if (!currentProfile.prenom || !currentProfile.date_emmenagement) setTimeout(() => showOnboarding(), 300);
+}
+
+function showOnboarding() {
+  // Fill step 1 with plan info
+  const planFeatures = {
+    essentiel: ['Mon Budget', 'Mon Déménagement', 'Guide des Aides', 'Mes Achats & Livraisons'],
+    complet: ['Tout Essentiel +', 'Calculateur Volume', 'Mon Avancement', 'Moodboard & Inspirations', 'Mes Contacts & Agenda', 'Mes Médias'],
+    premium: ['Tout Complet +', 'Moodboard IA', 'Crémaillère', 'Annuaire Pro', 'Espace Collaboratif', 'Support Prioritaire']
+  };
+  const suggestions = {
+    essentiel: [
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'💶',text:'Guide des Aides',href:'aides.html'},
+      {icon:'🚚',text:'Mes Achats',href:'achats.html'},
+    ],
+    complet: [
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'🎨',text:'Mon Moodboard',href:'moodboard.html'},
+      {icon:'✅',text:'Mon Avancement',href:'avancement.html'},
+    ],
+    premium: [
+      {icon:'✨',text:'Moodboard IA',href:'moodboard-ia.html'},
+      {icon:'💰',text:'Mon Budget',href:'budget.html'},
+      {icon:'📦',text:'Mon Déménagement',href:'demenagement.html'},
+      {icon:'🎉',text:'Ma Crémaillère',href:'cremaillere.html'},
+    ]
+  };
+  
+  const plan = currentPlan || 'essentiel';
+  const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  document.getElementById('onbPlanBadge').textContent = planLabel;
+  
+  const feats = planFeatures[plan] || planFeatures.essentiel;
+  document.getElementById('onbPlanFeatures').innerHTML = feats.map(f => 
+    '<div class="onb-plan-feat">' + f + '</div>'
+  ).join('');
+  
+  const suggs = suggestions[plan] || suggestions.essentiel;
+  document.getElementById('onbSuggestions').innerHTML = suggs.map(s =>
+    '<a class="onb-suggestion" href="' + s.href + '"><div class="onb-suggestion-icon">' + s.icon + '</div><div class="onb-suggestion-text">' + s.text + '</div></a>'
+  ).join('');
+  
+  document.getElementById('onboardingOverlay').style.display = 'flex';
+}
+
+function goToOnbStep2() {
+  document.getElementById('onbStep1').style.display = 'none';
+  document.getElementById('onbStep2').style.display = 'block';
+}
+
+// ── ONBOARDING ──
+async function saveOnboarding() {
+  const prenom = document.getElementById('onbPrenom').value.trim();
+  const date = document.getElementById('onbDate').value;
+  const type = document.getElementById('onbType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'onb') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+  closeOnboarding();
+}
+
+function closeOnboarding() {
+  document.getElementById('onboardingOverlay').style.display = 'none';
+}
+
+// ── PROFILE PANEL ──
+function openProfile() {
+  document.getElementById('profilePanel').classList.add('open');
+  document.getElementById('profilePanelOverlay').classList.add('open');
+}
+
+function closeProfile() {
+  document.getElementById('profilePanel').classList.remove('open');
+  document.getElementById('profilePanelOverlay').classList.remove('open');
+}
+
+async function saveProfile() {
+  const prenom = document.getElementById('profilePrenom').value.trim();
+  const date = document.getElementById('profileDate').value;
+  const type = document.getElementById('profileType').value;
+  let photoUrl = currentProfile.photo_url || null;
+  if (pendingPhotoFile && pendingPhotoTarget === 'profile') photoUrl = await uploadPhoto(pendingPhotoFile);
+
+  await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
+  currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
+
+  const displayName = prenom || document.getElementById('userName').textContent;
+  document.getElementById('userName').textContent = displayName;
+  refreshAvatarUI(displayName, photoUrl);
+  refreshWelcomeMeta();
+  pendingPhotoFile = null;
+
+  const msg = document.getElementById('profileSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+}
+
+// ── PHOTO PREVIEW ──
+function previewPhoto(input, target) {
+  if (!input.files[0]) return;
+  pendingPhotoFile = input.files[0];
+  pendingPhotoTarget = target;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (target === 'onb') {
+      document.getElementById('onbPhotoPreview').innerHTML = `<img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;position:absolute;" onchange="previewPhoto(this,'profile')">`;
+      document.getElementById('navAvatar').innerHTML = `<img src="${e.target.result}" alt="">`;
+    }
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function uploadPhoto(file) {
+  const ext = file.name.split('.').pop();
+  const path = `avatars/${currentUser.id}.${ext}`;
+  const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
+  if (error) { console.error('Upload error:', error); return null; }
+  const { data } = sb.storage.from('profiles').getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
+
+async function changePassword() {
+  const pwd = document.getElementById('profileNewPwd').value;
+  if (!pwd || pwd.length < 6) {
+    alert('Le mot de passe doit faire au moins 6 caractères.');
+    return;
+  }
+  const { error } = await sb.auth.updateUser({ password: pwd });
+  if (error) { alert('Erreur : ' + error.message); return; }
+  document.getElementById('profileNewPwd').value = '';
+  const msg = document.getElementById('pwdSavedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+
+// ── NOTIFICATIONS SYSTEM ──
+let notifications = [];
+let notifOpen = false;
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  
+  // Generate smart notifications based on data
+  await generateSmartNotifs();
+  
+  // Load from DB
+  const { data } = await sb.from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  
+  notifications = data || [];
+  renderNotifBadge();
+  renderNotifPanel();
+}
+
+async function generateSmartNotifs() {
+  const toInsert = [];
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Check for today's deliveries
+  const { data: livraisons } = await sb.from('achats_commandes')
+    .select('nom, date_livraison')
+    .eq('user_id', currentUser.id)
+    .eq('date_livraison', today)
+    .neq('statut', 'livré');
+  
+  for (const l of (livraisons || [])) {
+    const exists = await checkNotifExists('livraison_' + l.nom + '_' + today);
+    if (!exists) {
+      toInsert.push({ user_id: currentUser.id, type: 'livraison', titre: "Livraison prévue aujourd'hui", message: l.nom + " devrait arriver aujourd'hui !", lien: 'achats.html', created_at: new Date().toISOString() });
+    }
+  }
+  
+  // Check for overdue urgent tasks (admin_taches - skip if table missing)
+  try {
+    const { data: taches } = await sb.from('admin_taches')
+      .select('titre').eq('user_id', currentUser.id).eq('fait', false).eq('priorite', 'urgent');
+    if ((taches || []).length > 0) {
+      toInsert.push({ user_id: currentUser.id, type: 'urgente', titre: taches.length + ' démarche(s) urgente(s)', message: "Tu as " + taches.length + " démarche(s) urgente(s) à faire.", lien: 'admin.html', created_at: new Date().toISOString() });
+    }
+  } catch(e) {}
+  
+  // Check Jour J in 7 days
+  const { data: profile } = await sb.from('Profiles').select('date_emmenagement, prenom').eq('id', currentUser.id).single();
+  if (profile?.date_emmenagement) {
+    const diff = Math.ceil((new Date(profile.date_emmenagement) - new Date()) / (1000*60*60*24));
+    if (diff === 7 || diff === 3 || diff === 1) {
+      const exists = await checkNotifExists('jourj_' + diff + '_' + today);
+      if (!exists) {
+        toInsert.push({ user_id: currentUser.id, type: 'jourj', titre: `Jour J dans ${diff} jour${diff > 1 ? 's' : ''} !`, message: "Ton déménagement approche. Vérifie ta checklist !", lien: 'demenagement.html', created_at: new Date().toISOString() });
+      }
+    }
+  }
+  
+  // Check profile completeness for new module unlock hint
+  if (profile && !profile.prenom) {
+    const exists = await checkNotifExists('profil_incomplet_' + today);
+    if (!exists) {
+      toInsert.push({ user_id: currentUser.id, type: 'module', titre: 'Complète ton profil', message: "Ajoute ton prénom et ta date d'emménagement pour personnaliser ton espace.", lien: 'app.html', created_at: new Date().toISOString() });
+    }
+  }
+  
+  if (toInsert.length > 0) {
+    await sb.from('notifications').insert(toInsert);
+  }
+}
+
+async function checkNotifExists(key) {
+  // Use a simple dedup check based on title+date
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await sb.from('notifications')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .gte('created_at', today)
+    .eq('titre', key.split('_')[0])
+    .limit(1);
+  return false; // Always generate fresh, dedup by date in UI
+}
+
+function renderNotifBadge() {
+  const unread = notifications.filter(n => !n.lue).length;
+  const badge = document.getElementById('notifBadge');
+  const mBadge = document.getElementById('mobileNotifBadge');
+  if (badge) {
+    badge.style.display = unread > 0 ? 'flex' : 'none';
+    badge.textContent = unread > 9 ? '9+' : unread;
+  }
+  if (mBadge) {
+    mBadge.style.display = unread > 0 ? 'flex' : 'none';
+    mBadge.textContent = unread > 9 ? '9+' : unread;
+  }
+}
+
+const NOTIF_ICONS = { livraison: '🚚', urgente: '⚠️', jourj: '📅', module: '✨', collab: '🤝' };
+const NOTIF_ICON_CLASS = { livraison: 'notif-icon-livraison', urgente: 'notif-icon-urgente', jourj: 'notif-icon-jourj', module: 'notif-icon-module', collab: 'notif-icon-collab' };
+
+
+function renderNotifPanel() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) { list.innerHTML = '<div class="notif-empty">Tout est à jour ✓</div>'; return; }
+  list.innerHTML = notifications.map(function(n) {
+    var ago = timeAgo(n.created_at);
+    var cls = n.lue ? 'notif-item' : 'notif-item unread';
+    var icon = NOTIF_ICONS[n.type] || '🔔';
+    var iconCls = NOTIF_ICON_CLASS[n.type] || '';
+    return '<div class="' + cls + '" data-id="' + n.id + '" data-lien="' + (n.lien||'') + '" onclick="clickNotifEl(this)">' +
+      '<div class="notif-icon ' + iconCls + '">' + icon + '</div>' +
+      '<div class="notif-content">' +
+        '<div class="notif-title">' + n.titre + '</div>' +
+        '<div class="notif-msg">' + (n.message||'') + '</div>' +
+        '<div class="notif-time">' + ago + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function closeNotifPanel() {
+  notifOpen = false;
+  var p = document.getElementById('notifPanel');
+  if (p) p.classList.remove('open');
+}
+
+function clickNotifEl(el) {
+  var id = el.getAttribute('data-id');
+  var lien = el.getAttribute('data-lien');
+  clickNotif(id, lien);
+}
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((new Date() - new Date(dateStr)) / 60000);
+  if (diff < 1) return "À l'instant";
+  if (diff < 60) return diff + ' min';
+  if (diff < 1440) return Math.floor(diff/60) + 'h';
+  return Math.floor(diff/1440) + 'j';
+}
+
+async function clickNotif(id, lien) {
+  await sb.from('notifications').update({ lue: true }).eq('id', id);
+  const n = notifications.find(n => n.id === id);
+  if (n) n.lue = true;
+  renderNotifBadge();
+  renderNotifPanel();
+  if (lien) window.location.href = lien;
+  closeNotifPanel();
+}
+
+async function markAllRead() {
+  await sb.from('notifications').update({ lue: true }).eq('user_id', currentUser.id).eq('lue', false);
+  notifications.forEach(n => n.lue = true);
+  renderNotifBadge();
+  renderNotifPanel();
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  notifOpen = !notifOpen;
+  panel.classList.toggle('open', notifOpen);
+}
+
+function closeNotifPanel() {
+  notifOpen = false;
+  const panel = document.getElementById('notifPanel');
+  if (panel) panel.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifBell') && !e.target.closest('#notifPanel')) closeNotifPanel();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('authPassword')?.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+});
+
+init();
+</script>
+<script>
+function toggleMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(!drawer || !overlay || !ham) return;
+  drawer.classList.toggle('open');
+  overlay.classList.toggle('open');
+  ham.classList.toggle('open');
+}
+function closeMenu() {
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('mobileOverlay');
+  const ham = document.getElementById('hamburger');
+  if(drawer) drawer.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+  if(ham) ham.classList.remove('open');
+}
+// Set active item
+const currentPage = window.location.pathname.split('/').pop() || 'app.html';
+document.querySelectorAll('.mobile-drawer .nav-item').forEach(el => {
+  if(el.getAttribute('href') === currentPage) el.classList.add('active');
+});
+// Set username after load
+setTimeout(() => {
+  const user = document.getElementById('sidebarUser');
+  const mobileUser = document.getElementById('mobileUser');
+  if(user && mobileUser && user.textContent) mobileUser.textContent = user.textContent;
+}, 2000);
+</script>
+<script data-cfasync="false">
+// ═══════════════════════════════════════════
+// ANTI-FRAUD SYSTEM — Niveau 1, 2
+// ═══════════════════════════════════════════
+(function() {
+
+  // Generate device fingerprint
+  async function getFingerprint() {
+    const components = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      screen.colorDepth,
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || 0,
+      navigator.deviceMemory || 0,
+      window.devicePixelRatio || 1,
+    ];
+    const str = components.join('|');
+    // Hash with SubtleCrypto
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').slice(0,32);
+  }
+
+  // Get IP + geo info (free service)
+  async function getGeoInfo() {
+    try {
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      return {
+        ip: data.ip,
+        country: data.country_code,
+        city: data.city,
+      };
+    } catch { return { ip: null, country: null, city: null }; }
+  }
+
+  // VPN/proxy detection heuristics
+  function isSuspiciousIP(geoInfo) {
+    // If timezone doesn't match country — likely VPN
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const tzCountry = {
+      'Europe/Paris': 'FR', 'Europe/London': 'GB', 'Europe/Berlin': 'DE',
+      'America/New_York': 'US', 'America/Los_Angeles': 'US',
+    };
+    const expectedCountry = tzCountry[tz];
+    if (expectedCountry && geoInfo.country && expectedCountry !== geoInfo.country) {
+      return { suspicious: true, reason: 'timezone_country_mismatch' };
+    }
+    return { suspicious: false };
+  }
+
+  window.runAntiFraudCheck = async function(userId) {
+    if (!userId) return;
+    try {
+      const [fingerprint, geoInfo] = await Promise.all([getFingerprint(), getGeoInfo()]);
+      const suspicious = isSuspiciousIP(geoInfo);
+
+      // Check if device is known
+      const { data: existingDevice } = await sb.from('user_devices')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('fingerprint', fingerprint)
+        .maybeSingle();
+
+      if (existingDevice) {
+        // Known device — update last seen
+        await sb.from('user_devices')
+          .update({ last_seen: new Date().toISOString(), login_count: (existingDevice.login_count || 1) + 1, ip_address: geoInfo.ip })
+          .eq('id', existingDevice.id);
+
+        // Check if country changed since last login
+        if (existingDevice.country && geoInfo.country && existingDevice.country !== geoInfo.country) {
+          console.warn('Country change detected:', existingDevice.country, '->', geoInfo.country);
+          await logFraudAlert(userId, 'country_change', { from: existingDevice.country, to: geoInfo.country, ip: geoInfo.ip });
+        }
+      } else {
+        // New device — register it
+        await sb.from('user_devices').insert({
+          user_id: userId,
+          fingerprint,
+          ip_address: geoInfo.ip,
+          user_agent: navigator.userAgent.slice(0, 200),
+          country: geoInfo.country,
+          city: geoInfo.city,
+          is_trusted: false,
+        });
+
+        // Log unknown device alert
+        await logFraudAlert(userId, 'unknown_device', {
+          fingerprint,
+          ip: geoInfo.ip,
+          country: geoInfo.country,
+          city: geoInfo.city,
+          user_agent: navigator.userAgent.slice(0, 100),
+        });
+
+        console.log('New device registered:', geoInfo.city, geoInfo.country);
+      }
+
+      // Flag suspicious IP
+      if (suspicious.suspicious) {
+        await logFraudAlert(userId, 'suspicious_ip', {
+          reason: suspicious.reason,
+          ip: geoInfo.ip,
+          country: geoInfo.country,
+        });
+      }
+
+      // Check for multiple active countries in last 24h
+      const yesterday = new Date(Date.now() - 86400000).toISOString();
+      const { data: recentDevices } = await sb.from('user_devices')
+        .select('country, ip_address')
+        .eq('user_id', userId)
+        .gte('last_seen', yesterday);
+
+      if (recentDevices && recentDevices.length > 0) {
+        const countries = [...new Set(recentDevices.map(d => d.country).filter(Boolean))];
+        if (countries.length >= 3) {
+          await logFraudAlert(userId, 'multiple_countries', {
+            countries,
+            count: countries.length,
+          });
+        }
+      }
+
+    } catch(e) {
+      console.warn('Anti-fraud check error:', e.message);
+    }
+  };
+
+  async function logFraudAlert(userId, type, details) {
+    try {
+      // Use service role via Edge Function to bypass RLS
+      await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/fraud-alert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session?.access_token,
+        },
+        body: JSON.stringify({ user_id: userId, type, details }),
+      });
+    } catch(e) {
+      console.warn('Could not log fraud alert:', e.message);
+    }
+  }
+
+})();
+</script>
+<script data-cfasync="<script data-cfasync="false">
+function showSMSSetup(userId) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,31,20,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#F7F3EE;border-radius:20px;padding:36px;max-width:400px;width:90%;text-align:center';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-style:italic;font-size:22px;color:#2C1F14;margin-bottom:8px';
+  title.textContent = 'Sécurise ton compte';
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'font-size:12px;font-weight:200;color:#8A7968;margin-bottom:20px;line-height:1.6';
+  desc.textContent = 'Pour protéger ton espace Le Move, ajoute ton numéro de téléphone. Un code sera envoyé à chaque connexion depuis un nouvel appareil.';
+
+  var input = document.createElement('input');
+  input.type = 'tel';
+  input.id = 'smsPhoneInput';
+  input.placeholder = '+33 6 XX XX XX XX';
+  input.style.cssText = 'width:100%;padding:12px;border:1px solid #E8E0D5;border-radius:8px;font-family:inherit;font-size:13px;outline:none;margin-bottom:12px;box-sizing:border-box';
+
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:12px;background:#2C1F14;color:#F7F3EE;border:none;border-radius:8px;font-family:inherit;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer';
+  btn.textContent = 'Ajouter mon numéro →';
+  btn.onclick = function() { saveSMSPhone(userId); };
+
+  var skip = document.createElement('div');
+  skip.style.cssText = 'margin-top:12px;font-size:10px;color:#C9BAA8;cursor:pointer';
+  skip.textContent = "Passer pour l'instant";
+  skip.onclick = function() { overlay.remove(); };
+
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(input);
+  card.appendChild(btn);
+  card.appendChild(skip);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+async function saveSMSPhone(userId) {
+  var phone = document.getElementById('smsPhoneInput') ? document.getElementById('smsPhoneInput').value.trim() : '';
+  if (!phone) return;
+  await sb.from('Profiles').update({ telephone: phone }).eq('id', userId);
+  await sendSMSOTP(userId, phone);
+  var overlay = document.getElementById('smsPhoneInput') ? document.getElementById('smsPhoneInput').closest('[style*="position:fixed"]') : null;
+  if (overlay) overlay.remove();
+  showSMSVerifyModal(userId, phone);
+}
+
+async function sendSMSOTP(userId, phone) {
+  var code = Math.floor(100000 + Math.random() * 900000).toString();
+  var expiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  await sb.from('Profiles').update({ sms_otp: code, sms_otp_expiry: expiry }).eq('id', userId);
+  try {
+    await fetch('https://xnmlpxteslwmimmdqjye.supabase.co/functions/v1/send-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, code: code, user_id: userId }),
+    });
+  } catch(e) { console.warn('SMS error:', e.message); }
+}
+
+function showSMSVerifyModal(userId, phone) {
+  var masked = phone.replace(/(\+\d{2})\d+(\d{2})/, '$1••••••$2');
+  var overlay = document.createElement('div');
+  overlay.id = 'smsVerifyOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,31,20,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+
+  var card = document.createElement('div');
+  card.style.cssText = 'background:#F7F3EE;border-radius:20px;padding:36px;max-width:400px;width:90%;text-align:center';
+
+  var emoji = document.createElement('div');
+  emoji.style.cssText = 'font-size:36px;margin-bottom:12px';
+  emoji.textContent = '📱';
+
+  var title = document.createElement('div');
+  title.style.cssText = 'font-family:Georgia,serif;font-style:italic;font-size:22px;color:#2C1F14;margin-bottom:8px';
+  title.textContent = 'Code de vérification';
+
+  var desc = document.createElement('p');
+  desc.style.cssText = 'font-size:12px;font-weight:200;color:#8A7968;margin-bottom:20px;line-height:1.6';
+  desc.innerHTML = 'Un code à 6 chiffres a été envoyé au <strong>' + masked + '</strong>.';
+
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'smsOTPInput';
+  input.maxLength = 6;
+  input.placeholder = '000000';
+  input.style.cssText = 'width:100%;padding:14px;border:1px solid #E8E0D5;border-radius:8px;font-family:Georgia,serif;font-size:28px;text-align:center;letter-spacing:0.3em;outline:none;margin-bottom:12px;box-sizing:border-box';
+
+  var btn = document.createElement('button');
+  btn.style.cssText = 'width:100%;padding:12px;background:#2C1F14;color:#F7F3EE;border:none;border-radius:8px;font-family:inherit;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer';
+  btn.textContent = 'Vérifier →';
+  btn.onclick = function() { verifySMSOTP(userId); };
+
+  var errEl = document.createElement('div');
+  errEl.id = 'smsError';
+  errEl.style.cssText = 'color:#C4714A;font-size:11px;margin-top:10px;display:none';
+  errEl.textContent = 'Code incorrect ou expiré.';
+
+  var resend = document.createElement('div');
+  resend.style.cssText = 'margin-top:12px;font-size:10px;color:#C9BAA8;cursor:pointer';
+  resend.textContent = 'Renvoyer le code';
+  resend.onclick = function() { resendSMSOTP(userId); };
+
+  card.appendChild(emoji);
+  card.appendChild(title);
+  card.appendChild(desc);
+  card.appendChild(input);
+  card.appendChild(btn);
+  card.appendChild(errEl);
+  card.appendChild(resend);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+}
+
+async function verifySMSOTP(userId) {
+  var inputCode = document.getElementById('smsOTPInput') ? document.getElementById('smsOTPInput').value.trim() : '';
+  if (!inputCode) return;
+  var res = await sb.from('Profiles').select('sms_otp, sms_otp_expiry').eq('id', userId).single();
+  var profile = res.data;
+  if (!profile || !profile.sms_otp || profile.sms_otp !== inputCode) {
+    var err = document.getElementById('smsError');
+    if (err) err.style.display = 'block';
+    return;
+  }
+  if (new Date(profile.sms_otp_expiry) < new Date()) {
+    var err = document.getElementById('smsError');
+    if (err) { err.textContent = 'Code expiré. Demande-en un nouveau.'; err.style.display = 'block'; }
+    return;
+  }
+  await sb.from('Profiles').update({ sms_verified: true, sms_otp: null, sms_otp_expiry: null }).eq('id', userId);
+  localStorage.setItem('lm_sms_verified_' + userId, '1');
+  var overlay = document.getElementById('smsVerifyOverlay');
+  if (overlay) overlay.remove();
+}
+
+async function resendSMSOTP(userId) {
+  var res = await sb.from('Profiles').select('telephone').eq('id', userId).single();
+  if (res.data && res.data.telephone) await sendSMSOTP(userId, res.data.telephone);
+}
+
+async function checkSMSVerification(userId, isNewDevice) {
+  try {
+    var smsKey = 'lm_sms_verified_' + userId;
+    var alreadyVerified = localStorage.getItem(smsKey);
+    if (!alreadyVerified || isNewDevice) {
+      var res = await sb.from('Profiles').select('telephone, sms_verified').eq('id', userId).maybeSingle();
+      var profile = res.data;
+      if (!profile || !profile.telephone) {
+        showSMSSetup(userId);
+        return false;
+      }
+      if (!profile.sms_verified || isNewDevice) {
+        await sendSMSOTP(userId, profile.telephone);
+        showSMSVerifyModal(userId, profile.telephone);
+        return false;
+      }
+    }
+    return true;
+  } catch(e) {
+    console.warn('SMS check error:', e.message);
+    return true;
+  }
+}
+</script>
+<script data-cfasync="false">
+// ── REVIEW NUDGE ──
+async function checkReviewNudge(userId) {
+  try {
+    var key = 'lm_review_asked_' + userId;
+    if (localStorage.getItem(key)) return;
+
+    // Check account age
+    var res = await sb.from('Users').select('created_at').ilike('Email', currentUser.email).maybeSingle();
+    if (!res.data) return;
+
+    var created = new Date(res.data.created_at);
+    var daysSince = Math.floor((Date.now() - created.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Only after 7 days
+    if (daysSince < 7) return;
+
+    // Show nudge
+    localStorage.setItem(key, '1');
+    setTimeout(function() { showReviewNudge(); }, 3000);
+  } catch(e) {}
+}
+
+function showReviewNudge() {
+  var nudge = document.createElement('div');
+  nudge.id = 'reviewNudge';
+  nudge.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2C1F14;border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:16px;z-index:999;box-shadow:0 8px 32px rgba(44,31,20,0.3);max-width:480px;width:90%;animation:slideUp 0.3s ease';
+  nudge.innerHTML =
+    '<div style="font-size:28px">✦</div>' +
+    '<div style="flex:1">' +
+      '<div style="font-family:Georgia,serif;font-style:italic;font-size:15px;color:#F7F3EE;margin-bottom:3px">Tu aimes Le Move ?</div>' +
+      '<div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.5);line-height:1.5">Un avis Google nous aide énormément à nous faire connaître.</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">' +
+      '<a href="https://share.google/52uWaVrRHmxti7jSp" target="_blank" style="padding:8px 16px;background:#C4714A;color:white;border-radius:8px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;text-align:center;white-space:nowrap;display:block">Laisser un avis →</a>' +
+      '<div onclick="var n=document.getElementById(\'reviewNudge\');if(n)n.remove();" style="font-size:10px;color:rgba(247,243,238,0.3);text-align:center;cursor:pointer">Plus tard</div>' +
+    '</div>';
+  document.body.appendChild(nudge);
+  setTimeout(function() {
+    var el = document.getElementById('reviewNudge');
+    if (el) el.style.opacity = '0', el.style.transition = 'opacity 0.5s', setTimeout(function(){if(el)el.remove();}, 500);
+  }, 12000);
+}
+</script>
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2C1F14;z-index:9998;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="flex:1;min-width:200px">
+    <div style="font-size:12px;font-weight:300;color:#F7F3EE;margin-bottom:3px">Nous utilisons des cookies analytics pour améliorer Le Move.</div>
+    <div style="font-size:10px;font-weight:200;color:rgba(247,243,238,0.4)">Aucune donnée vendue à des tiers. <a href="cookies.html" style="color:#C4714A;text-decoration:none">En savoir plus</a></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0">
+    <button onclick="refuseCookies()" style="padding:8px 18px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(247,243,238,0.5);font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer">Refuser</button>
+    <button onclick="acceptCookies()" style="padding:8px 18px;background:#C4714A;border:none;border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer">Accepter</button>
+  </div>
+</div>
+<script>
+(function(){
+  var consent = localStorage.getItem('lm_cookie_consent');
+  if (!consent) {
+    document.getElementById('cookieBanner').style.display = 'flex';
+  } else if (consent === 'accepted') {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({'event': 'cookie_consent_accepted'});
+  }
+})();
+function acceptCookies() {
+  localStorage.setItem('lm_cookie_consent', 'accepted');
+  document.getElementById('cookieBanner').style.display = 'none';
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({'event': 'cookie_consent_accepted'});
+}
+function refuseCookies() {
+  localStorage.setItem('lm_cookie_consent', 'refused');
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+</script>
+</body>
+</html>
