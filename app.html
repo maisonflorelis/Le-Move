@@ -1109,7 +1109,7 @@ async function saveOnboarding() {
   const date = document.getElementById('onbDate').value;
   const type = document.getElementById('onbType').value;
   let photoUrl = currentProfile.photo_url || null;
-  if (pendingPhotoFile && pendingPhotoTarget === 'onb') photoUrl = await uploadPhoto(pendingPhotoFile);
+  if (pendingPhotoFile && pendingPhotoTarget === 'onb') photoUrl = (await uploadPhoto(pendingPhotoFile)) || photoUrl;
 
   await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
   currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
@@ -1142,7 +1142,7 @@ async function saveProfile() {
   const date = document.getElementById('profileDate').value;
   const type = document.getElementById('profileType').value;
   let photoUrl = currentProfile.photo_url || null;
-  if (pendingPhotoFile && pendingPhotoTarget === 'profile') photoUrl = await uploadPhoto(pendingPhotoFile);
+  if (pendingPhotoFile && pendingPhotoTarget === 'profile') photoUrl = (await uploadPhoto(pendingPhotoFile)) || photoUrl;
 
   await sb.from('Profiles').upsert({ id: currentUser.id, prenom: prenom || null, date_emmenagement: date || null, type_logement: type || null, photo_url: photoUrl, updated_at: new Date().toISOString() });
   currentProfile = { ...currentProfile, prenom, date_emmenagement: date, type_logement: type, photo_url: photoUrl };
@@ -1177,9 +1177,9 @@ function previewPhoto(input, target) {
 
 async function uploadPhoto(file) {
   const ext = file.name.split('.').pop();
-  const path = `avatars/${currentUser.id}.${ext}`;
+  const path = `${currentUser.id}/avatar.${ext}`;
   const { error } = await sb.storage.from('profiles').upload(path, file, { upsert: true });
-  if (error) { console.error('Upload error:', error); return null; }
+  if (error) { console.error('Upload error:', error); alert("La photo n'a pas pu être enregistrée. Réessaie."); return null; }
   const { data } = sb.storage.from('profiles').getPublicUrl(path);
   return data.publicUrl + '?t=' + Date.now();
 }
