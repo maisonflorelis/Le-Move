@@ -570,8 +570,29 @@ async function logout() {
 
 // ── LOAD ──
 async function loadContacts() {
-  const { data } = await sb.from('contacts').select('*').eq('actif', true).order('ordre').order('created_at');
-  allContacts = data || [];
+  const [{ data }, { data: partenairesData }] = await Promise.all([
+    sb.from('contacts').select('*').eq('actif', true).order('ordre').order('created_at'),
+    sb.from('partenaires').select('*').eq('statut', 'actif')
+  ]);
+
+  // Les partenaires validés (candidature acceptée + payante) alimentent
+  // automatiquement l'annuaire client — pas besoin de les ressaisir à la main.
+  const fromPartenaires = (partenairesData || []).map(p => ({
+    id: 'partenaire_' + p.id,
+    type: 'partner',
+    nom: p.entreprise || 'Partenaire Le Move',
+    categorie: p.activite || '',
+    ville: p.zone || '',
+    telephone: p.telephone || '',
+    email: p.email || '',
+    site_web: p.site || '',
+    description: p.description || '',
+    actif: true,
+    isRealPartner: true,
+    partenaireId: p.id,
+  }));
+
+  allContacts = [...fromPartenaires, ...(data || [])];
   renderContacts(allContacts);
 }
 
@@ -589,10 +610,10 @@ function renderContacts(contacts) {
   } else {
     pg.innerHTML = partners.map(p => `
       <div class="partner-card">
-        <div class="partner-admin-btns ${isAdmin ? 'visible' : ''}">
+        ${!p.isRealPartner ? `<div class="partner-admin-btns ${isAdmin ? 'visible' : ''}">
           <button class="admin-btn-sm admin-edit" onclick="editContact(event, '${p.id}')">✏️</button>
           <button class="admin-btn-sm admin-delete" onclick="deleteContact(event, '${p.id}')">🗑</button>
-        </div>
+        </div>` : ''}
         <div class="partner-badge">Partenaire Le Move</div>
         <div class="partner-name">${p.nom}</div>
         <div class="partner-cat">${p.categorie}${p.ville ? ' · ' + p.ville : ''}</div>
