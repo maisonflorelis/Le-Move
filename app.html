@@ -69,7 +69,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .nav-sep{width:1px;height:18px;background:rgba(255,255,255,0.1)}
 .nav-plan-badge{font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:var(--terra);padding:4px 12px;border:1px solid rgba(196,113,74,0.3);border-radius:20px}
 .nav-right{display:flex;align-items:center;gap:14px}
-.nav-avatar{width:30px;height:30px;border-radius:50%;background:rgba(196,113,74,0.2);border:1px solid rgba(196,113,74,0.3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--terra);cursor:pointer;font-weight:300}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:rgba(196,113,74,0.2);border:1px solid rgba(196,113,74,0.3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--terra);cursor:pointer;font-weight:300;overflow:hidden;flex-shrink:0}
+.nav-avatar img{width:100%;height:100%;object-fit:cover}
 .nav-logout{background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(247,242,236,0.4);padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
 .nav-logout:hover{border-color:rgba(255,255,255,0.25);color:var(--linen)}
 
@@ -238,6 +239,50 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .profile-saved-msg{display:none;text-align:center;font-size:11px;color:var(--sage);margin-top:10px}
 .profile-logout{width:100%;padding:12px;background:none;border:1px solid var(--warm);color:var(--text-light);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:all 0.2s}
 .profile-logout:hover{border-color:var(--terra);color:var(--terra)}
+
+/* ── OVERLAY (Tutorial & Onboarding) ── */
+.overlay{position:fixed;inset:0;background:rgba(26,20,16,0.65);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.overlay-card{background:var(--cream);border-radius:20px;padding:36px 32px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;text-align:center;animation:popIn 0.25s ease}
+
+/* ── TUTORIAL ── */
+.tut-dots{display:flex;justify-content:center;gap:6px;margin-bottom:20px}
+.tut-dot{width:6px;height:6px;border-radius:50%;background:var(--warm);transition:all 0.2s}
+.tut-dot.active{background:var(--terra);width:18px;border-radius:4px}
+.tut-dot.done{background:var(--sand)}
+.tut-icon{font-size:40px;margin-bottom:16px}
+.tut-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;font-weight:300;color:var(--espresso);margin-bottom:12px;line-height:1.25}
+.tut-text{font-size:13px;font-weight:300;color:var(--text-light);line-height:1.7;margin-bottom:28px}
+.tut-actions{display:flex;flex-direction:column-reverse;gap:10px}
+.tut-next{width:100%;padding:13px;background:var(--espresso);color:var(--linen);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.tut-next:hover{opacity:0.85}
+.tut-skip{background:none;border:none;color:var(--text-light);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;padding:4px}
+.tut-skip:hover{color:var(--terra)}
+
+/* ── ONBOARDING ── */
+.onb-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;font-weight:300;color:var(--espresso);margin-bottom:8px}
+.onb-sub{font-size:12px;font-weight:300;color:var(--text-light);line-height:1.6;margin-bottom:24px}
+.onb-plan-badge{display:inline-block;background:var(--terra);color:var(--linen);font-size:10px;letter-spacing:0.08em;padding:2px 10px;border-radius:20px;font-weight:400}
+.onb-field{text-align:left;margin-bottom:16px}
+.onb-label{display:block;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);margin-bottom:8px}
+.onb-photo-area{display:flex;align-items:center;gap:16px}
+.onb-photo-preview{width:56px;height:56px;border-radius:50%;background:var(--linen);border:1px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0}
+.onb-photo-preview img{width:100%;height:100%;object-fit:cover}
+.onb-photo-btn{padding:9px 16px;background:var(--linen);border:1px solid var(--warm);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--espresso);cursor:pointer;transition:border-color 0.2s}
+.onb-photo-btn:hover{border-color:var(--terra)}
+.onb-input,.onb-select{width:100%;padding:11px 14px;background:var(--linen);border:1px solid var(--warm);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--espresso);outline:none;transition:border-color 0.2s}
+.onb-input:focus,.onb-select:focus{border-color:var(--terra)}
+.onb-submit{width:100%;padding:13px;background:var(--espresso);color:var(--linen);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;margin-top:6px;transition:opacity 0.2s}
+.onb-submit:hover{opacity:0.85}
+.onb-skip{display:block;width:100%;background:none;border:none;color:var(--text-light);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;padding:12px;margin-top:4px}
+.onb-skip:hover{color:var(--terra)}
+.onb-plan-feats{display:flex;flex-direction:column;gap:6px}
+.onb-plan-feat{font-size:12px;font-weight:300;color:var(--espresso);padding:9px 12px;background:var(--linen);border-radius:8px}
+.onb-plan-feat::before{content:'✓ ';color:var(--sage)}
+.onb-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.onb-suggestion{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:var(--linen);border:1px solid var(--warm);border-radius:10px;text-decoration:none;transition:border-color 0.2s}
+.onb-suggestion:hover{border-color:var(--terra)}
+.onb-suggestion-icon{font-size:18px}
+.onb-suggestion-text{font-size:10px;font-weight:400;color:var(--espresso);text-align:center}
 
 /* ── PRICING ── */
 .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -410,11 +455,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="progressPips" style="display:none"></div>
   <div id="quickModules" style="display:none"></div>
   <div id="reviewNudge" style="display:none"></div>
-  <div id="onbStep1" style="display:none"></div>
-  <div id="onbStep2" style="display:none"></div>
-  <div id="onbPlanBadge" style="display:none"></div>
-  <div id="onbPlanFeatures" style="display:none"></div>
-  <div id="onbSuggestions" style="display:none"></div>
   <div id="smsVerifyOverlay" style="display:none"><div id="smsPhoneInput"></div><div id="smsOTPInput"></div><div id="smsError"></div></div>
   <!-- MOBILE NAV -->
   <div class="mobile-nav" id="mobileNav">
@@ -458,47 +498,67 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ONBOARDING -->
 <div class="overlay" id="onboardingOverlay" style="display:none;">
   <div class="overlay-card">
-    <div style="font-size:32px;margin-bottom:12px;">✨</div>
-    <div class="onb-title">Personnalise ton espace.</div>
-    <div class="onb-sub">Quelques infos pour que Le Move soit vraiment toi — ça prend 30 secondes.</div>
+    <div id="onbStep1">
+      <div style="font-size:32px;margin-bottom:12px;">✨</div>
+      <div class="onb-title">Personnalise ton espace.</div>
+      <div class="onb-sub">Quelques infos pour que Le Move soit vraiment toi — ça prend 30 secondes.</div>
 
-    <div class="onb-field">
-      <label class="onb-label">Ta photo de profil</label>
-      <div class="onb-photo-area">
-        <div class="onb-photo-preview" id="onbPhotoPreview">😊</div>
-        <div>
-          <button class="onb-photo-btn" onclick="document.getElementById('onbPhotoInput').click()">Choisir une photo</button>
-          <input type="file" id="onbPhotoInput" accept="image/*" style="display:none" onchange="previewPhoto(this,'onb')">
-          <div style="font-size:10px;color:var(--text-light);margin-top:6px;">JPG ou PNG · Max 2 Mo</div>
+      <div class="onb-field">
+        <label class="onb-label">Ta photo de profil</label>
+        <div class="onb-photo-area">
+          <div class="onb-photo-preview" id="onbPhotoPreview">😊</div>
+          <div>
+            <button class="onb-photo-btn" onclick="document.getElementById('onbPhotoInput').click()">Choisir une photo</button>
+            <input type="file" id="onbPhotoInput" accept="image/*" style="display:none" onchange="previewPhoto(this,'onb')">
+            <div style="font-size:10px;color:var(--text-light);margin-top:6px;">JPG ou PNG · Max 2 Mo</div>
+          </div>
         </div>
       </div>
+
+      <div class="onb-field">
+        <label class="onb-label">Ton prénom</label>
+        <input type="text" class="onb-input" id="onbPrenom" placeholder="Ex : Sophie">
+      </div>
+
+      <div class="onb-field">
+        <label class="onb-label">Date d'emménagement prévue</label>
+        <input type="date" class="onb-input" id="onbDate">
+      </div>
+
+      <div class="onb-field">
+        <label class="onb-label">Type de logement</label>
+        <select class="onb-select" id="onbType">
+          <option value="">— Choisir —</option>
+          <option value="Studio">Studio</option>
+          <option value="T1">T1 / 1 pièce</option>
+          <option value="T2">T2 / 2 pièces</option>
+          <option value="T3">T3 / 3 pièces</option>
+          <option value="T4+">T4 et plus</option>
+          <option value="Maison">Maison</option>
+        </select>
+      </div>
+
+      <button class="onb-submit" onclick="saveOnboarding()">Enregistrer mon profil →</button>
+      <button class="onb-skip" onclick="closeOnboarding()">Passer pour l'instant</button>
     </div>
 
-    <div class="onb-field">
-      <label class="onb-label">Ton prénom</label>
-      <input type="text" class="onb-input" id="onbPrenom" placeholder="Ex : Sophie">
-    </div>
+    <div id="onbStep2" style="display:none">
+      <div style="font-size:32px;margin-bottom:12px;">🎉</div>
+      <div class="onb-title">Tout est prêt !</div>
+      <div class="onb-sub">Voici ce que ton plan <span class="onb-plan-badge" id="onbPlanBadge">Essentiel</span> te donne, et par où commencer.</div>
 
-    <div class="onb-field">
-      <label class="onb-label">Date d'emménagement prévue</label>
-      <input type="date" class="onb-input" id="onbDate">
-    </div>
+      <div class="onb-field">
+        <label class="onb-label">Inclus dans ton plan</label>
+        <div class="onb-plan-feats" id="onbPlanFeatures"></div>
+      </div>
 
-    <div class="onb-field">
-      <label class="onb-label">Type de logement</label>
-      <select class="onb-select" id="onbType">
-        <option value="">— Choisir —</option>
-        <option value="Studio">Studio</option>
-        <option value="T1">T1 / 1 pièce</option>
-        <option value="T2">T2 / 2 pièces</option>
-        <option value="T3">T3 / 3 pièces</option>
-        <option value="T4+">T4 et plus</option>
-        <option value="Maison">Maison</option>
-      </select>
-    </div>
+      <div class="onb-field">
+        <label class="onb-label">Pour bien démarrer</label>
+        <div class="onb-suggestions" id="onbSuggestions"></div>
+      </div>
 
-    <button class="onb-submit" onclick="saveOnboarding()">Enregistrer mon profil →</button>
-    <button class="onb-skip" onclick="closeOnboarding()">Passer pour l'instant</button>
+      <button class="onb-submit" onclick="closeOnboarding()">Accéder à mon espace →</button>
+    </div>
   </div>
 </div>
 
@@ -585,6 +645,8 @@ const ALL_MODULES = [
 const TUTORIAL_STEPS = [
   { icon: '🎉', title: 'Bienvenue dans Le Move !', text: "Ton espace digital pour organiser ton emménagement de A à Z — de la recherche du logement jusqu'à ta crémaillère. 17 modules centralisés en un seul endroit." },
   { icon: '🏠', title: 'Commence par Mon Logement.', text: "Avant même de signer, Le Move t'aide à analyser ton futur logement : score sur 100, DPE, transports, prix du marché, vices cachés par IA, et dossier locataire complet. Exclusif Premium." },
+  { icon: '💰', title: 'Mon Budget, sous contrôle.', text: "Définis ton enveloppe globale, suis tes dépenses par catégorie et visualise en un coup d'œil ce qu'il te reste. Chaque achat enregistré vient s'y ranger automatiquement." },
+  { icon: '🚚', title: 'Mon Déménagement, phase par phase.', text: "Une checklist organisée par phase, ton compte à rebours jusqu'au Jour J, et tous tes contacts (déménageurs, artisans...) centralisés au même endroit." },
   { icon: '📦', title: '17 modules t\'attendent.', text: "5 grandes familles : Recherche (Mon Logement), Emménagement (budget, déménagement, achats, aides), Déco & Style (moodboard, IA), Pratique (carnet, contacts, avancement) et Social & Pro (crémaillère, annuaire, collab)." },
   { icon: '💶', title: 'Tes aides financières.', text: "Le module Guide des Aides te présente toutes les aides auxquelles tu as peut-être droit — APL, Visale, Mobili-Pass, Loca-Pass. À consulter en priorité !" },
   { icon: '✨', title: 'Moodboard IA (Premium)', text: "Réponds à quelques questions sur ton style et l'IA génère ta palette de couleurs, tes boutiques recommandées et tes achats prioritaires sur-mesure." },
@@ -1052,7 +1114,7 @@ async function saveOnboarding() {
   refreshAvatarUI(displayName, photoUrl);
   refreshWelcomeMeta();
   pendingPhotoFile = null;
-  closeOnboarding();
+  goToOnbStep2();
 }
 
 function closeOnboarding() {
