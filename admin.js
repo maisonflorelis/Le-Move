@@ -2,10 +2,21 @@
 const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = atob('c2hlcnlsLm1lcmNpZXJAZ21haWwuY29t');
-const RESEND_KEY = atob('cmVfQWtYNU5jUEVfQmhmaTRnWlh2R0gza2p3WHhhdEJkYUZHbg==');
 const STRIPE_LINK = 'https://buy.stripe.com/9B63cv9HickT8pLeF56EU06';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Relais l'envoi d'email vers la fonction Edge "notify-email" : la clé Resend
+// reste côté serveur (secret Supabase), jamais exposée dans ce fichier.
+async function sendViaEdge(to, subject, html) {
+  const { data: { session } } = await sb.auth.getSession();
+  const res = await fetch(SUPABASE_URL + '/functions/v1/notify-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify({ to, subject, html }),
+  });
+  if (!res.ok) throw new Error('Envoi email échoué (' + res.status + ')');
+}
 
 let allUsers = [], allCandidatures = [], allPartenaires = [];
 let editingUser = null;
@@ -145,7 +156,7 @@ async function sendEmail() {
   const subject=document.getElementById('emailSubject').value.trim();
   const body=document.getElementById('emailBody').value.trim();
   if(!subject||!body){alert('Remplis le sujet et le message.');return;}
-  await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_KEY},body:JSON.stringify({from:'Le Move <'+['bonjour','lemove.fr'].join('@')+'>',to,subject,html:'<div style="font-family:Arial,sans-serif;padding:32px">'+body.replace(/\n/g,'<br>')+'</div>'})});
+  await sendViaEdge(to, subject, '<div style="font-family:Arial,sans-serif;padding:32px">'+body.replace(/\n/g,'<br>')+'</div>');
   closeModal('emailModal'); showToast('Email envoyé !');
 }
 function renderCandidatures() {
@@ -170,16 +181,14 @@ async function viewDoc(path) {
 async function validerCandidature(id,email,prenom,nom) {
   if(!confirm('Valider '+prenom+' '+nom+' ?')) return;
   await sb.from('candidatures_partenaires').update({statut:'valide',stripe_link_sent:true}).eq('id',id);
-  const fromEmail='Le Move <'+['bonjour','lemove.fr'].join('@')+'>';
-  await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_KEY},body:JSON.stringify({from:fromEmail,to:email,subject:'✦ Votre candidature Partenaire Le Move est validée !',html:`<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto"><div style="background:#2C1F14;padding:32px;text-align:center;border-radius:16px 16px 0 0"><div style="font-family:Georgia,serif;font-style:italic;font-size:24px;color:#F7F3EE">Le Move</div></div><div style="background:white;padding:40px;border-radius:0 0 16px 16px"><h2 style="font-family:Georgia,serif;font-style:italic;font-weight:300;color:#2C1F14">Félicitations ${prenom} ! ✦</h2><p style="color:#6B5C4E;line-height:1.8">Votre candidature a été <strong>validée</strong>.</p><div style="background:#F7F3EE;border-radius:12px;padding:20px;margin:20px 0;text-align:center"><div style="font-family:Georgia,serif;font-size:40px;color:#2C1F14">39€<span style="font-size:16px">/mois</span></div><div style="font-size:11px;color:#9C8B7E">Tarif Fondateurs · Sans engagement</div></div><div style="text-align:center"><a href="${STRIPE_LINK}" style="background:#C4714A;color:white;padding:14px 32px;border-radius:8px;text-decoration:none;font-size:12px;text-transform:uppercase;display:inline-block">Activer mon accès →</a></div></div></div>`})});
+  await sendViaEdge(email, '✦ Votre candidature Partenaire Le Move est validée !', `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto"><div style="background:#2C1F14;padding:32px;text-align:center;border-radius:16px 16px 0 0"><div style="font-family:Georgia,serif;font-style:italic;font-size:24px;color:#F7F3EE">Le Move</div></div><div style="background:white;padding:40px;border-radius:0 0 16px 16px"><h2 style="font-family:Georgia,serif;font-style:italic;font-weight:300;color:#2C1F14">Félicitations ${prenom} ! ✦</h2><p style="color:#6B5C4E;line-height:1.8">Votre candidature a été <strong>validée</strong>.</p><div style="background:#F7F3EE;border-radius:12px;padding:20px;margin:20px 0;text-align:center"><div style="font-family:Georgia,serif;font-size:40px;color:#2C1F14">39€<span style="font-size:16px">/mois</span></div><div style="font-size:11px;color:#9C8B7E">Tarif Fondateurs · Sans engagement</div></div><div style="text-align:center"><a href="${STRIPE_LINK}" style="background:#C4714A;color:white;padding:14px 32px;border-radius:8px;text-decoration:none;font-size:12px;text-transform:uppercase;display:inline-block">Activer mon accès →</a></div></div></div>`);
   const c=allCandidatures.find(c=>c.id===id); if(c) c.statut='valide';
   renderDashboard(); renderCandidatures(); showToast('✓ Validé — email envoyé !');
 }
 async function refuserCandidature(id,email,prenom) {
   const raison=prompt('Motif de refus (optionnel) :'); if(raison===null) return;
   await sb.from('candidatures_partenaires').update({statut:'refuse'}).eq('id',id);
-  const fromEmail='Le Move <'+['bonjour','lemove.fr'].join('@')+'>';
-  await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_KEY},body:JSON.stringify({from:fromEmail,to:email,subject:'Votre candidature Partenaire Le Move',html:`<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px"><p>Bonjour ${prenom},</p><p>Nous ne pouvons pas accepter votre candidature à ce stade.${raison?'<br><br>Motif : '+raison:''}</p><p style="color:#9C8B7E;font-size:12px">L'équipe Le Move</p></div>`})});
+  await sendViaEdge(email, 'Votre candidature Partenaire Le Move', `<div style="font-family:Arial,sans-serif;padding:32px;max-width:560px"><p>Bonjour ${prenom},</p><p>Nous ne pouvons pas accepter votre candidature à ce stade.${raison?'<br><br>Motif : '+raison:''}</p><p style="color:#9C8B7E;font-size:12px">L'équipe Le Move</p></div>`);
   const c=allCandidatures.find(c=>c.id===id); if(c) c.statut='refuse';
   renderDashboard(); renderCandidatures(); showToast('✕ Refusé.');
 }

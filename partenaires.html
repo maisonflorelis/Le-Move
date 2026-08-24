@@ -483,36 +483,10 @@ async function submitForm() {
 
     if (error) throw error;
 
-    // Send notification email to admin
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn' },
-      body: JSON.stringify({
-        from: 'Le Move Partenaires <bonjour@lemove.fr>',
-        to: 'sheryl.mercier@gmail.com',
-        subject: `🆕 Nouvelle candidature partenaire — ${prenom} ${nom} (${activite})`,
-        html: `<h2 style="font-family:Georgia,serif">Nouvelle candidature partenaire</h2>
-          <p><strong>Nom :</strong> ${prenom} ${nom}</p>
-          <p><strong>Email :</strong> ${email}</p>
-          <p><strong>Téléphone :</strong> ${tel}</p>
-          <p><strong>Entreprise :</strong> ${entreprise}</p>
-          <p><strong>SIRET :</strong> ${siret}</p>
-          <p><strong>Activité :</strong> ${activite}</p>
-          <p><strong>Zone :</strong> ${zone}</p>
-          <p><strong>Message :</strong><br>${message}</p>
-          <hr>
-          <p><strong>Documents uploadés :</strong></p>
-          <p>📄 Kbis : ${uploadedUrls.kbis ? 'Oui' : 'Non'}</p>
-          <p>🛡️ RC Pro : ${uploadedUrls.rcpro ? 'Oui' : 'Non'}</p>
-          <p>🎓 Diplômes : ${uploadedUrls.diplomes ? 'Oui' : 'Non'}</p>
-          <hr>
-          <p style="margin-top:20px">
-            <a href="https://lemove.fr/admin-partenaires.html" style="background:#2C1F14;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-family:sans-serif;font-size:12px">
-              Gérer les candidatures →
-            </a>
-          </p>`
-      })
-    });
+    // Un trigger côté base de données (on_candidature_partenaire_created) envoie déjà
+    // automatiquement l'email de notification admin + la confirmation au candidat
+    // via la fonction Edge "notify-candidature" — pas besoin d'appeler Resend ici,
+    // et surtout pas avec une clé API exposée côté client.
 
     document.getElementById('formContent').style.display = 'none';
     document.getElementById('formSuccess').style.display = 'block';

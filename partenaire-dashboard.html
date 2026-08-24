@@ -459,8 +459,19 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <script>
 var SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 var SUPABASE_ANON = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
-var RESEND_KEY = atob('cmVfQWtYNU5jUEVfQmhmaTRnWlh2R0gza2p3WHhhdEJkYUZHbg==');
 var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Relais l'envoi d'email vers la fonction Edge "notify-email" : la clé Resend
+// reste côté serveur (secret Supabase), jamais exposée dans cette page.
+async function sendViaEdge(to, subject, html) {
+  var sess = await sb.auth.getSession();
+  var res = await fetch(SUPABASE_URL + '/functions/v1/notify-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sess.data.session.access_token },
+    body: JSON.stringify({ to: to, subject: subject, html: html }),
+  });
+  if (!res.ok) throw new Error('Envoi email échoué (' + res.status + ')');
+}
 
 var currentUser = null;
 var partenaire = null;
@@ -629,16 +640,11 @@ async function sendReply(msgId, idx, toEmail) {
   if (!text) { alert('Écris ta réponse d\'abord.'); return; }
 
   if (toEmail) {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
-      body: JSON.stringify({
-        from: 'Le Move Partenaire <bonjour@lemove.fr>',
-        to: [toEmail],
-        subject: 'Réponse de ' + (partenaire.entreprise || 'votre partenaire Le Move'),
-        html: '<div style="font-family:Arial,sans-serif;max-width:560px;padding:32px"><p>' + text.replace(/\n/g, '<br>') + '</p><br><hr><p style="font-size:11px;color:#9C8B7E">' + (partenaire.entreprise || '') + ' via Le Move · lemove.fr</p></div>'
-      })
-    });
+    await sendViaEdge(
+      toEmail,
+      'Réponse de ' + (partenaire.entreprise || 'votre partenaire Le Move'),
+      '<div style="font-family:Arial,sans-serif;max-width:560px;padding:32px"><p>' + text.replace(/\n/g, '<br>') + '</p><br><hr><p style="font-size:11px;color:#9C8B7E">' + (partenaire.entreprise || '') + ' via Le Move · lemove.fr</p></div>'
+    );
   }
 
   await sb.from('partenaires_messages').update({ repondu: true, reponse: text }).eq('id', msgId);

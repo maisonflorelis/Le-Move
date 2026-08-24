@@ -1286,7 +1286,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <input type="tel" class="partner-input" id="pTel" placeholder="Téléphone">
       </div>
       <textarea class="partner-textarea" id="pMessage" placeholder="Décrivez votre activité et ce que vous proposeriez à nos utilisateurs..."></textarea>
-      <button class="partner-submit" onclick="submitPartner()">Envoyer ma demande →</button>
+      <button class="partner-submit" id="partnerSubmitBtn" onclick="submitPartner()">Envoyer ma demande →</button>
     </div>
     </div>
     <div class="partner-success" id="partnerSuccess">
@@ -1470,7 +1470,12 @@ function showPreview(index) {
 }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const sbPartner = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 async function submitPartner() {
   const nom = document.getElementById('pNom').value.trim();
   const email = document.getElementById('pEmail').value.trim();
@@ -1486,16 +1491,33 @@ async function submitPartner() {
   const tel = document.getElementById('pTel').value;
   const message = document.getElementById('pMessage').value;
 
+  const btn = document.getElementById('partnerSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours...';
+
   try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer re_AkX5NcPE_Bhfi4gZXvGH3kjwXatBdaFGn'
-      },
-      body: JSON.stringify({
-        from: 'Le Move <bonjour@lemove.fr>',
-        to: ['bonjour@lemove.fr'],
-        reply_to: email,
-        subject: `[Partenaire] ${nom} — ${entreprise} (${categorie})`,
-        html: `<div style="font-family:Arial;padding:20px;"><h2>Nouvelle demande partenaire</h2><p><b>Nom :</b> ${nom}</p><p><b>Entreprise :</b> ${entreprise}</p><p><b>Email :</b> <a href="mailto:${email}">${email}</a></p><p><b>Téléphone :</b> ${tel || '—'}</p><p><b>Ville :</b> ${ville ||
+    // Insère dans la même table que le formulaire de candidature complet
+    // (partenaires.html) : un trigger côté base de données envoie déjà
+    // automatiquement un email à l'admin + une confirmation au candidat
+    // (fonction Edge "notify-candidature"), sans exposer aucune clé API ici.
+    const { error } = await sbPartner.from('candidatures_partenaires').insert({
+      prenom: nom, nom: '', entreprise, email, telephone: tel,
+      activite: categorie, zone: ville, message, formule: 'Demande rapide (accueil)'
+    });
+
+    if (error) throw error;
+
+    document.getElementById('partnerFormWrap').style.display = 'none';
+    document.getElementById('partnerSuccess').style.display = 'block';
+  } catch (e) {
+    console.error('Erreur envoi demande partenaire:', e);
+    alert('Une erreur est survenue lors de l\'envoi. Merci de réessayer ou de nous écrire directement à bonjour@lemove.fr');
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma demande →';
+  }
+}
+</script>
+
+</body>
+</html>
+
