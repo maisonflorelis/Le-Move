@@ -558,7 +558,8 @@ window._sb=sb;
   if (!session) { window.location.href = 'app.html'; return; }
   // Admin bypass
   if (session.user.email === 'sheryl.mercier@gmail.com') { return; }
-  var { data: u } = await sb.from('Users').select('Plan').eq('id', session.user.id).single();
+  var { data: u } = await sb.from('Profiles').select('Plan').eq('id', session.user.id).single();
+  if (!u?.Plan) { var { data: u2 } = await sb.from('Users').select('Plan').ilike('Email', session.user.email).single(); u = u2; }
   var plan = (u && u.Plan ? u.Plan : 'essentiel').toLowerCase();
   var allowed = ["complet", "premium"];
   if (!allowed.includes(plan)) {
@@ -610,9 +611,9 @@ let currentUser=null,taches=[];
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
   currentUser=session.user;
-  const{data:p}=await sb.from('Profiles').select('prenom,date_emmenagement,photo_url').eq('id',session.user.id).single();
+  const{data:p}=await sb.from('Profiles').select('prenom,date_emmenagement,photo_url,Plan').eq('id',session.user.id).single();
   var __sn=p?.prenom||session.user.email.split('@')[0];document.getElementById('sidebarUser').textContent=__sn;var __sav=document.getElementById('sidebarAvatar');if(__sav){if(p?.photo_url){__sav.innerHTML='<img src="'+p.photo_url+'" alt="">';}else{__sav.textContent=(__sn[0]||'?').toUpperCase();}}sidebarFillProgress();
-  if(typeof setNavPlan==='function') setNavPlan((userData?.Plan||p?.Plan||'essentiel').toLowerCase());
+  if(typeof setNavPlan==='function') setNavPlan((p?.Plan||'essentiel').toLowerCase());
   if(p?.date_emmenagement){
     const diff=Math.ceil((new Date(p.date_emmenagement)-new Date())/(1000*60*60*24));
     document.getElementById('jourJ').textContent=Math.abs(diff);
@@ -990,7 +991,8 @@ window.addEventListener('load', () => {
       var session = await window._sb?.auth.getSession();
       if (!session?.data?.session) return cached;
       var uid = session.data.session.user.id;
-      var res = await window._sb.from('Users').select('Plan').eq('id', uid).single();
+      var res = await window._sb.from('Profiles').select('Plan').eq('id', uid).single();
+      if (!res.data?.Plan) res = await window._sb.from('Users').select('Plan').ilike('Email', session.data.session.user.email).single();
       if (res.data?.Plan) {
         var plan = res.data.Plan.toLowerCase();
         localStorage.setItem('lm_plan', JSON.stringify(plan));
