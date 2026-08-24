@@ -93,6 +93,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .countdown-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:80px;font-weight:300;color:var(--linen);line-height:1}
 .countdown-lbl{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(201,186,168,0.3);margin-top:6px}
 .countdown-date{font-size:12px;font-weight:200;color:var(--terra);margin-top:4px}
+.welcome-meta{font-size:10px;font-weight:200;color:rgba(201,186,168,0.5);margin-top:8px}
 
 /* ── PROGRESS STRIP ── */
 .welcome-progress-block{background:var(--espresso);border-top:1px solid rgba(255,255,255,0.05);padding:14px 32px}
@@ -101,6 +102,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .progress-track{flex:1;height:1px;background:rgba(255,255,255,0.08);position:relative;border-radius:1px;overflow:hidden}
 .progress-fill-bar{position:absolute;top:0;left:0;height:100%;background:var(--terra);border-radius:1px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
 .progress-pct-label{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;color:var(--linen);flex-shrink:0;line-height:1}
+.progress-pips{display:flex;gap:3px;margin-top:12px}
 
 /* ── QUICK MODULES (4 cards strip) ── */
 .quick-modules-strip{background:var(--espresso);border-top:1px solid rgba(255,255,255,0.04);padding:14px 32px 20px}
@@ -424,6 +426,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="countdown-num" id="countdownNum">—</div>
         <div class="countdown-lbl">Jours avant le Jour J</div>
         <div class="countdown-date" id="countdownDate"></div>
+        <div class="welcome-meta" id="welcomeMeta"></div>
       </div>
     </div>
   </div>
@@ -435,6 +438,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="progress-pct-label" id="progressPct">0%</div>
     </div>
+    <div class="progress-pips" id="progressPips"></div>
+  </div>
+
+  <div class="quick-modules-strip">
+    <div class="quick-modules-grid" id="quickModules"></div>
   </div>
 
   <div class="app-content">
@@ -451,9 +459,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   <!-- ELEMENTS REQUIS PAR LE JS -->
-  <div id="welcomeMeta" style="display:none"></div>
-  <div id="progressPips" style="display:none"></div>
-  <div id="quickModules" style="display:none"></div>
   <div id="reviewNudge" style="display:none"></div>
   <div id="smsVerifyOverlay" style="display:none"><div id="smsPhoneInput"></div><div id="smsOTPInput"></div><div id="smsError"></div></div>
   <!-- MOBILE NAV -->

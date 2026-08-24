@@ -16,33 +16,42 @@
 <meta http-equiv="Content-Security-Policy" content="default-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
 <title>Le Move — Guide des Aides</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--cream:#F7F3EE;--warm-white:#FDFAF6;--linen:#E8E0D5;--sand:#C9BAA8;--espresso:#2C1F14;--warm-black:#1A1410;--sage:#7A8C7E;--terracotta:#C4714A;--gold:#B89A6A;--text-light:#8A7968}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--warm-black);display:flex;flex-direction:column;z-index:100}
-  .sidebar-top{padding:28px 20px 12px;flex-shrink:0}
-  .sidebar-scroll{flex:1;overflow-y:auto;padding:4px 8px 16px 20px;min-height:0}
+.sidebar{position:fixed;left:16px;top:16px;bottom:16px;width:228px;background:rgba(253,250,246,0.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:22px;box-shadow:0 8px 32px rgba(44,31,20,0.10),0 1px 2px rgba(44,31,20,0.06);display:flex;flex-direction:column;z-index:100}
+  .sidebar-top{padding:20px 16px 8px;flex-shrink:0}
+  .sidebar-scroll{flex:1;overflow-y:auto;padding:4px 10px 12px;min-height:0}
   .sidebar-scroll::-webkit-scrollbar{width:5px}
   .sidebar-scroll::-webkit-scrollbar-track{background:transparent}
-  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(122,140,126,0.45);border-radius:10px}
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(122,140,126,0.75)}
-  .sidebar-footer{padding:14px 20px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
-  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
-  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
-  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 10px;border-radius:6px;font-size:13px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
-  .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--cream)}
-  .nav-item.active{background:rgba(122,140,126,0.15);color:#A8C4AB;border-left-color:#7A8C7E;padding-left:7px}
-  .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(201,186,168,0.4);flex-shrink:0}
-  .nav-item.active .nav-dot{background:#7A8C7E}
-  .nav-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.3);padding:10px 10px 4px}
-  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:16px;line-height:1.2;cursor:pointer}
-  .sidebar-logo span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);font-style:normal;margin-top:4px}
-  .sidebar-footer{padding:16px 0 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0}
-.progress-mini{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:8px;font-weight:300}
-.progress-bar-mini{height:2px;background:rgba(255,255,255,0.1);border-radius:2px}
-.main{margin-left:220px;min-height:100vh;background:var(--warm-white);flex:1}
+  .sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(44,31,20,0.15);border-radius:10px}
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover{background:rgba(44,31,20,0.25)}
+  .sidebar-footer{padding:12px 16px 16px;border-top:1px solid rgba(44,31,20,0.08);flex-shrink:0}
+  .sidebar-brand{display:flex;align-items:center;gap:7px;padding:2px 4px 14px}
+  .sidebar-mark{font-size:14px;color:var(--terracotta)}
+  .sidebar-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--espresso);line-height:1;cursor:pointer;margin:0}
+  .sidebar-logo span{display:none}
+  .sidebar-userchip{display:flex;align-items:center;gap:9px;padding:8px 8px;margin-bottom:10px;background:rgba(44,31,20,0.03);border-radius:14px}
+  .sidebar-avatar{width:26px;height:26px;border-radius:50%;background:var(--espresso);color:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;flex-shrink:0}
+  .sidebar-uname{font-size:11px;color:var(--espresso);font-weight:400}
+  .sidebar-uplan{font-size:8px;color:var(--sand);letter-spacing:0.04em}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:12px;font-size:12.5px;font-weight:300;color:var(--text-light);cursor:pointer;transition:all 0.15s;border-left:none}
+  .nav-item i{font-size:15px;flex-shrink:0;color:var(--sand)}
+  .nav-item:hover{background:rgba(44,31,20,0.045);color:var(--espresso)}
+  .nav-item.active{background:var(--espresso);color:var(--warm-white);padding-left:10px}
+  .nav-item.active i{color:var(--terracotta)}
+  .sidebar .nav-dot{display:none}
+  .nav-section{font-size:8px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--sand);padding:12px 10px 5px}
+  .nav-item.nav-locked{opacity:0.42}
+  .nav-item.nav-locked:hover{background:none;color:var(--text-light)}
+  .nav-lock{color:var(--sand)}
+.progress-mini{font-size:8.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--sand);margin-bottom:7px;font-weight:400}
+.progress-bar-mini{height:3px;background:rgba(44,31,20,0.08);border-radius:2px;overflow:hidden}
+.progress-bar-mini-fill{height:100%;width:0%;background:var(--terracotta);border-radius:2px;transition:width .5s ease}
+.main{margin-left:264px;min-height:100vh;background:var(--warm-white);flex:1}
 .page-header{background:var(--espresso);padding:52px 52px 40px;position:relative;overflow:hidden}
 .page-header::before{content:'💶';position:absolute;right:52px;top:50%;transform:translateY(-50%);font-size:120px;opacity:0.06;pointer-events:none}
 .breadcrumb{font-size:9px;font-weight:200;letter-spacing:0.2em;text-transform:uppercase;color:rgba(247,243,238,0.35);margin-bottom:16px}
@@ -197,75 +206,79 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <body>
 <aside class="sidebar">
   <div class="sidebar-top">
-    <div class="sidebar-logo" onclick="window.location.href='app.html'">Le Move<span>Ton premier chez-toi</span></div>
-    <div class="nav-item" onclick="window.location.href='app.html'"><div class="nav-dot"></div>Dashboard</div>
+    <div class="sidebar-brand" onclick="window.location.href='app.html'"><span class="sidebar-mark">✦</span><span class="sidebar-logo">Le Move</span></div>
+    <div class="sidebar-userchip">
+      <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+      <div><div class="sidebar-uname" id="sidebarUser"></div><div class="sidebar-uplan" id="sidebarPlan"></div></div>
+    </div>
+    <div class="nav-item" onclick="window.location.href='app.html'"><i class="ti ti-home" aria-hidden="true"></i>Dashboard</div>
   </div>
   <div class="sidebar-scroll">
     <div class="nav-section">Emménagement</div>
-    <div class="nav-item" onclick="window.location.href='budget.html'"><div class="nav-dot"></div>Mon Budget</div>
-    <div class="nav-item" onclick="window.location.href='demenagement.html'"><div class="nav-dot"></div>Mon Déménagement</div>
-    <div class="nav-item active" onclick="window.location.href='aides.html'"><div class="nav-dot"></div>Guide des Aides</div>
-    <div class="nav-item" onclick="window.location.href='achats.html'"><div class="nav-dot"></div>Mes Achats</div>
+    <div class="nav-item" onclick="window.location.href='budget.html'"><i class="ti ti-wallet" aria-hidden="true"></i>Mon Budget</div>
+    <div class="nav-item" onclick="window.location.href='demenagement.html'"><i class="ti ti-truck" aria-hidden="true"></i>Mon Déménagement</div>
+    <div class="nav-item active" onclick="window.location.href='aides.html'"><i class="ti ti-cash" aria-hidden="true"></i>Guide des Aides</div>
+    <div class="nav-item" onclick="window.location.href='achats.html'"><i class="ti ti-package" aria-hidden="true"></i>Mes Achats</div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'calculateur.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-calculator" aria-hidden="true"></i>
       <span class="nav-item-label">Calculateur</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-section">Déco & Style</div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'moodboard.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-palette" aria-hidden="true"></i>
       <span class="nav-item-label">Mon Moodboard</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'moodboard-ia.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-sparkles" aria-hidden="true"></i>
       <span class="nav-item-label">Moodboard IA</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'medias.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-photo" aria-hidden="true"></i>
       <span class="nav-item-label">Mes Médias</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-section">Pratique</div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'admin.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-checklist" aria-hidden="true"></i>
       <span class="nav-item-label">Checklist Admin</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'carnet.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-notebook" aria-hidden="true"></i>
       <span class="nav-item-label">Carnet de Bord</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'avancement.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-chart-bar" aria-hidden="true"></i>
       <span class="nav-item-label">Mon Avancement</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="complet" onclick="navItemClick(this,'mes-contacts.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-address-book" aria-hidden="true"></i>
       <span class="nav-item-label">Mes Contacts</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-section">Social & Pro</div>
     <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'cremaillere.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-gift" aria-hidden="true"></i>
       <span class="nav-item-label">Crémaillère</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'annuaire.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-building-store" aria-hidden="true"></i>
       <span class="nav-item-label">Annuaire Pro</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'collab.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-users" aria-hidden="true"></i>
       <span class="nav-item-label">Espace Collab</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
     <div class="nav-item nav-locked" data-plan="premium" onclick="navItemClick(this,'support.html')" style="position:relative">
-      <div class="nav-dot"></div>
+      <i class="ti ti-lifebuoy" aria-hidden="true"></i>
       <span class="nav-item-label">Support</span>
       <span class="nav-lock" style="margin-left:auto;font-size:9px;opacity:0.5">🔒</span>
     </div>
@@ -273,10 +286,9 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   </div>
   <div class="sidebar-footer">
     <div class="progress-mini">Avancement global</div>
-    <div class="progress-bar-mini"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08)">
-      <div style="font-size:9px;font-weight:200;color:var(--sand)" id="sidebarUser"></div>
-      <div style="font-size:9px;color:rgba(201,186,168,0.4);cursor:pointer" onclick="logout()">Quitter</div>
+    <div class="progress-bar-mini"><div class="progress-bar-mini-fill" id="sidebarProgressFill"></div></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid rgba(44,31,20,0.08)">
+      <div style="font-size:9px;color:var(--sand);cursor:pointer" onclick="logout()">Quitter</div>
     </div>
   </div>
 </aside>
@@ -430,7 +442,7 @@ window._sb=sb;
   const{data:{session}}=await sb.auth.getSession();
   if(!session){window.location.href='app.html';return;}
   const{data:p}=await sb.from('Profiles').select('prenom').eq('id',session.user.id).single();
-  document.getElementById('sidebarUser').textContent=p?.prenom||session.user.email.split('@')[0];
+  var __sn=p?.prenom||session.user.email.split('@')[0];document.getElementById('sidebarUser').textContent=__sn;var __sav=document.getElementById('sidebarAvatar');if(__sav)__sav.textContent=(__sn[0]||'?').toUpperCase();sidebarFillProgress();
   if(typeof setNavPlan==='function') setNavPlan((userData?.Plan||p?.Plan||'essentiel').toLowerCase());
 })();
 async function logout(){await sb.auth.signOut();window.location.href='app.html';}
@@ -438,6 +450,39 @@ async function logout(){await sb.auth.signOut();window.location.href='app.html';
 <script>
 
 // Apply plan restrictions to sidebar nav
+
+async function sidebarFillProgress() {
+  try {
+    var uid = currentUser.id;
+    var r = await Promise.all([
+      sb.from('Profiles').select('prenom,date_emmenagement,photo_url,budget_total').eq('id', uid).single(),
+      sb.from('budget_achats').select('id', { count: 'exact', head: true }).eq('user_id', uid).then(function(x){return {count:x.count||0};}).catch(function(){return {count:0};}),
+      sb.from('demenagement_taches').select('fait').eq('user_id', uid),
+      sb.from('achats_commandes').select('statut').eq('user_id', uid),
+      sb.from('avancement_taches').select('statut').eq('user_id', uid),
+    ]);
+    var prof = r[0].data || {};
+    var scores = [];
+    var ps = 0;
+    if (prof.prenom) ps += 34;
+    if (prof.date_emmenagement) ps += 33;
+    if (prof.photo_url) ps += 33;
+    scores.push({ score: ps, weight: 1 });
+    scores.push({ score: ((prof.budget_total > 0) ? 50 : 0) + ((r[1].count || 0) > 0 ? 50 : 0), weight: 1 });
+    var dem = r[2].data || [];
+    scores.push({ score: dem.length ? Math.round(dem.filter(function(t){return t.fait;}).length/dem.length*100) : 0, weight: 2 });
+    var ach = r[3].data || [];
+    scores.push({ score: ach.length ? Math.round(ach.filter(function(t){return t.statut==='livré';}).length/ach.length*100) : 0, weight: 1 });
+    var av = r[4].data || [];
+    scores.push({ score: av.length ? Math.round(av.filter(function(t){return t.statut==='done';}).length/av.length*100) : 0, weight: 2 });
+    var tw = scores.reduce(function(s,m){return s+m.weight;},0);
+    var ws = scores.reduce(function(s,m){return s+(m.score*m.weight);},0);
+    var pct = tw ? Math.round(ws/tw) : 0;
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) fill.style.width = pct + '%';
+  } catch (e) { console.warn('sidebarFillProgress:', e); }
+}
+
 function applyPlanToSidebar(plan) {
   var planRank = { essentiel: 1, complet: 2, premium: 3 };
   var requiredRank = { essentiel: 1, complet: 2, premium: 3 };
@@ -645,6 +690,7 @@ window.addEventListener('load', () => {
   window.setNavPlan = function(plan) {
     localStorage.setItem('lm_plan', JSON.stringify(plan));
     applyNavLocks(plan);
+    var __pl=document.getElementById('sidebarPlan');if(__pl)__pl.textContent='Plan '+(plan.charAt(0).toUpperCase()+plan.slice(1));
   };
 
   document.addEventListener('DOMContentLoaded', function() {
