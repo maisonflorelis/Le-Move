@@ -535,15 +535,23 @@ const ADMIN_EMAIL = 'sheryl.mercier@gmail.com';
 let isAdmin = false;
 let allContacts = [];
 let currentCat = 'all';
+let currentUser = null;
 
 // ── AUTH ──
 
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'app.html'; return; }
+  currentUser = session.user;
 
-  const { data: profile } = await sb.from('Profiles').select('prenom').eq('id', session.user.id).single();
+  const { data: profile } = await sb.from('Profiles').select('prenom,photo_url').eq('id', session.user.id).single();
   document.getElementById('sidebarUser').textContent = profile?.prenom || session.user.email.split('@')[0];
+  (function() {
+    var __n = profile?.prenom || session.user.email.split('@')[0];
+    var __sav = document.getElementById('sidebarAvatar');
+    if (__sav) { if (profile?.photo_url) { __sav.innerHTML = '<img src="' + profile.photo_url + '" alt="">'; } else { __sav.textContent = (__n[0] || '?').toUpperCase(); } }
+  })();
+  sidebarFillProgress();
 
   isAdmin = session.user.email === ADMIN_EMAIL;
   if (isAdmin) {
@@ -739,6 +747,38 @@ document.getElementById('modalOverlay').addEventListener('click', e => {
 <script>
 
 // Apply plan restrictions to sidebar nav
+async function sidebarFillProgress() {
+  try {
+    var uid = currentUser.id;
+    var r = await Promise.all([
+      sb.from('Profiles').select('prenom,date_emmenagement,photo_url,budget_total').eq('id', uid).single(),
+      sb.from('budget_achats').select('id', { count: 'exact', head: true }).eq('user_id', uid).then(function(x){return {count:x.count||0};}).catch(function(){return {count:0};}),
+      sb.from('demenagement_taches').select('fait').eq('user_id', uid),
+      sb.from('achats_commandes').select('statut').eq('user_id', uid),
+      sb.from('avancement_taches').select('statut').eq('user_id', uid),
+    ]);
+    var prof = r[0].data || {};
+    var scores = [];
+    var ps = 0;
+    if (prof.prenom) ps += 34;
+    if (prof.date_emmenagement) ps += 33;
+    if (prof.photo_url) ps += 33;
+    scores.push({ score: ps, weight: 1 });
+    scores.push({ score: ((prof.budget_total > 0) ? 50 : 0) + ((r[1].count || 0) > 0 ? 50 : 0), weight: 1 });
+    var dem = r[2].data || [];
+    scores.push({ score: dem.length ? Math.round(dem.filter(function(t){return t.fait;}).length/dem.length*100) : 0, weight: 2 });
+    var ach = r[3].data || [];
+    scores.push({ score: ach.length ? Math.round(ach.filter(function(t){return t.statut==='livré';}).length/ach.length*100) : 0, weight: 1 });
+    var av = r[4].data || [];
+    scores.push({ score: av.length ? Math.round(av.filter(function(t){return t.statut==='done';}).length/av.length*100) : 0, weight: 2 });
+    var tw = scores.reduce(function(s,m){return s+m.weight;},0);
+    var ws = scores.reduce(function(s,m){return s+(m.score*m.weight);},0);
+    var pct = tw ? Math.round(ws/tw) : 0;
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) fill.style.width = pct + '%';
+  } catch (e) { console.warn('sidebarFillProgress:', e); }
+}
+
 function applyPlanToSidebar(plan) {
   var planRank = { essentiel: 1, complet: 2, premium: 3 };
   var requiredRank = { essentiel: 1, complet: 2, premium: 3 };
