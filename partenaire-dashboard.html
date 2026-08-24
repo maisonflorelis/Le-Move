@@ -7,6 +7,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <title>Le Move — Espace Partenaire</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -20,24 +21,31 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--sand);border-radius:4px}
 
 /* SIDEBAR */
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--warm-black);padding:28px 18px;display:flex;flex-direction:column;gap:2px;z-index:100;overflow-y:auto;scrollbar-width:none}
+.sidebar{position:fixed;left:16px;top:16px;bottom:16px;width:238px;background:rgba(253,250,246,0.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:22px;box-shadow:0 8px 32px rgba(44,31,20,0.10),0 1px 2px rgba(44,31,20,0.06);padding:20px 16px;display:flex;flex-direction:column;gap:2px;z-index:100;overflow-y:auto;scrollbar-width:none}
 .sidebar::-webkit-scrollbar{display:none}
-.sb-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--cream);line-height:1}
-.sb-badge{font-size:7px;letter-spacing:0.2em;text-transform:uppercase;background:rgba(196,113,74,0.2);color:var(--terracotta);padding:3px 10px;border-radius:10px;display:inline-block;margin:6px 0 22px}
-.sb-section{font-size:7px;font-weight:300;letter-spacing:0.25em;text-transform:uppercase;color:rgba(201,186,168,0.3);padding:12px 10px 4px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:12px;font-weight:300;color:var(--sand);cursor:pointer;transition:all 0.2s;position:relative}
-.sb-item:hover{background:rgba(255,255,255,0.06);color:var(--cream)}
-.sb-item.active{background:rgba(255,255,255,0.1);color:var(--cream)}
-.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--sand);flex-shrink:0;transition:background 0.2s}
-.sb-item.active .sb-dot{background:var(--terracotta)}
+.sb-brand{display:flex;align-items:center;gap:7px;padding:2px 4px 14px}
+.sb-mark{font-size:14px;color:var(--terracotta)}
+.sb-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--espresso);line-height:1}
+.sb-userchip{display:flex;align-items:center;gap:9px;padding:8px 8px;margin-bottom:10px;background:rgba(44,31,20,0.03);border-radius:14px}
+.sb-avatar{width:26px;height:26px;border-radius:50%;background:var(--espresso);color:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11px;flex-shrink:0}
+.sb-uname{font-size:11px;color:var(--espresso);font-weight:400;line-height:1.3}
+.sb-uplan{font-size:8px;color:var(--terracotta);letter-spacing:0.04em}
+.sb-badge{display:none}
+.sb-section{font-size:8px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--sand);padding:12px 10px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:12px;font-size:12.5px;font-weight:300;color:var(--text-light);cursor:pointer;transition:all 0.15s;position:relative}
+.sb-item i{font-size:15px;flex-shrink:0;color:var(--sand)}
+.sb-item:hover{background:rgba(44,31,20,0.045);color:var(--espresso)}
+.sb-item.active{background:var(--espresso);color:var(--warm-white)}
+.sb-item.active i{color:var(--terracotta)}
+.sb-dot{display:none}
 .sb-badge-count{font-size:8px;padding:1px 7px;border-radius:10px;background:var(--terracotta);color:white;margin-left:auto;display:none}
-.sb-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)}
-.sb-email{font-size:9px;font-weight:200;color:rgba(201,186,168,0.35);margin-bottom:8px;word-break:break-all}
-.sb-logout{font-size:10px;color:rgba(201,186,168,0.35);cursor:pointer;transition:color 0.2s}
+.sb-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(44,31,20,0.08)}
+.sb-email{font-size:9px;font-weight:200;color:var(--sand);margin-bottom:8px;word-break:break-all}
+.sb-logout{font-size:10px;color:var(--sand);cursor:pointer;transition:color 0.2s}
 .sb-logout:hover{color:var(--terracotta)}
 
 /* MAIN */
-.main{margin-left:230px;flex:1;min-height:100vh}
+.main{margin-left:274px;flex:1;min-height:100vh}
 
 /* HEADER */
 .page-hero{background:var(--espresso);padding:36px 48px;position:relative;overflow:hidden}
@@ -225,17 +233,20 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <!-- APP -->
 <aside class="sidebar" id="appSidebar" style="display:none">
-  <div class="sb-logo">Le Move</div>
-  <div class="sb-badge">✦ Partenaire</div>
-  <div class="sb-item active" onclick="showPanel('dashboard',this)"><div class="sb-dot"></div>Tableau de bord</div>
-  <div class="sb-item" onclick="showPanel('messages',this)"><div class="sb-dot"></div>Messages <span class="sb-badge-count" id="msgCount"></span></div>
-  <div class="sb-item" onclick="showPanel('avis',this)"><div class="sb-dot"></div>Avis clients <span class="sb-badge-count" id="avisCount"></span></div>
-  <div class="sb-item" onclick="showPanel('contacts',this)"><div class="sb-dot"></div>Mes contacts</div>
+  <div class="sb-brand"><span class="sb-mark">✦</span><span class="sb-logo">Le Move</span></div>
+  <div class="sb-userchip">
+    <div class="sb-avatar" id="sbAvatar">?</div>
+    <div><div class="sb-uname" id="sbEntreprise">Mon espace</div><div class="sb-uplan">Partenaire</div></div>
+  </div>
+  <div class="sb-item active" onclick="showPanel('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Tableau de bord</div>
+  <div class="sb-item" onclick="showPanel('messages',this)"><i class="ti ti-mail" aria-hidden="true"></i>Messages <span class="sb-badge-count" id="msgCount"></span></div>
+  <div class="sb-item" onclick="showPanel('avis',this)"><i class="ti ti-star" aria-hidden="true"></i>Avis clients <span class="sb-badge-count" id="avisCount"></span></div>
+  <div class="sb-item" onclick="showPanel('contacts',this)"><i class="ti ti-address-book" aria-hidden="true"></i>Mes contacts</div>
   <div class="sb-section">Mon profil</div>
-  <div class="sb-item" onclick="showPanel('fiche',this)"><div class="sb-dot"></div>Ma fiche annuaire</div>
-  <div class="sb-item" onclick="showPanel('documents',this)"><div class="sb-dot"></div>Mes documents</div>
+  <div class="sb-item" onclick="showPanel('fiche',this)"><i class="ti ti-id-badge-2" aria-hidden="true"></i>Ma fiche annuaire</div>
+  <div class="sb-item" onclick="showPanel('documents',this)"><i class="ti ti-file" aria-hidden="true"></i>Mes documents</div>
   <div class="sb-section">Marché</div>
-  <div class="sb-item" onclick="showPanel('zone',this)"><div class="sb-dot"></div>Données de zone</div>
+  <div class="sb-item" onclick="showPanel('zone',this)"><i class="ti ti-map-pin" aria-hidden="true"></i>Données de zone</div>
   <div class="sb-footer">
     <div class="sb-email" id="sbEmail"></div>
     <div class="sb-logout" onclick="logout()">Déconnexion</div>
@@ -556,6 +567,9 @@ function showApp() {
   document.getElementById('appMain').style.display = 'block';
   document.getElementById('sbEmail').textContent = currentUser.email;
   document.getElementById('heroName').textContent = partenaire.entreprise || 'Mon Espace';
+  var __sbName = partenaire.entreprise || 'Mon espace';
+  document.getElementById('sbEntreprise').textContent = __sbName;
+  document.getElementById('sbAvatar').textContent = (__sbName[0] || '?').toUpperCase();
   document.getElementById('heroMeta').textContent = [partenaire.activite, partenaire.zone].filter(Boolean).join(' · ');
   document.getElementById('memberSince').textContent = 'Membre depuis ' + new Date(partenaire.created_at || Date.now()).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
@@ -778,6 +792,9 @@ async function saveFiche() {
   await sb.from('partenaires').update(updates).eq('id', partenaire.id);
   partenaire = Object.assign({}, partenaire, updates);
   document.getElementById('heroName').textContent = partenaire.entreprise || 'Mon Espace';
+  var __sbName = partenaire.entreprise || 'Mon espace';
+  document.getElementById('sbEntreprise').textContent = __sbName;
+  document.getElementById('sbAvatar').textContent = (__sbName[0] || '?').toUpperCase();
   document.getElementById('heroMeta').textContent = [partenaire.activite, partenaire.zone].filter(Boolean).join(' · ');
   toggleFicheEdit();
   var flash = document.getElementById('ficheFlash');
