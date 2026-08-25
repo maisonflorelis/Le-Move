@@ -121,8 +121,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:28px;color:var(--espresso);margin-bottom:4px">Le Move</div>
     <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);margin-bottom:28px">Administration</div>
     <input type="email" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminEmail" placeholder="Email admin" id="adminEmailInput">
-    <input type="password" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminPwd" placeholder="Mot de passe">
-    <button id="loginBtn" style="width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer">Accéder →</button>
+    <input type="password" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminPwd" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button id="loginBtn" onclick="adminLogin()" style="width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer">Accéder →</button>
     <div id="authErr" style="color:#DC2626;font-size:11px;margin-top:10px;display:none">Accès refusé.</div>
     <div id="resetMsg" style="font-size:11px;margin-top:10px;display:none"></div>
     <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--text-light);cursor:pointer;text-decoration:underline" onclick="resetAdminPassword()">Mot de passe oublié ?</div>
