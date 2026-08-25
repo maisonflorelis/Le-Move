@@ -748,9 +748,14 @@ async function loadApp(user) {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
 
-  const seen = localStorage.getItem('lemove_tutorial_' + user.id);
-  if (!seen) setTimeout(() => showTutorial(), 600);
-  else if (!currentProfile?.prenom || !currentProfile?.date_emmenagement) setTimeout(() => showOnboarding(), 600);
+  // Le tutoriel + l'onboarding "profil client" présentent les modules
+  // Budget/Déménagement/etc. — sans objet pour un compte partenaire, qui a
+  // son propre parcours (voir le bloc d'onboarding partenaire plus bas).
+  if (currentPlan !== 'partenaire') {
+    const seen = localStorage.getItem('lemove_tutorial_' + user.id);
+    if (!seen) setTimeout(() => showTutorial(), 600);
+    else if (!currentProfile?.prenom || !currentProfile?.date_emmenagement) setTimeout(() => showOnboarding(), 600);
+  }
   setTimeout(() => updateProgress(), 800);
   setTimeout(() => loadNotifications(), 1000);
   // Anti-fraud checks
