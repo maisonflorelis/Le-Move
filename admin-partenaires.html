@@ -348,7 +348,8 @@ const SUPABASE_URL = 'https://xnmlpxteslwmimmdqjye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
 const ADMIN_EMAIL = atob('c2hlcnlsLm1lcmNpZXJAZ21haWwuY29t');
 const STRIPE_LINK = 'https://buy.stripe.com/dRm3cv8De1Gf21n8gH6EU09';
-const PLANS_PRICE = { essentiel: 39, complet: 69, premium: 99 };
+const PLANS_PRICE = { essentiel: 39, complet: 89, premium: 150 };
+const PARTENAIRE_PRICE_MONTHLY = Math.round(349 / 12); // 349€/an
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -447,7 +448,7 @@ function renderDashboard() {
   const partenairesActifs = allPartenaires.filter(p => p.statut === 'actif').length;
   const pending = allCandidatures.filter(c => c.statut === 'en_attente').length;
 
-  const mrr = (essentiel * 39) + (complet * 69) + (premium * 99) + (partenairesActifs * 39);
+  const mrr = (essentiel * PLANS_PRICE.essentiel) + (complet * PLANS_PRICE.complet) + (premium * PLANS_PRICE.premium) + (partenairesActifs * PARTENAIRE_PRICE_MONTHLY);
   const conversion = total > 0 ? Math.round(((essentiel + complet + premium) / total) * 100) : 0;
 
   document.getElementById('dTotalUsers').textContent = total;
@@ -462,9 +463,9 @@ function renderDashboard() {
 
   // Plan breakdown
   const plans = [
-    { name: 'Essentiel', count: essentiel, color: 'var(--sand)', price: 39 },
-    { name: 'Complet', count: complet, color: 'var(--gold)', price: 69 },
-    { name: 'Premium', count: premium, color: 'var(--terracotta)', price: 99 },
+    { name: 'Essentiel', count: essentiel, color: 'var(--sand)', price: PLANS_PRICE.essentiel },
+    { name: 'Complet', count: complet, color: 'var(--gold)', price: PLANS_PRICE.complet },
+    { name: 'Premium', count: premium, color: 'var(--terracotta)', price: PLANS_PRICE.premium },
   ];
   document.getElementById('planBreakdown').innerHTML = plans.map(p => `
     <div style="display:flex;align-items:center;gap:12px">
@@ -566,9 +567,9 @@ function updatePlansTable(users) {
       <td><span class="plan-badge plan-${u.Plan || 'essentiel'}">${u.Plan || 'essentiel'}</span></td>
       <td>
         <select class="filter-select" style="font-size:11px;padding:5px 10px" onchange="quickChangePlan('${u.id}', this.value)">
-          <option value="essentiel" ${(u.Plan||'essentiel')==='essentiel'?'selected':''}>Essentiel — 39€</option>
-          <option value="complet" ${u.Plan==='complet'?'selected':''}>Complet — 69€</option>
-          <option value="premium" ${u.Plan==='premium'?'selected':''}>Premium — 99€</option>
+          <option value="essentiel" ${(u.Plan||'essentiel')==='essentiel'?'selected':''}>Essentiel — ${PLANS_PRICE.essentiel}€</option>
+          <option value="complet" ${u.Plan==='complet'?'selected':''}>Complet — ${PLANS_PRICE.complet}€</option>
+          <option value="premium" ${u.Plan==='premium'?'selected':''}>Premium — ${PLANS_PRICE.premium}€</option>
         </select>
       </td>
     </tr>`).join('') || '<tr><td colspan="4" class="empty">Aucun utilisateur</td></tr>';
@@ -790,8 +791,8 @@ function renderRevenus() {
   const premium = allUsers.filter(u => u.Plan === 'premium').length;
   const partenairesActifs = allPartenaires.filter(p => p.statut === 'actif').length;
 
-  const mrrUsers = (essentiel * 39) + (complet * 69) + (premium * 99);
-  const mrrPart = Math.round(partenairesActifs * 349 / 12); // 349€/an = ~29€/mois
+  const mrrUsers = (essentiel * PLANS_PRICE.essentiel) + (complet * PLANS_PRICE.complet) + (premium * PLANS_PRICE.premium);
+  const mrrPart = partenairesActifs * PARTENAIRE_PRICE_MONTHLY;
   const mrrTotal = mrrUsers + mrrPart;
 
   document.getElementById('mrrTotal').textContent = mrrTotal.toLocaleString('fr-FR') + '€';
@@ -799,10 +800,10 @@ function renderRevenus() {
   document.getElementById('mrrPartenaires').textContent = mrrPart.toLocaleString('fr-FR') + '€';
 
   document.getElementById('revenusBreakdown').innerHTML = [
-    { name: 'Essentiel', count: essentiel, price: 39, color: 'var(--sand)' },
-    { name: 'Complet', count: complet, price: 69, color: 'var(--gold)' },
-    { name: 'Premium', count: premium, price: 99, color: 'var(--terracotta)' },
-    { name: 'Partenaires', count: partenairesActifs, price: 39, color: 'var(--sage)' },
+    { name: 'Essentiel', count: essentiel, price: PLANS_PRICE.essentiel, color: 'var(--sand)' },
+    { name: 'Complet', count: complet, price: PLANS_PRICE.complet, color: 'var(--gold)' },
+    { name: 'Premium', count: premium, price: PLANS_PRICE.premium, color: 'var(--terracotta)' },
+    { name: 'Partenaires', count: partenairesActifs, price: PARTENAIRE_PRICE_MONTHLY, color: 'var(--sage)' },
   ].map(r => `
     <div style="display:flex;align-items:center;gap:16px">
       <div style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0"></div>
