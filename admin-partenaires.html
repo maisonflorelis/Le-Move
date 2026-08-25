@@ -124,6 +124,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <input type="password" style="width:100%;padding:12px 16px;background:var(--warm-white);border:1px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:10px" id="adminPwd" placeholder="Mot de passe">
     <button id="loginBtn" style="width:100%;padding:13px;background:var(--espresso);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer">Accéder →</button>
     <div id="authErr" style="color:#DC2626;font-size:11px;margin-top:10px;display:none">Accès refusé.</div>
+    <div id="resetMsg" style="font-size:11px;margin-top:10px;display:none"></div>
+    <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--text-light);cursor:pointer;text-decoration:underline" onclick="resetAdminPassword()">Mot de passe oublié ?</div>
   </div>
 </div>
 
@@ -382,6 +384,21 @@ async function adminLogin() {
   showAdmin();
 }
 async function adminLogout() { await sb.auth.signOut(); location.reload(); }
+
+async function resetAdminPassword() {
+  const email = document.getElementById('adminEmail').value || ADMIN_EMAIL;
+  const msgEl = document.getElementById('resetMsg');
+  const redirectTo = window.location.origin + '/reset-password.html';
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+  msgEl.style.display = 'block';
+  if (error) {
+    msgEl.style.color = '#DC2626';
+    msgEl.textContent = 'Erreur : ' + error.message;
+    return;
+  }
+  msgEl.style.color = '#16A34A';
+  msgEl.textContent = '✓ Email envoyé ! Vérifie ta boîte mail.';
+}
 
 function showAdmin() {
   document.getElementById('authScreen').style.display = 'none';
