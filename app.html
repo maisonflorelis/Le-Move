@@ -2094,10 +2094,11 @@ function refuseCookies() {
     function showBanner() { banner.classList.add('lm-onb-banner-visible'); }
     function hideBanner() { banner.classList.remove('lm-onb-banner-visible'); }
 
-    async function loadPartner() {
-      var sess = await sb.auth.getSession();
-      var user = sess && sess.data && sess.data.session ? sess.data.session.user : null;
-      if (!user) return;
+    var checked = false;
+
+    async function loadPartner(user) {
+      if (!user || checked) return;
+      checked = true;
 
       var res = await sb.from('partenaires')
         .select('id, entreprise, activite, zone, telephone, site, description, profil_confirme')
@@ -2166,7 +2167,14 @@ function refuseCookies() {
     });
     els.bannerCta.addEventListener('click', openModal);
 
-    loadPartner();
+    // onAuthStateChange fires immediately with the current session (covers an
+    // already-logged-in page load) AND again on every future sign-in — unlike
+    // a one-shot getSession() call, this still catches the case where the
+    // user isn't authenticated yet when this script first runs and logs in
+    // afterwards via the on-page form.
+    sb.auth.onAuthStateChange(function (event, session) {
+      loadPartner(session ? session.user : null);
+    });
   }
 
   initOnboarding();
