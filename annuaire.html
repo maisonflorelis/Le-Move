@@ -108,6 +108,23 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 .partner-btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--cream); }
 .partner-admin-btns { position: absolute; top: 14px; right: 14px; display: none; gap: 6px; }
 .partner-card:hover .partner-admin-btns.visible { display: flex; }
+
+/* CERTIFIED SEAL — partenaires réels (vérifiés), coin de la carte */
+.certified-seal { position: absolute; top: 16px; right: 16px; width: 54px; height: 54px; }
+.certified-seal-ring {
+  position: absolute; inset: 0; border-radius: 50%; background: var(--cream);
+  background-image: repeating-conic-gradient(from 0deg, rgba(44,31,20,0.16) 0deg 1.2deg, transparent 1.2deg 6deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 82%, #000 82.5%);
+  mask: radial-gradient(closest-side, transparent 82%, #000 82.5%);
+}
+.certified-seal-disc { position: absolute; inset: 5px; border-radius: 50%; background: var(--cream); box-shadow: 0 2px 8px rgba(0,0,0,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+.certified-seal-icon { width: 17px; height: 17px; color: var(--espresso); }
+.certified-seal-label { font-size: 4.6px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--terracotta); margin-top: 1px; }
+.certified-seal-check {
+  position: absolute; right: -2px; bottom: -2px; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--terracotta); border: 2px solid var(--espresso);
+  color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1;
+}
 .admin-btn-sm { padding: 4px 10px; border-radius: 4px; font-size: 9px; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
 .admin-edit { background: rgba(255,255,255,0.15); color: white; }
 .admin-delete { background: rgba(196,113,74,0.3); color: var(--terracotta); }
@@ -610,11 +627,22 @@ function renderContacts(contacts) {
   } else {
     pg.innerHTML = partners.map(p => `
       <div class="partner-card">
-        ${!p.isRealPartner ? `<div class="partner-admin-btns ${isAdmin ? 'visible' : ''}">
+        ${p.isRealPartner ? `
+        <div class="certified-seal" title="Partenaire certifié Le Move">
+          <div class="certified-seal-ring"></div>
+          <div class="certified-seal-disc">
+            <svg class="certified-seal-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 46 L50 12 L92 46"></path>
+              <path d="M20 40 L20 88 L40 88 L40 60 L50 72 L60 60 L60 88 L80 88 L80 40"></path>
+            </svg>
+            <div class="certified-seal-label">Certifié</div>
+          </div>
+          <div class="certified-seal-check">✓</div>
+        </div>` : `<div class="partner-admin-btns ${isAdmin ? 'visible' : ''}">
           <button class="admin-btn-sm admin-edit" onclick="editContact(event, '${p.id}')">✏️</button>
           <button class="admin-btn-sm admin-delete" onclick="deleteContact(event, '${p.id}')">🗑</button>
-        </div>` : ''}
-        <div class="partner-badge">Partenaire Le Move</div>
+        </div>
+        <div class="partner-badge">Partenaire Le Move</div>`}
         <div class="partner-name">${p.nom}</div>
         <div class="partner-cat">${p.categorie}${p.ville ? ' · ' + p.ville : ''}</div>
         ${p.description ? `<div class="partner-desc">${p.description}</div>` : ''}
