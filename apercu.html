@@ -228,7 +228,7 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 <!-- DEMO BANNER -->
 <div class="demo-banner">
   <p>✦ Aperçu interactif — Toutes les données sont fictives</p>
-  <a href="https://www.lemove.fr" target="_blank">Créer mon espace →</a>
+  <a href="index.html#pricing" target="_blank">Créer mon espace →</a>
 </div>
 
 <!-- NAV -->
@@ -473,6 +473,14 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
     </div>
   </div>
 
+  <div class="module-panel" id="panel-generic">
+    <div class="panel-header">
+      <div class="panel-title" id="genericPanelTitle"></div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div id="genericPanelBody"></div>
+  </div>
+
   <!-- MODULES GRID -->
   <div class="section-label">Tes modules</div>
   <div class="modules-grid" id="modulesGrid"></div>
@@ -484,7 +492,7 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
       <div class="upgrade-title">Débloque le plan Premium.</div>
       <div class="upgrade-desc">Moodboard IA, Espace Collaboratif, Annuaire Pro, Crémaillère.</div>
     </div>
-    <a href="https://www.lemove.fr#tarifs" class="upgrade-btn" target="_blank">Voir les offres →</a>
+    <a href="index.html#pricing" class="upgrade-btn" target="_blank">Voir les offres →</a>
   </div>
 
 </div>
@@ -494,6 +502,7 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
 
 <script>
 const MODULES = [
+  { id:'mon-logement', icon:'🏠', title:'Mon Logement', desc:'Analyse avant visite, score logement, vices cachés, dossier locataire, négociation de loyer.', tags:['Recherche','IA'], plan:'premium', locked:true },
   { id:'budget', icon:'💰', title:'Mon Budget', desc:'Budget total, dépensé, restant. Catégories personnalisées avec jauges et alertes.', tags:['Finances','Planning'], plan:'essentiel' },
   { id:'demenagement', icon:'📦', title:'Mon Déménagement', desc:'Checklist par phase : Signature, Préparation, Démarches, Jour J, Installation.', tags:['Organisation','Checklist'], plan:'essentiel' },
   { id:'aides', icon:'💶', title:'Guide des Aides', desc:'APL, Visale, Mobili-Pass, Loca-Pass — les aides auxquelles tu as peut-être droit.', tags:['Aides','Budget'], plan:'essentiel' },
@@ -502,10 +511,14 @@ const MODULES = [
   { id:'admin', icon:'📋', title:'Checklist Administrative', desc:'Changements adresse, résiliations, démarches officielles — rien oublier.', tags:['Admin','Démarches'], plan:'complet' },
   { id:'carnet', icon:'📓', title:'Carnet de Bord', desc:'Codes, mesures, contacts immeuble, notes pratiques au quotidien.', tags:['Notes','Pratique'], plan:'complet', featured:true },
   { id:'avancement', icon:'✅', title:'Mon Avancement', desc:'Vue Kanban de toutes tes tâches — faites, en cours, countdown Jour J.', tags:['Gestion','Tâches'], plan:'complet' },
+  { id:'mes-contacts', icon:'📒', title:'Mes Contacts & Agenda', desc:'Carnet de contacts clés avec agenda rendez-vous.', tags:['Contacts','Agenda'], plan:'complet' },
   { id:'moodboard', icon:'🎨', title:'Moodboard & Inspirations', desc:'Palette de couleurs, inspirations sauvegardées, notes de style par pièce.', tags:['Déco','Inspiration'], plan:'complet' },
+  { id:'medias', icon:'📁', title:'Mes Médias', desc:'Photos, vidéos, documents — visite appart, inspirations, état des lieux.', tags:['Photos','Vidéos'], plan:'complet' },
   { id:'moodboard-ia', icon:'✨', title:'Moodboard IA', desc:"Questionnaire déco — l'IA génère ta palette, ton style et tes achats prioritaires.", tags:['IA','Déco'], plan:'premium', locked:true },
   { id:'collab', icon:'🤝', title:'Espace Collaboratif', desc:"Invite un proche ou un pro à accéder à ton espace.", tags:['Partage','Premium'], plan:'premium', locked:true },
+  { id:'annuaire', icon:'⭐', title:'Annuaire Pro', desc:'Prestataires vérifiés et partenaires Le Move près de chez toi.', tags:['Contacts','Premium'], plan:'premium', locked:true },
   { id:'cremaillere', icon:'🎉', title:'Ma Crémaillère', desc:'Crée ta liste de cadeaux et partage-la avec tes proches.', tags:['Cadeaux','Partage'], plan:'premium', locked:true },
+  { id:'support', icon:'💬', title:'Support Prioritaire', desc:"Accès direct à l'équipe Le Move. Réponse garantie sous 24h.", tags:['Support','Premium'], plan:'premium', locked:true },
 ];
 
 const TASKS = {
@@ -567,7 +580,22 @@ function glowMove(e, card) {
 
 function openModule(id) {
   document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
-  const panel = document.getElementById('panel-'+id);
+  let panel = document.getElementById('panel-'+id);
+  if (!panel) {
+    const mod = MODULES.find(m => m.id === id);
+    if (mod) {
+      document.getElementById('genericPanelTitle').textContent = mod.icon + ' ' + mod.title;
+      document.getElementById('genericPanelBody').innerHTML = `
+        <p style="font-size:13px;color:var(--text-light);line-height:1.8;margin-bottom:20px">${mod.desc}</p>
+        <div style="display:flex;gap:8px;margin-bottom:24px">
+          ${mod.tags.map(t => `<span style="font-size:10px;padding:5px 14px;border-radius:20px;background:var(--linen);color:var(--text-light)">${t}</span>`).join('')}
+        </div>
+        <div style="padding:24px;background:var(--warm-white);border:1px dashed var(--sand);border-radius:12px;text-align:center">
+          <div style="font-size:12px;color:var(--text-light);line-height:1.6">Cet aperçu se concentre sur quelques modules phares. Le module complet t'attend dans ton espace, avec tes propres données.</div>
+        </div>`;
+      panel = document.getElementById('panel-generic');
+    }
+  }
   if (panel) {
     panel.classList.add('active');
     panel.scrollIntoView({ behavior:'smooth', block:'start' });
