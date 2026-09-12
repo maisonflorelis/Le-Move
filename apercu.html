@@ -564,9 +564,10 @@ function buildGrid() {
       <div class="module-num">0${i+1}</div>
       <div class="module-icon">${m.icon}</div>
       <div class="module-title">${m.title}</div>
+      ${m.locked ? `<div class="module-desc">Disponible en plan Premium.</div>` : `
       <div class="module-desc">${m.desc}</div>
       <div class="module-tags">${m.tags.map(t=>`<span class="module-tag">${t}</span>`).join('')}</div>
-      ${!m.locked ? `<div class="module-arrow">→</div>` : ''}
+      <div class="module-arrow">→</div>`}
     </div>
   `).join('');
 }
