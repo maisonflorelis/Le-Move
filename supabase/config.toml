@@ -1,0 +1,34 @@
+project_id = "xnmlpxteslwmimmdqjye"
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = true
+
+[functions.moodboard-ai]
+verify_jwt = false
+
+[functions.send-collab-invite]
+verify_jwt = true
+
+[functions.send-support]
+verify_jwt = true
+
+[functions.send-reminder]
+verify_jwt = false
+
+[functions.fraud-alert]
+verify_jwt = false
+
+[functions.send-sms]
+verify_jwt = false
+
+[functions.claude-proxy]
+verify_jwt = false
+
+[functions.notify-candidature]
+verify_jwt = false
+
+[functions.notify-email]
+verify_jwt = true
