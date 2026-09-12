@@ -108,6 +108,14 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .legal-links a{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(247,243,238,0.25);text-decoration:none}
 .legal-links a:hover{color:var(--terracotta)}
 
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.08s}
+.reveal-delay-2{transition-delay:0.16s}
+.reveal-delay-3{transition-delay:0.24s}
+.new-badge{display:inline-block;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:white;background:var(--terracotta);padding:3px 9px;border-radius:20px;margin-left:8px;vertical-align:middle;animation:newPulse 2s ease-in-out infinite}
+@keyframes newPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
@@ -147,7 +155,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <!-- ARTICLE 1 FEATURED -->
 <div class="featured-wrap">
-  <a class="featured" href="blog-checklist-demenagement.html">
+  <a class="featured reveal" href="blog-checklist-demenagement.html">
     <div class="featured-visual">
       <div class="featured-num">01</div>
       <div class="featured-icon">📋</div>
@@ -169,7 +177,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <!-- ARTICLES 2-5 GRID -->
 <div class="grid-wrap">
   <div class="articles-grid">
-    <a class="article" href="blog-budget-premier-appartement.html">
+    <a class="article reveal reveal-delay-1" href="blog-budget-premier-appartement.html">
       <div class="article-band b-terracotta"></div>
       <div class="article-body">
         <div class="article-tag">Budget · 6 min</div>
@@ -181,7 +189,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-organiser-son-demenagement.html">
+    <a class="article reveal reveal-delay-2" href="blog-organiser-son-demenagement.html">
       <div class="article-band b-sage"></div>
       <div class="article-body">
         <div class="article-tag">Organisation · 5 min</div>
@@ -193,7 +201,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-moodboard-deco-appartement.html">
+    <a class="article reveal reveal-delay-3" href="blog-moodboard-deco-appartement.html">
       <div class="article-band b-gold"></div>
       <div class="article-body">
         <div class="article-tag">Déco · 5 min</div>
@@ -205,7 +213,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-reussir-sa-cremaillere.html">
+    <a class="article reveal" href="blog-reussir-sa-cremaillere.html">
       <div class="article-band b-espresso"></div>
       <div class="article-body">
         <div class="article-tag">Social · 4 min</div>
@@ -222,7 +230,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <!-- ARTICLE 6 FEATURED -->
 <div class="second-featured-wrap">
-  <a class="second-featured" href="blog-erreurs-premier-emenagement.html">
+  <a class="second-featured reveal" href="blog-erreurs-premier-emenagement.html">
     <div class="sf-visual">
       <div class="sf-num">06</div>
       <div class="sf-icon">⚠️</div>
@@ -244,7 +252,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <!-- ARTICLES 7-8 LAST ROW -->
 <div class="last-wrap">
   <div class="last-grid">
-    <a class="article" href="blog-demenager-seul-ou-professionnels.html">
+    <a class="article reveal reveal-delay-1" href="blog-demenager-seul-ou-professionnels.html">
       <div class="article-band b-sage"></div>
       <div class="article-body">
         <div class="article-tag">Déménagement · 5 min</div>
@@ -256,7 +264,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-negocier-loyer-charges.html">
+    <a class="article reveal reveal-delay-2" href="blog-negocier-loyer-charges.html">
       <div class="article-band b-terracotta"></div>
       <div class="article-body">
         <div class="article-tag">Negociation · 4 min</div>
@@ -278,11 +286,16 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <!-- ARTICLES 9-14 GRID -->
 <div class="grid-wrap">
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px">
+    <div style="font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--terracotta)">Fraîchement publiés</div>
+    <div style="flex:1;height:1px;background:var(--linen)"></div>
+    <div style="font-size:10px;color:var(--sand)">Septembre 2026</div>
+  </div>
   <div class="articles-grid">
-    <a class="article" href="blog-aides-financieres-demenagement.html">
+    <a class="article reveal reveal-delay-1" href="blog-aides-financieres-demenagement.html">
       <div class="article-band b-sage"></div>
       <div class="article-body">
-        <div class="article-tag">Aides · 6 min</div>
+        <div class="article-tag">Aides · 6 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Aides financières au déménagement : lesquelles sont faites pour vous ?</div>
         <div class="article-desc">CAF, Action Logement, Pôle Emploi, collectivités locales — le tour d'horizon des dispositifs disponibles.</div>
         <div class="article-footer">
@@ -291,10 +304,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-resilier-son-bail.html">
+    <a class="article reveal reveal-delay-2" href="blog-resilier-son-bail.html">
       <div class="article-band b-terracotta"></div>
       <div class="article-body">
-        <div class="article-tag">Administratif · 5 min</div>
+        <div class="article-tag">Administratif · 5 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Résilier son bail : préavis, lettre type et démarches</div>
         <div class="article-desc">Combien de temps de préavis, comment envoyer votre congé, et ce qu'il faut vérifier avant de partir.</div>
         <div class="article-footer">
@@ -303,10 +316,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-changement-adresse-organismes.html">
+    <a class="article reveal reveal-delay-3" href="blog-changement-adresse-organismes.html">
       <div class="article-band b-gold"></div>
       <div class="article-body">
-        <div class="article-tag">Administratif · 5 min</div>
+        <div class="article-tag">Administratif · 5 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Changement d'adresse : la liste complète des organismes à prévenir</div>
         <div class="article-desc">Banque, impôts, employeur, mutuelle, énergie — la checklist exhaustive pour ne rien oublier.</div>
         <div class="article-footer">
@@ -315,10 +328,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-calculer-volume-demenagement.html">
+    <a class="article reveal" href="blog-calculer-volume-demenagement.html">
       <div class="article-band b-espresso"></div>
       <div class="article-body">
-        <div class="article-tag">Logistique · 4 min</div>
+        <div class="article-tag">Logistique · 4 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Comment calculer le volume de son déménagement (en m³) ?</div>
         <div class="article-desc">La méthode simple pour estimer le volume de vos affaires et choisir le bon camion.</div>
         <div class="article-footer">
@@ -333,10 +346,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <!-- ARTICLES 13-14 -->
 <div class="last-wrap">
   <div class="last-grid">
-    <a class="article" href="blog-emenager-a-deux.html">
+    <a class="article reveal reveal-delay-1" href="blog-emenager-a-deux.html">
       <div class="article-band b-sage"></div>
       <div class="article-body">
-        <div class="article-tag">Couple · 5 min</div>
+        <div class="article-tag">Couple · 5 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Emménager à deux : bien s'organiser sans (trop) se disputer</div>
         <div class="article-desc">Fusionner deux vies, deux styles et deux façons de ranger sous un même toit.</div>
         <div class="article-footer">
@@ -345,10 +358,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a class="article" href="blog-comparer-devis-demenagement.html">
+    <a class="article reveal reveal-delay-2" href="blog-comparer-devis-demenagement.html">
       <div class="article-band b-terracotta"></div>
       <div class="article-body">
-        <div class="article-tag">Devis · 5 min</div>
+        <div class="article-tag">Devis · 5 min <span class="new-badge">Nouveau</span></div>
         <div class="article-title">Devis déménagement : comment bien comparer et éviter les arnaques</div>
         <div class="article-desc">Ce qu'un devis sérieux doit contenir et les signaux d'alerte à repérer.</div>
         <div class="article-footer">
@@ -357,7 +370,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         </div>
       </div>
     </a>
-    <a href="apercu.html" class="article" style="background:var(--espresso);border-color:var(--espresso);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px;text-align:center;min-height:200px">
+    <a href="apercu.html" class="article reveal reveal-delay-3" style="background:var(--espresso);border-color:var(--espresso);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:32px;text-align:center;min-height:200px">
       <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--cream);margin-bottom:8px">Envie de voir Le Move en action ?</div>
       <div style="font-size:11px;font-weight:200;color:rgba(247,243,238,0.45);margin-bottom:20px;line-height:1.6">Essayez la démo interactive, sans inscription.</div>
       <span style="padding:10px 20px;background:var(--terracotta);color:white;border-radius:8px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase">Voir la démo →</span>
@@ -405,6 +418,13 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 function acceptCookies(){localStorage.setItem('lm_cookie_consent','accepted');document.getElementById('cookieBanner').style.display='none';}
 function refuseCookies(){localStorage.setItem('lm_cookie_consent','refused');document.getElementById('cookieBanner').style.display='none';}
 
+// Scroll reveal
+var revealObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el){ revealObserver.observe(el); });
 </script>
 </body>
 </html>

@@ -51,6 +51,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .breadcrumb a:hover{color:var(--terracotta)}
 .article-header{max-width:720px;margin:0 auto;padding:24px 24px 32px;border-bottom:1px solid var(--linen)}
 .article-header-tag{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--terracotta);margin-bottom:14px}
+.new-badge{display:inline-block;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:white;background:var(--terracotta);padding:3px 9px;border-radius:20px;margin-left:8px;vertical-align:middle}
 .article-header-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:42px;font-weight:300;color:var(--espresso);line-height:1.2;margin-bottom:12px}
 .article-header-meta{font-size:11px;color:var(--sand)}
 .article-main{max-width:720px;margin:0 auto;padding:40px 24px;font-size:14px;font-weight:300;color:#4A3728;line-height:2}
@@ -78,6 +79,11 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .cta-sub{font-size:12px;font-weight:200;color:rgba(247,243,238,0.4)}
 .cta-btn{padding:14px 28px;background:var(--terracotta);color:white;border-radius:8px;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;white-space:nowrap;transition:opacity 0.2s}
 .cta-btn:hover{opacity:0.85}
+.read-progress{position:fixed;top:0;left:0;height:3px;background:var(--terracotta);z-index:200;width:0%;transition:width 0.1s linear}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.08s}
+.reveal-delay-2{transition-delay:0.16s}
 .footer-legal{background:var(--espresso);padding:24px 64px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .footer-copy{font-size:10px;color:rgba(247,243,238,0.3)}
 .legal-links{display:flex;gap:20px;flex-wrap:wrap}
@@ -95,6 +101,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <!-- GTM noscript -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5BVKVHC" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
+<div class="read-progress" id="readProgress"></div>
+
 <nav class="nav">
   <a href="index.html" class="nav-logo">Le Move</a>
   <div class="nav-links">
@@ -109,9 +117,9 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
 <article>
   <header class="article-header">
-    <div class="article-header-tag">Devis · Comparatif</div>
+    <div class="article-header-tag">Devis · Comparatif <span class="new-badge">Nouveau</span></div>
     <h1 class="article-header-title">Devis déménagement : comment bien comparer et éviter les arnaques</h1>
-    <div class="article-header-meta">5 min de lecture · Mis à jour en avril 2026</div>
+    <div class="article-header-meta">5 min de lecture · Mis à jour en septembre 2026</div>
   </header>
 
   <div class="article-main">
@@ -140,7 +148,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 <h2>Vérifiez les avis avant de signer</h2>
 <p>Consultez les avis en ligne de l'entreprise, en vous méfiant des profils avec uniquement des avis 5 étoiles récents et génériques (signe potentiel d'avis achetés). Un mélange d'avis positifs et de quelques critiques détaillées est souvent plus rassurant qu'une note parfaite suspecte.</p>
 
-    <div class="article-cta-block">
+    <div class="article-cta-block reveal">
       <div class="article-cta-text">Le Move centralise tout ça en un seul espace.<br>Budget, checklist, moodboard, livraisons — dès 39€.</div>
       <a href="index.html#pricing" class="article-cta-btn">Essayer Le Move →</a>
     </div>
@@ -155,9 +163,9 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="related-wrap">
     <div class="related-title">À lire aussi</div>
     <div class="related-list">
-      <a class="related-link" href="blog-checklist-demenagement.html">Checklist déménagement : tout ce qu&#x27;il ne faut pas oublier</a>
-      <a class="related-link" href="blog-budget-premier-appartement.html">Budget premier appartement : combien prévoir en 2026 ?</a>
-      <a class="related-link" href="blog-organiser-son-demenagement.html">Comment organiser son emménagement sereinement</a>
+      <a class="related-link reveal " href="blog-checklist-demenagement.html">Checklist déménagement : tout ce qu&#x27;il ne faut pas oublier</a>
+      <a class="related-link reveal reveal-delay-1" href="blog-budget-premier-appartement.html">Budget premier appartement : combien prévoir en 2026 ?</a>
+      <a class="related-link reveal reveal-delay-2" href="blog-organiser-son-demenagement.html">Comment organiser son emménagement sereinement</a>
     </div>
   </div>
 </article>
@@ -199,6 +207,27 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 })();
 function acceptCookies(){localStorage.setItem('lm_cookie_consent','accepted');document.getElementById('cookieBanner').style.display='none';}
 function refuseCookies(){localStorage.setItem('lm_cookie_consent','refused');document.getElementById('cookieBanner').style.display='none';}
+
+// Reading progress
+(function(){
+  var bar = document.getElementById('readProgress');
+  function update(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (scrolled / max * 100) : 0) + '%';
+  }
+  document.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+// Scroll reveal
+var revealObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el){ revealObserver.observe(el); });
 </script>
 </body>
 </html>
