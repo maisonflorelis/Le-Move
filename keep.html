@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Move Keep</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+button,input,textarea,select{font-family:inherit}
+:root{
+  --cream:#F0EBE3; --linen:#F7F2EC; --card:#FAF7F3; --warm:#E8E0D5; --sand:#C9BAA8;
+  --espresso:#2C1F14; --warm-black:#1A1410; --terra:#C4714A; --gold:#B89A6A; --sage:#7A8C7E; --text-light:#8A7968;
+}
+body{background:var(--espresso);color:var(--linen);font-family:'DM Sans',sans-serif;min-height:100vh;padding-block:56px;padding-inline:max(16px,calc((100vw - 900px)/2))}
+.page{max-width:900px;margin:0 auto;opacity:0;transition:opacity .5s ease}
+.page.ready{opacity:1}
+
+.meta-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:36px;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(247,242,236,0.4)}
+.meta-strip a{color:inherit;text-decoration:none}
+.meta-strip a:hover{color:var(--linen)}
+
+.wordmark{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:24px;color:var(--linen);text-align:center;margin-bottom:32px}
+.wordmark-keep{font-family:'DM Sans',sans-serif;font-weight:700;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--terra);background:rgba(196,113,74,0.16);border:1px solid rgba(196,113,74,0.32);padding:4px 10px 3px;border-radius:20px;vertical-align:middle;margin-left:8px;position:relative;top:-2px}
+
+.tabs{display:flex;gap:4px;padding-left:24px;flex-wrap:wrap}
+.tab{padding:12px 20px 15px;border-radius:14px 14px 0 0;background:rgba(247,242,236,0.08);border:1px solid rgba(247,242,236,0.14);border-bottom:none;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;color:rgba(247,242,236,0.5);cursor:pointer;transition:color .2s,background .2s}
+.tab:hover{color:rgba(247,242,236,0.85)}
+.tab.active{background:var(--card);border-color:var(--card);color:var(--espresso);cursor:default}
+
+.card{background:var(--card);color:var(--espresso);border-radius:0 18px 18px 18px;padding:44px 40px 38px;box-shadow:0 40px 80px -20px rgba(10,6,3,0.5)}
+.panel{transition:opacity .2s ease}
+.panel[hidden]{display:none}
+.card-eyebrow{font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage);margin-bottom:16px}
+.card-headline{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:38px;line-height:1.1;margin:0 0 8px}
+.card-sub{font-size:13px;color:var(--text-light);margin:0 0 26px}
+
+.hero-stat{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:22px 24px;background:linear-gradient(135deg,rgba(196,113,74,0.1),rgba(184,154,106,0.08));border:1px solid rgba(196,113,74,0.2);border-radius:14px;margin-bottom:6px;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.hero-stat-label{display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);margin-bottom:6px}
+.hero-stat-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:42px;color:var(--espresso)}
+.hero-stat-note{font-size:11px;color:var(--text-light);white-space:nowrap}
+
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:15px 4px;border-bottom:1px solid var(--warm);width:100%;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.stat-row:hover{background:rgba(196,113,74,0.04)}
+.stat-label{font-size:13px}
+.stat-right{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-light)}
+.stat-value{color:var(--espresso);font-weight:600}
+
+.cat-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--warm);font-size:13px}
+.cat-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.budget-hero{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.budget-hero-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px}
+.budget-hero-of{font-size:12px;color:var(--text-light)}
+.budget-bar-track{height:6px;background:var(--warm);border-radius:4px;margin-bottom:24px;overflow:hidden}
+.budget-bar-fill{height:100%;background:var(--terra)}
+
+.palette-row{display:flex;gap:10px;margin-bottom:22px}
+.swatch{width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,0.08)}
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gallery-card{border-radius:12px;overflow:hidden;background:var(--warm)}
+.gallery-img{aspect-ratio:1;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:22px}
+.gallery-label{padding:8px 9px 10px;font-size:9.5px;color:var(--text-light);line-height:1.4;border-top:1px solid var(--warm)}
+
+.doc-list{border-top:1px solid var(--warm)}
+.doc-row{display:flex;align-items:center;gap:14px;padding:15px 2px;border-bottom:1px solid var(--warm)}
+.doc-icon{width:32px;height:32px;border-radius:9px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:var(--text-light)}
+.doc-name{font-size:13px;flex:1}
+.contact-tag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;background:var(--warm);color:var(--text-light);font-size:9px;letter-spacing:0.05em;text-transform:uppercase;vertical-align:middle}
+.doc-date{font-size:11px;color:var(--text-light);white-space:nowrap}
+.doc-link{color:var(--terra);font-size:12px;text-decoration:none;margin-left:6px}
+
+.empty{padding:30px 0;text-align:center;color:var(--text-light);font-size:13px}
+
+.card-footer{margin-top:26px;padding-top:22px;border-top:1px solid var(--warm);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.card-footer-note{font-size:12px;color:var(--text-light)}
+.cta-btn{padding:11px 22px;background:var(--espresso);color:var(--linen);border:none;border-radius:8px;font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block}
+.cta-btn.outline{background:none;border:1px solid var(--espresso);color:var(--espresso)}
+.footer-ctas{display:flex;gap:10px;flex-wrap:wrap}
+
+.gate{max-width:440px;margin:80px auto;text-align:center;background:var(--card);color:var(--espresso);border-radius:20px;padding:44px 32px;box-shadow:0 40px 80px -20px rgba(0,0,0,0.5)}
+.gate-eyebrow{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage);margin-bottom:14px}
+.gate-headline{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:30px;margin-bottom:12px}
+.gate-sub{font-size:13px;color:var(--text-light);margin-bottom:26px;line-height:1.6}
+
+@media (max-width:640px){
+  .card{padding:32px 22px 26px;border-radius:0 14px 14px 14px}
+  .card-headline{font-size:30px}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .tabs{padding-left:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="page" id="page">
+  <div class="meta-strip">
+    <a href="app.html">← Mon espace</a>
+    <span id="statusLabel"></span>
+  </div>
+  <div class="wordmark">Le Move<span class="wordmark-keep">Keep</span></div>
+  <div id="content"></div>
+</div>
+
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }) : ''; }
+
+async function startCheckout(type, btn){
+  if (btn) { btn.disabled = true; btn.dataset.label = btn.textContent; btn.textContent = 'Redirection…'; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ type }),
+    });
+    const out = await res.json();
+    if (out.url) { window.location.href = out.url; return; }
+    throw new Error(out.error || 'Erreur inconnue');
+  } catch (e) {
+    alert("Une erreur est survenue. Réessayez ou contactez bonjour@lemove.fr.");
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label; }
+  }
+}
+window.startCheckout = startCheckout;
+
+function renderGate(status){
+  const content = document.getElementById('content');
+  document.getElementById('statusLabel').textContent = status === 'keep' ? 'Lecture seule' : 'Accès suspendu';
+  if (status === 'keep_expired') {
+    content.innerHTML = `
+      <div class="gate">
+        <div class="gate-eyebrow">Le Move Keep</div>
+        <div class="gate-headline">Votre Move est en pause.</div>
+        <p class="gate-sub">La période de grâce est passée sans renouvellement ni abonnement Keep. Vos données sont conservées — choisissez comment y revenir.</p>
+        <button class="cta-btn" style="width:100%;margin-bottom:10px" onclick="startCheckout('reactivation', this)">Réactiver mon Move (accès complet)</button>
+        <button class="cta-btn outline" style="width:100%" onclick="startCheckout('keep_subscribe', this)">Reprendre avec Le Move Keep, 2€/mois</button>
+      </div>`;
+  }
+}
+
+async function loadKeepData(userId){
+  const [profileQ, catsQ, achatsQ, tachesQ, contactsQ, mediasQ, paletteQ, itemsQ] = await Promise.all([
+    sb.from('Profiles').select('prenom,ville,type_logement,date_emmenagement,budget_total,plan_expires_at,Plan').eq('id', userId).single(),
+    sb.from('budget_categories').select('id,nom,budget_max,couleur').eq('user_id', userId),
+    sb.from('budget_achats').select('categorie_id,prix,statut').eq('user_id', userId),
+    sb.from('avancement_taches').select('statut').eq('user_id', userId),
+    sb.from('mes_contacts').select('nom,categorie,telephone,email,entreprise').eq('user_id', userId),
+    sb.from('medias').select('nom,type,url,created_at').eq('user_id', userId).order('created_at', { ascending: false }),
+    sb.from('moodboard_palette').select('hex,nom').eq('user_id', userId).order('ordre'),
+    sb.from('moodboard_items').select('url,note,piece').eq('user_id', userId).limit(8),
+  ]);
+
+  const profile = profileQ.data || {};
+  const cats = catsQ.data || [];
+  const achats = achatsQ.data || [];
+  const taches = tachesQ.data || [];
+  const contacts = contactsQ.data || [];
+  const medias = mediasQ.data || [];
+  const palette = paletteQ.data || [];
+  const items = itemsQ.data || [];
+
+  const totalSpent = achats.reduce((s, a) => s + (Number(a.prix) || 0), 0);
+  const budgetTotal = Number(profile.budget_total) || 0;
+  const pct = budgetTotal > 0 ? Math.round((totalSpent / budgetTotal) * 100) : null;
+  const doneCount = taches.filter(t => t.statut === 'done').length;
+
+  const COLOR_HEX = { terracotta:'#C4714A', sage:'#7A8C7E', gold:'#B89A6A', espresso:'#2C1F14' };
+  const catSpend = {};
+  achats.forEach(a => { if (a.categorie_id) catSpend[a.categorie_id] = (catSpend[a.categorie_id]||0) + (Number(a.prix)||0); });
+
+  return { profile, cats, catSpend, totalSpent, budgetTotal, pct, taches, doneCount, contacts, medias, palette, items, COLOR_HEX };
+}
+
+function renderKeep(status, data){
+  const { profile, cats, catSpend, totalSpent, budgetTotal, pct, taches, doneCount, contacts, medias, palette, items, COLOR_HEX } = data;
+  const locationLine = [profile.type_logement, profile.ville].filter(Boolean).join(', ') || 'Votre projet';
+  const expiresLabel = profile.plan_expires_at ? fmtDate(profile.plan_expires_at) : '';
+
+  const statRows = `
+    <button class="stat-row" data-target="panel-documents">
+      <span class="stat-label">Tâches complétées</span>
+      <span class="stat-right"><span>${taches.length ? doneCount + '/' + taches.length : '—'}</span><span>›</span></span>
+    </button>
+    <button class="stat-row" data-target="panel-documents">
+      <span class="stat-label">Documents conservés</span>
+      <span class="stat-right"><span class="stat-value">${medias.length}</span><span>›</span></span>
+    </button>
+    <button class="stat-row" data-target="panel-souvenirs">
+      <span class="stat-label">Souvenirs</span>
+      <span class="stat-right"><span class="stat-value">${items.length}</span><span>›</span></span>
+    </button>
+    <button class="stat-row" data-target="panel-contacts">
+      <span class="stat-label">Prestataires suivis</span>
+      <span class="stat-right"><span class="stat-value">${contacts.length}</span><span>›</span></span>
+    </button>`;
+
+  const catRowsHtml = cats.length ? cats.map((c,i) => {
+    const spent = catSpend[c.id] || 0;
+    const color = COLOR_HEX[c.couleur] || '#9C8CA8';
+    return `<div class="cat-row"><span><span class="cat-dot" style="background:${color}"></span>${esc(c.nom)}</span><span>${spent.toLocaleString('fr-FR')} €</span></div>`;
+  }).join('') : '<div class="empty">Aucune catégorie de budget enregistrée.</div>';
+
+  const paletteHtml = palette.length ? `<div class="palette-row">${palette.map(p => `<div class="swatch" style="background:${esc(p.hex)}" title="${esc(p.nom||'')}"></div>`).join('')}</div>` : '';
+  const galleryHtml = items.length ? `<div class="gallery-grid">${items.map(it => `
+    <div class="gallery-card">
+      <div class="gallery-img" style="background-image:url('${esc(it.url)}')"></div>
+      <div class="gallery-label">${esc(it.note || it.piece || '')}</div>
+    </div>`).join('')}</div>` : '<div class="empty">Aucun élément de moodboard enregistré.</div>';
+
+  const contactsHtml = contacts.length ? `<div class="doc-list">${contacts.map(c => `
+    <div class="doc-row">
+      <span class="doc-icon">👤</span>
+      <span class="doc-name">${esc(c.nom)}${c.categorie ? `<span class="contact-tag">${esc(c.categorie)}</span>` : ''}</span>
+      <span class="doc-date">${esc(c.telephone || c.email || '')}</span>
+    </div>`).join('')}</div>` : '<div class="empty">Aucun contact enregistré.</div>';
+
+  const mediasHtml = medias.length ? `<div class="doc-list">${medias.map(m => `
+    <div class="doc-row">
+      <span class="doc-icon">${m.type === 'photo' ? '📷' : '📄'}</span>
+      <span class="doc-name">${esc(m.nom || 'Sans titre')}</span>
+      <span class="doc-date">${fmtDate(m.created_at)}</span>
+      ${m.url ? `<a class="doc-link" href="${esc(m.url)}" target="_blank" rel="noopener">Voir</a>` : ''}
+    </div>`).join('')}</div>` : '<div class="empty">Aucun document enregistré.</div>';
+
+  const footerCtas = status === 'keep'
+    ? `<button class="cta-btn" onclick="startCheckout('reactivation', this)">Réactiver ce Move →</button>`
+    : '';
+
+  document.getElementById('content').innerHTML = `
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-target="panel-recap">Récap</button>
+      <button class="tab" data-target="panel-budget">Budget</button>
+      <button class="tab" data-target="panel-souvenirs">Souvenirs</button>
+      <button class="tab" data-target="panel-contacts">Contacts</button>
+      <button class="tab" data-target="panel-documents">Documents</button>
+    </nav>
+    <div class="card">
+      <div id="panel-recap" class="panel">
+        <div class="card-eyebrow">${expiresLabel ? 'Accès complet jusqu’au ' + expiresLabel + ' — depuis en lecture seule' : 'Votre Move'}</div>
+        <h1 class="card-headline">Votre Move, résumé.</h1>
+        <p class="card-sub">${esc(locationLine)}</p>
+        ${pct !== null ? `
+        <button class="hero-stat" data-target="panel-budget">
+          <span><span class="hero-stat-label">Budget respecté</span><span class="hero-stat-num">${pct} %</span></span>
+          <span class="hero-stat-note">${totalSpent.toLocaleString('fr-FR')} € sur ${budgetTotal.toLocaleString('fr-FR')} €</span>
+        </button>` : ''}
+        <div class="stat-list">${statRows}</div>
+      </div>
+      <div id="panel-budget" class="panel" hidden>
+        <div class="card-eyebrow">Bilan</div>
+        <h1 class="card-headline">Votre budget, à l'arrivée.</h1>
+        <p class="card-sub">${esc(locationLine)}</p>
+        ${pct !== null ? `
+        <div class="budget-hero"><span class="budget-hero-num">${totalSpent.toLocaleString('fr-FR')} €</span><span class="budget-hero-of">dépensés sur ${budgetTotal.toLocaleString('fr-FR')} € prévus</span></div>
+        <div class="budget-bar-track"><div class="budget-bar-fill" style="width:${Math.min(pct,100)}%"></div></div>` : ''}
+        ${catRowsHtml}
+      </div>
+      <div id="panel-souvenirs" class="panel" hidden>
+        <div class="card-eyebrow">Votre style</div>
+        <h1 class="card-headline">Ce que vous avez choisi.</h1>
+        <p class="card-sub">Palette et inspirations sauvegardées</p>
+        ${paletteHtml}
+        ${galleryHtml}
+      </div>
+      <div id="panel-contacts" class="panel" hidden>
+        <div class="card-eyebrow">${contacts.length} prestataire${contacts.length>1?'s':''}</div>
+        <h1 class="card-headline">Ceux qui ont fait le travail.</h1>
+        <p class="card-sub">Coordonnées gardées pour votre prochain projet</p>
+        ${contactsHtml}
+      </div>
+      <div id="panel-documents" class="panel" hidden>
+        <div class="card-eyebrow">${medias.length} fichier${medias.length>1?'s':''}</div>
+        <h1 class="card-headline">Tout ce qu'il faut garder.</h1>
+        <p class="card-sub">Consultables à tout moment</p>
+        ${mediasHtml}
+      </div>
+      <div class="card-footer">
+        <p class="card-footer-note"><strong>Le Move Keep</strong> — votre projet reste consultable, à votre rythme. 2€/mois.</p>
+        <div class="footer-ctas">${footerCtas}</div>
+      </div>
+    </div>`;
+
+  document.querySelectorAll('[data-target]').forEach(el => {
+    el.addEventListener('click', () => activateTab(el.dataset.target));
+  });
+}
+
+function activateTab(targetId){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.target === targetId));
+  document.querySelectorAll('.panel').forEach(p => p.hidden = (p.id !== targetId));
+}
+
+(async function init(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+
+  const { data: prof } = await sb.from('Profiles').select('plan_expires_at,keep_active').eq('id', session.user.id).single();
+
+  let status = 'active';
+  if (prof?.plan_expires_at) {
+    const expires = new Date(prof.plan_expires_at);
+    const graceEnd = new Date(expires.getTime() + 30*24*60*60*1000);
+    const now = new Date();
+    if (now < expires) status = 'active';
+    else if (now < graceEnd) status = 'grace';
+    else if (prof.keep_active) status = 'keep';
+    else status = 'keep_expired';
+  }
+
+  if (status === 'active' || status === 'grace') { window.location.href = 'app.html'; return; }
+
+  document.getElementById('statusLabel').textContent = status === 'keep' ? 'Lecture seule' : 'Accès suspendu';
+
+  if (status === 'keep_expired') {
+    renderGate(status);
+  } else {
+    const data = await loadKeepData(session.user.id);
+    renderKeep(status, data);
+  }
+
+  document.getElementById('page').classList.add('ready');
+})();
+</script>
+</body>
+</html>

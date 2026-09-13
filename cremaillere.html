@@ -400,6 +400,32 @@ window._sb=sb;
   }
 })();
 
+// ── KEEP / CYCLE DE VIE DU PLAN ──
+(async function() {
+  var { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  if (session.user.email === 'sheryl.mercier@gmail.com') return;
+  var { data: prof } = await sb.from('Profiles').select('plan_expires_at,keep_active').eq('id', session.user.id).single();
+  if (!prof || !prof.plan_expires_at) return; // hors cycle : accès à vie historique ou partenaire
+  var expires = new Date(prof.plan_expires_at);
+  var graceEnd = new Date(expires.getTime() + 30*24*60*60*1000);
+  var now = new Date();
+  if (now < expires) return; // accès actif
+  if (now < graceEnd) {
+    var days = Math.max(1, Math.ceil((graceEnd - now) / 86400000));
+    var bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:#C4714A;color:#fff;text-align:center;padding:10px 16px;font:600 12px/1.5 "DM Sans",sans-serif;letter-spacing:.01em;box-shadow:0 2px 12px rgba(0,0,0,0.25)';
+    bar.innerHTML = 'Votre accès Le Move se termine dans ' + days + ' jour' + (days > 1 ? 's' : '') + '. ' +
+      '<a href="renouveler.html" style="color:#fff;text-decoration:underline;font-weight:700">Renouveler (-20%)</a> ou ' +
+      '<a href="keep.html" style="color:#fff;text-decoration:underline;font-weight:700">passer sur Le Move Keep</a>.';
+    document.documentElement.prepend(bar);
+    document.body.style.marginTop = '42px';
+    return;
+  }
+  // Grâce dépassée : plus jamais d'accès complet ici, tout se passe sur keep.html
+  window.location.href = 'keep.html';
+})();
+
 
 // ── ACCESS GUARD ──
 (async function checkAccess() {

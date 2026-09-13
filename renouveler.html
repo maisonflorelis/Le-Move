@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renouveler mon Move — Le Move</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+button,input,textarea,select{font-family:inherit}
+:root{
+  --cream:#F0EBE3; --linen:#F7F2EC; --card:#FAF7F3; --warm:#E8E0D5; --sand:#C9BAA8;
+  --espresso:#2C1F14; --warm-black:#1A1410; --terra:#C4714A; --gold:#B89A6A; --sage:#7A8C7E; --text-light:#8A7968;
+}
+body{background:var(--espresso);color:var(--linen);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+.wrap{max-width:440px;width:100%;text-align:center}
+.wordmark{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--linen);margin-bottom:28px}
+.card{background:var(--card);color:var(--espresso);border-radius:20px;padding:40px 32px;box-shadow:0 40px 80px -20px rgba(0,0,0,0.5)}
+.eyebrow{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage);margin-bottom:14px}
+.headline{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:32px;line-height:1.15;margin-bottom:10px}
+.sub{font-size:13px;color:var(--text-light);margin-bottom:28px;line-height:1.6}
+.price-row{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:6px}
+.price-old{font-size:16px;color:var(--sand);text-decoration:line-through}
+.price-new{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:44px;color:var(--espresso)}
+.price-note{font-size:11px;color:var(--terra);letter-spacing:0.04em;margin-bottom:28px}
+.cta{display:block;width:100%;padding:15px;background:var(--espresso);color:var(--linen);border:none;border-radius:10px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-bottom:14px}
+.cta:disabled{opacity:0.5;cursor:default}
+.alt-link{font-size:12px;color:var(--text-light);text-decoration:none}
+.alt-link:hover{color:var(--terra)}
+.msg{font-size:13px;color:var(--text-light);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wordmark">Le Move</div>
+  <div class="card" id="card">
+    <div class="eyebrow">Renouvellement</div>
+    <div class="headline">Encore un peu de temps ?</div>
+    <p class="sub">Six mois, c'est le temps qu'il faut pour vraiment prendre ses marques dans un nouveau logement. Prolongez votre accès complet pour continuer là où vous en étiez.</p>
+    <div id="priceBlock" style="display:none">
+      <div class="price-row"><span class="price-old" id="oldPrice"></span><span class="price-new" id="newPrice"></span></div>
+      <div class="price-note">-20% · réservé au renouvellement</div>
+    </div>
+    <button class="cta" id="renewBtn" disabled>Chargement…</button>
+    <a href="keep.html" class="alt-link">Ou passer sur Le Move Keep (2€/mois) →</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://xnmlpxteslwmimmdqjye.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_cCIu5hEEt-zRYpz6qJV2ow_jmDbfJoM';
+const{createClient}=supabase;
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+const PLAN_PRICE = { essentiel: 39, complet: 89, premium: 150 };
+const PLAN_LABEL = { essentiel: 'Essentiel', complet: 'Complet', premium: 'Premium' };
+
+(async function(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+
+  const { data: prof } = await sb.from('Profiles').select('Plan,plan_expires_at,keep_active').eq('id', session.user.id).single();
+  const plan = (prof?.Plan || '').toLowerCase();
+
+  if (prof?.plan_expires_at) {
+    const expires = new Date(prof.plan_expires_at);
+    const graceEnd = new Date(expires.getTime() + 30*24*60*60*1000);
+    const now = new Date();
+    if (now >= graceEnd) { window.location.href = 'keep.html'; return; }
+  }
+
+  const basePrice = PLAN_PRICE[plan];
+  if (!basePrice) {
+    document.getElementById('renewBtn').style.display = 'none';
+    document.querySelector('.sub').textContent = "Aucun plan renouvelable n'est associé à ce compte.";
+    return;
+  }
+
+  document.getElementById('oldPrice').textContent = basePrice + '€';
+  document.getElementById('newPrice').textContent = Math.round(basePrice * 0.8) + '€';
+  document.getElementById('priceBlock').style.display = 'block';
+
+  const btn = document.getElementById('renewBtn');
+  btn.disabled = false;
+  btn.textContent = 'Renouveler pour 6 mois de plus';
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Redirection…';
+    try {
+      const { data: { session: s } } = await sb.auth.getSession();
+      const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.access_token },
+        body: JSON.stringify({ type: 'renewal' }),
+      });
+      const out = await res.json();
+      if (out.url) { window.location.href = out.url; }
+      else { throw new Error(out.error || 'Erreur inconnue'); }
+    } catch (e) {
+      document.getElementById('card').insertAdjacentHTML('beforeend', '<div class="msg">Une erreur est survenue. Réessayez ou contactez bonjour@lemove.fr.</div>');
+      btn.disabled = false;
+      btn.textContent = 'Renouveler pour 6 mois de plus';
+    }
+  });
+})();
+</script>
+</body>
+</html>

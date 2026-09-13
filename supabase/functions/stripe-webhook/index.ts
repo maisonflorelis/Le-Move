@@ -49,6 +49,11 @@ const ORIGINAL_AMOUNT_TO_PLAN: Record<number, string> = {
   34900: "partenaire",
 };
 
+// Plans subject to the 6-month access cycle (grâce → Keep). "partenaire" runs
+// on its own annual subscription lifecycle and is never in this cycle.
+const CYCLE_PLANS = ["essentiel", "complet", "premium"];
+const PLAN_ACCESS_MONTHS = 6;
+
 const PLAN_DETAILS: Record<string, { label: string; price: string; color: string; features: string[] }> = {
   essentiel: {
     label: "Essentiel", price: "39€", color: "#C9BAA8",
@@ -396,6 +401,72 @@ async function updateUserPlan(email: string, plan: string) {
   });
 
   console.log(`✓ Done: ${email} → ${plan}`);
+  return user;
+}
+
+// Renews or reactivates an EXISTING account for another 6-month cycle, at a
+// discounted price already applied Stripe-side. Unlike updateUserPlan, this
+// never touches the password or sends the "welcome" onboarding email — the
+// account and its data are untouched, only the access window moves forward.
+async function renewUserPlan(email: string, plan: string, kind: "renewal" | "reactivation") {
+  console.log(`Renewing plan (${kind}): ${email} → ${plan}`);
+
+  const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw error;
+  const user = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+  if (!user) {
+    console.warn(`renewUserPlan: no existing account for ${email} — ignoring`);
+    return;
+  }
+
+  const expires = new Date();
+  expires.setMonth(expires.getMonth() + PLAN_ACCESS_MONTHS);
+
+  const { data: current } = await supabase.from("Profiles")
+    .select("renewal_count").eq("id", user.id).single();
+
+  const { error: updateError } = await supabase.from("Profiles").update({
+    Plan: plan,
+    plan_expires_at: expires.toISOString(),
+    plan_status: "active",
+    renewal_count: (current?.renewal_count || 0) + 1,
+  }).eq("id", user.id);
+  if (updateError) console.error("Renew update error:", updateError.message);
+  else console.log(`✓ ${kind} applied: ${email} → ${plan}, expires ${expires.toISOString()}`);
+
+  await supabase.from("Users").update({ Plan: plan }).ilike("Email", email);
+
+  await supabase.from("notifications").insert({
+    user_id: user.id,
+    type: "module",
+    titre: kind === "renewal" ? "Votre Move est renouvelé ✦" : "Bon retour sur Le Move ✦",
+    message: `Votre accès Plan ${plan} est reconduit pour 6 mois.`,
+    lien: "app.html",
+    lue: false,
+  });
+}
+
+// A Le Move Keep subscription (2€/mois) went active, was updated, or ended.
+// Tracked independently of Profiles.Plan — Keep sits alongside the cycle
+// plans, it never replaces the client's plan value.
+async function setKeepSubscriptionStatus(email: string, active: boolean, subscriptionId?: string) {
+  const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw error;
+  const user = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+  if (!user) { console.warn(`setKeepSubscriptionStatus: no account for ${email}`); return; }
+
+  const { data: current } = await supabase.from("Profiles")
+    .select("keep_started_at").eq("id", user.id).single();
+
+  const update: Record<string, unknown> = {
+    keep_active: active,
+    keep_stripe_subscription_id: active ? (subscriptionId || null) : null,
+  };
+  if (active && !current?.keep_started_at) update.keep_started_at = new Date().toISOString();
+
+  const { error: updateError } = await supabase.from("Profiles").update(update).eq("id", user.id);
+  if (updateError) console.error("Keep status update error:", updateError.message);
+  else console.log(`✓ Keep subscription ${active ? "activated" : "deactivated"} for ${email}`);
 }
 
 serve(async (req) => {
@@ -428,7 +499,26 @@ serve(async (req) => {
         const email = (obj.customer_details as Record<string, string>)?.email || obj.customer_email as string;
         if (!email) { console.warn("No email in session"); break; }
 
-        // Expand session to get line items
+        const sessionMetadata = obj.metadata as Record<string, string> | undefined;
+        const flowType = sessionMetadata?.type; // "renewal" | "reactivation" | "keep_subscribe" | undefined (= new purchase)
+
+        if (flowType === "keep_subscribe") {
+          // Subscription mode — the subscription itself is confirmed by the
+          // customer.subscription.created event below; nothing to do here
+          // beyond tracking the conversion.
+          await sendOpenAiAdsConversion(obj.id as string, obj.success_url as string | undefined);
+          break;
+        }
+
+        if (flowType === "renewal" || flowType === "reactivation") {
+          const plan = sessionMetadata?.plan;
+          if (!plan) { console.warn("Renewal/reactivation session missing plan metadata"); break; }
+          await renewUserPlan(email, plan, flowType);
+          await sendOpenAiAdsConversion(obj.id as string, obj.success_url as string | undefined);
+          break;
+        }
+
+        // Genuine new purchase — expand session to get line items
         const expanded = await stripeRequest(`/checkout/sessions/${obj.id}?expand[]=line_items`);
         const priceId = expanded.line_items?.data?.[0]?.price?.id;
 
@@ -436,7 +526,15 @@ serve(async (req) => {
         if (!plan) plan = getPlanFromSession(obj);
         if (!plan) { console.warn("Could not determine plan"); break; }
 
-        await updateUserPlan(email, plan);
+        const user = await updateUserPlan(email, plan);
+        // Only cycle plans (essentiel/complet/premium) start a 6-month access window.
+        if (user && CYCLE_PLANS.includes(plan)) {
+          const expires = new Date();
+          expires.setMonth(expires.getMonth() + PLAN_ACCESS_MONTHS);
+          await supabase.from("Profiles")
+            .update({ plan_expires_at: expires.toISOString(), plan_status: "active" })
+            .eq("id", user.id);
+        }
         await sendOpenAiAdsConversion(obj.id as string, obj.success_url as string | undefined);
         break;
       }
@@ -448,6 +546,12 @@ serve(async (req) => {
         const customer = await stripeRequest(`/customers/${customerId}`);
         const email = customer.email;
         if (!email) break;
+
+        const subMetadata = obj.metadata as Record<string, string> | undefined;
+        if (subMetadata?.type === "keep_subscribe") {
+          await setKeepSubscriptionStatus(email, status === "active" || status === "trialing", obj.id as string);
+          break;
+        }
 
         const priceId = (obj.items as Record<string, unknown[]>)?.data?.[0]?.price?.id as string;
         const plan = priceId ? PRICE_TO_PLAN[priceId] : null;
@@ -463,7 +567,14 @@ serve(async (req) => {
       case "customer.subscription.deleted": {
         const customerId = obj.customer as string;
         const customer = await stripeRequest(`/customers/${customerId}`);
-        if (customer.email) await updateUserPlan(customer.email, "essentiel");
+        if (!customer.email) break;
+
+        const subMetadata = obj.metadata as Record<string, string> | undefined;
+        if (subMetadata?.type === "keep_subscribe") {
+          await setKeepSubscriptionStatus(customer.email, false);
+        } else {
+          await updateUserPlan(customer.email, "essentiel");
+        }
         break;
       }
     }
