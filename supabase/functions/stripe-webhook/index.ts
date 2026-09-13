@@ -205,7 +205,7 @@ async function sendWelcomeEmail(email: string, plan: string, prenom?: string, te
         <div style="background:white;border-radius:12px;padding:24px;margin-bottom:24px;border:1px solid #E8E0D5">
           <div style="margin-bottom:16px">
             <span style="font-family:Georgia,serif;font-size:32px;color:#2C1F14">${details.price}</span>
-            <span style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${details.color};margin-left:8px">Plan ${details.label} · Accès à vie</span>
+            <span style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${details.color};margin-left:8px">Plan ${details.label} · ${CYCLE_PLANS.includes(plan) ? "6 mois d'accès complet" : "Abonnement annuel"}</span>
           </div>
           <ul style="margin:0;padding:0;list-style:none">${featuresList}</ul>
         </div>
